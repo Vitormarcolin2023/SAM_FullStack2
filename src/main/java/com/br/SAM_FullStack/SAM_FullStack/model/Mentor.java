@@ -1,13 +1,11 @@
 package com.br.SAM_FullStack.SAM_FullStack.model;
 
-import ch.qos.logback.core.status.Status;
-import jakarta.persistence.*;
+import jakarta.persistence.*; // Importa todas as anotações do JPA, incluindo @Id
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 
 @Data
 @AllArgsConstructor
@@ -16,7 +14,7 @@ import org.springframework.data.annotation.Id;
 @Table(name = "tb_mentor")
 public class Mentor {
 
-    @Id
+    @Id // Anotação correta do JPA
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
@@ -32,9 +30,6 @@ public class Mentor {
     @NotBlank(message = "O campo senha é obrigatório")
     private String senha;
 
-    /*@NotNull(message = "O tipo de usuário é obrigatório")
-    private TipoMentor tipoDeUsuario;
-     */
     @NotBlank(message = "O campo telefone é obrigatório")
     private String telefone;
 
@@ -44,11 +39,12 @@ public class Mentor {
     @Enumerated(EnumType.STRING)
     private StatusMentor tipoDeVinculo;
 
-
     @NotNull(message = "A área de atuação é obrigatória")
+    @Enumerated(EnumType.STRING) // Adicione esta anotação se AreaDeAtuacao for um enum
     private AreaDeAtuacao areaDeAtuacao;
 
-
-    //private Endereco endereco; criar classe endereço
+    // Relacionamento com Endereco
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "endereco_id", referencedColumnName = "id")
+    private Endereco endereco;
 }
-
