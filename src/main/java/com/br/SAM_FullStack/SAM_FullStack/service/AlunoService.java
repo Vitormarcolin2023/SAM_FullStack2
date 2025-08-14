@@ -56,5 +56,9 @@ public class AlunoService {
         }
     }
 
+    public void delete(Integer id){
+        Aluno aluno = findById(id);
+        alunoRepository.delete(aluno);
+    }
 }
 

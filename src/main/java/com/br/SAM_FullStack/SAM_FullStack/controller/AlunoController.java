@@ -22,9 +22,8 @@ public class AlunoController {
             List<Aluno> result = alunoService.findAll();
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception ex) {
-            // É uma boa prática logar o erro para depuração
-            ex.printStackTrace(); // Ou usar um logger: log.error("Erro ao buscar alunos", ex);
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR); // Status 500
+            ex.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -37,6 +36,17 @@ public class AlunoController {
             // Logar o erro
             ex.printStackTrace();
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR); // Status 500
+        }
+    }
+
+    //deletar
+    @DeleteMapping("/delet/{id}")
+    public ResponseEntity<?> delete (@PathVariable Integer id){
+        try{
+            alunoService.delete(id);
+            return ResponseEntity.noContent().build();
+        }catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
