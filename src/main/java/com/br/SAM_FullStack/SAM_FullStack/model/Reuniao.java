@@ -26,7 +26,7 @@ public class Reuniao {
     private FormatoReuniao formatoReuniao;
     private StatusReuniao statusReuniao;
 
-    private Mentor mentor;
+    //private Mentor mentor;
 
     private Grupo grupo;
 
