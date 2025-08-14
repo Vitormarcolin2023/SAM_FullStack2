@@ -1,6 +1,7 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
 import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
+import com.br.SAM_FullStack.SAM_FullStack.model.StatusMentor;
 import com.br.SAM_FullStack.SAM_FullStack.repository.MentorRepository;
 import org.springframework.stereotype.Service;
 
@@ -25,21 +26,12 @@ public class MentorService {
                 .orElseThrow(()-> new RuntimeException("Mentor não encontrado"));
     }
 
-    //salvar
- /* public Mentor save(Mentor mentor) {
-      // Regra de negócio: só pode finalizar o cadastro após aprovação da coordenação
-      // Status inicial até coordenação aprovar
-      mentor.setTipoDeVinculo(StatusMentor.PENDENTE);
-
-      // Simulação futura da verificação de aprovação
-       if (CoordenadorService.aprovado(mentor)) {
-           mentor.setTipoDeVinculo(StatusMentor.CONCLUIDO);
-       } else {
-           mentor.setTipoDeVinculo(StatusMentor.PENDENTE);
-      // }
-      return mentorRepository.save(mentor);
-  }
-  */
+    // Salvar
+    public Mentor save(Mentor mentor) {
+        // Status inicial até a coordenação aprovar
+        mentor.setStatusMentor(StatusMentor.PENDENTE);
+        return mentorRepository.save(mentor);
+    }
 
     //atualizar
     public Mentor update(Long id, Mentor mentorUpdate){
