@@ -56,6 +56,18 @@ public class AlunoService {
         }
     }
 
+    public Aluno update(Integer id, Aluno alunoUpdate){
+
+        Aluno alunoExistente = findById(id);
+        alunoExistente.setNome(alunoUpdate.getNome());
+        alunoExistente.setRa(alunoUpdate.getRa());
+        alunoExistente.setSenha(alunoUpdate.getSenha());
+        alunoExistente.setEmail(alunoUpdate.getEmail());
+
+
+        return alunoRepository.save(alunoExistente);
+    }
+
     public void delete(Integer id){
         Aluno aluno = findById(id);
         alunoRepository.delete(aluno);

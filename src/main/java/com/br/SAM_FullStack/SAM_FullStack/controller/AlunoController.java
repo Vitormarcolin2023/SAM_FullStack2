@@ -2,6 +2,7 @@ package com.br.SAM_FullStack.SAM_FullStack.controller;
 
 import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.service.AlunoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +37,17 @@ public class AlunoController {
             // Logar o erro
             ex.printStackTrace();
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR); // Status 500
+        }
+    }
+
+    //atualizar
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update (@PathVariable Integer id, @Valid @RequestBody Aluno alunoUpdate){
+        try{
+            Aluno alunoAtualizado = alunoService.update(id, alunoUpdate);
+            return ResponseEntity.ok(alunoAtualizado);
+        }catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
