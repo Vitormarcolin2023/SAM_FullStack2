@@ -6,8 +6,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Endereco {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,7 +25,7 @@ public class Endereco {
 
     @NotBlank(message = "O campo número é obrigatório")
     @Column(nullable = false)
-    private String numero; // alterei para String para aceitar "123A", "S/N", etc.
+    private String numero; // alterei para String para aceitar "123A" "S/N" etc.
 
     @NotBlank(message = "O campo bairro é obrigatório")
     @Column(length = 45, nullable = false)
