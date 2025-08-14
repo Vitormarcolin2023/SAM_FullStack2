@@ -12,6 +12,7 @@ import org.springframework.data.annotation.Id;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
 @Table(name = "tb_mentor")
 public class Mentor {
 
