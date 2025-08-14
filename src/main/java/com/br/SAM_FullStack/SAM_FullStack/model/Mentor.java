@@ -35,13 +35,12 @@ public class Mentor {
 
     private String tempoDeExperiencia;
 
+    @Enumerated(EnumType.STRING)
+    private StatusMentor statusMentor;
+
     @NotNull(message = "O tipo de vínculo do mentor é obrigatório")
     @Enumerated(EnumType.STRING)
     private TipoDeVinculo tipoDeVinculo;
-
-    @NotNull(message = "O status do mentor é obrigatório")
-    @Enumerated(EnumType.STRING)
-    private StatusMentor statusMentor;
 
     @NotNull(message = "A área de atuação é obrigatória")
     @Enumerated(EnumType.STRING) // Adicione esta anotação se AreaDeAtuacao for um enum
