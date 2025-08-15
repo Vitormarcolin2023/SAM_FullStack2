@@ -32,17 +32,30 @@ public class MentorController {
 
     //buscar pelo Id
     @GetMapping("/findById/{id}")
-    public ResponseEntity<Mentor> findById(@PathVariable Long id){
-        return ResponseEntity.ok(mentorService.findById(id));
+    public ResponseEntity<Object> findById(@PathVariable Long id) {
+        try {
+            Mentor mentor = mentorService.findById(id);
+            return ResponseEntity.ok(mentor);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Mentor com ID " + id + " não encontrado.");
+        }
     }
 
     //salvar
     @PostMapping("/save")
-    public ResponseEntity<Mentor> save(@RequestBody Mentor mentor){
-        return ResponseEntity.ok(mentorService.save(mentor));
+    public ResponseEntity<Object> save(@RequestBody Mentor mentor) {
+        try {
+            Mentor savedMentor = mentorService.save(mentor);
+            // Retorna o mentor salvo se a operação for bem-sucedida.
+            return ResponseEntity.ok(savedMentor);
+        } catch (Exception e) {
+            // Retorna uma mensagem de erro e o status BAD_REQUEST em caso de falha.
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao salvar mentor: " + e.getMessage());
+        }
     }
 
 
+    //update
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> update(@PathVariable Long id, @RequestBody Mentor mentor) {
         try {
@@ -56,6 +69,7 @@ public class MentorController {
         }
     }
 
+    //delete
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) {
         try {
