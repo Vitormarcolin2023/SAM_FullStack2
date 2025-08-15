@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Data
 @Entity
@@ -21,4 +22,9 @@ public class Aluno {
     private Integer ra;
     private String senha;
     private String email;
+
+    @ManyToOne
+    @JoinColumn(name = "curso_id", nullable = false)
+    @JsonIgnoreProperties("alunos")
+    private Curso curso;
 }
