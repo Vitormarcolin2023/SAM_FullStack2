@@ -41,7 +41,7 @@ public class AlunoController {
     }
 
     //atualizar
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<?> update (@PathVariable Integer id, @Valid @RequestBody Aluno alunoUpdate){
         try{
             Aluno alunoAtualizado = alunoService.update(id, alunoUpdate);

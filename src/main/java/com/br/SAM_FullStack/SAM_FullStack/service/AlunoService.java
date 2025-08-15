@@ -21,7 +21,8 @@ public class AlunoService {
 
 
     public Aluno findById(Integer id) {
-        return alunoRepository.findById(id).orElseThrow(() -> new RuntimeException("Aluno não encontrado com ID: " + id));
+        return alunoRepository.findById(id).orElseThrow(() ->
+                new RuntimeException("Aluno não encontrado com ID: " + id));
     }
 
     public Aluno findByRa(Integer ra){
