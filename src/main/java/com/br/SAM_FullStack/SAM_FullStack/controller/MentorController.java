@@ -30,23 +30,25 @@ public class MentorController {
         }
     }
 
+    //buscar pelo Id
     @GetMapping("/{id}")
     public ResponseEntity<Mentor> findById(@PathVariable Long id){
         return ResponseEntity.ok(mentorService.findById(id));
     }
 
-
+    //salvar
     @PostMapping("/save")
     public ResponseEntity<Mentor> save(@RequestBody Mentor mentor){
         return ResponseEntity.ok(mentorService.save(mentor));
     }
 
-
+    //update
     @PutMapping("/{id}")
     public ResponseEntity<Mentor> update(@PathVariable Long id, @RequestBody Mentor mentor){
         return ResponseEntity.ok(mentorService.update(id, mentor));
     }
 
+    //deletar
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete (@PathVariable Long id){
         mentorService.delete(id);
