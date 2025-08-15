@@ -1,8 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.controller;
 
-import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.model.AreaDeAtuacao;
-import com.br.SAM_FullStack.SAM_FullStack.service.AlunoService;
 import com.br.SAM_FullStack.SAM_FullStack.service.AreaDeAtuacaoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
