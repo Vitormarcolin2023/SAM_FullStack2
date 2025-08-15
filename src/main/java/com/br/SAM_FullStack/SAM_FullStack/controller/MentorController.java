@@ -31,28 +31,57 @@ public class MentorController {
     }
 
     //buscar pelo Id
-    @GetMapping("/{id}")
-    public ResponseEntity<Mentor> findById(@PathVariable Long id){
-        return ResponseEntity.ok(mentorService.findById(id));
+    @GetMapping("/findById/{id}")
+    public ResponseEntity<Object> findById(@PathVariable Long id) {
+        try {
+            Mentor mentor = mentorService.findById(id);
+            return ResponseEntity.ok(mentor);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Mentor com ID " + id + " não encontrado.");
+        }
     }
 
     //salvar
     @PostMapping("/save")
-    public ResponseEntity<Mentor> save(@RequestBody Mentor mentor){
-        return ResponseEntity.ok(mentorService.save(mentor));
+    public ResponseEntity<Object> save(@RequestBody Mentor mentor) {
+        try {
+            Mentor savedMentor = mentorService.save(mentor);
+            // Retorna o mentor salvo se a operação for bem-sucedida.
+            return ResponseEntity.ok(savedMentor);
+        } catch (Exception e) {
+            // Retorna uma mensagem de erro e o status BAD_REQUEST em caso de falha.
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao salvar mentor: " + e.getMessage());
+        }
     }
+
 
     //update
-    @PutMapping("/{id}")
-    public ResponseEntity<Mentor> update(@PathVariable Long id, @RequestBody Mentor mentor){
-        return ResponseEntity.ok(mentorService.update(id, mentor));
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Object> update(@PathVariable Long id, @RequestBody Mentor mentor) {
+        try {
+            // Tenta realizar a atualização do mentor
+            Mentor mentorAtualizado = mentorService.update(id, mentor);
+            // Se a atualização for bem-sucedida, retorna o mentor com status 200 OK
+            return ResponseEntity.ok(mentorAtualizado);
+        } catch (Exception e) {
+            // Se houver um erro, retorna uma mensagem com status 400 Bad Request
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Não foi possível atualizar o mentor. Verifique o ID ou os dados fornecidos.");
+        }
     }
 
-    //deletar
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete (@PathVariable Long id){
-        mentorService.delete(id);
-        return ResponseEntity.noContent().build();
+    //delete
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> delete(@PathVariable Long id) {
+        try {
+            // Tenta excluir o mentor
+            mentorService.delete(id);
+
+            // Se a exclusão for bem-sucedida, retorna a mensagem de sucesso
+            return ResponseEntity.ok("Mentor excluído com sucesso");
+        } catch (Exception e) {
+            // Se ocorrer um erro (por exemplo, mentor não encontrado), retorna a mensagem de erro com status 400
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Não foi possível excluir o mentor. O ID fornecido não existe.");
+        }
     }
 
 }
