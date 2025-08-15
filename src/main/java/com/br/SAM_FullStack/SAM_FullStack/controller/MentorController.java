@@ -35,12 +35,12 @@ public class MentorController {
         return ResponseEntity.ok(mentorService.findById(id));
     }
 
-    /*
-    @PostMapping
+
+    @PostMapping("/save")
     public ResponseEntity<Mentor> save(@RequestBody Mentor mentor){
         return ResponseEntity.ok(mentorService.save(mentor));
     }
-     */
+
 
     @PutMapping("/{id}")
     public ResponseEntity<Mentor> update(@PathVariable Long id, @RequestBody Mentor mentor){
