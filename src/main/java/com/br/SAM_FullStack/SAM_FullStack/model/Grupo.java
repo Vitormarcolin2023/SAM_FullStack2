@@ -23,7 +23,12 @@ public class Grupo {
 
     private String nome; // Definido conforme o ID do grupo
 
+    @OneToOne
+    @JoinColumn(name = "aluno_admin_id")
+    private Aluno alunoAdmin;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    private List<Aluno> alunos = new ArrayList<>();
+
+    @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL)
+    private List<Aluno> alunos;
+
 }

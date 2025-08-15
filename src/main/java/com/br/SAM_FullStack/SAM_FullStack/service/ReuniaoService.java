@@ -31,8 +31,9 @@ public class ReuniaoService {
     }
 
     // Método para salvar uma reuniao requisitada
-    public Reuniao save (Reuniao reuniao){
+    public String save (Reuniao reuniao){
         reuniao.setStatusReuniao(StatusReuniao.PENDENTE);
-        return reuniaoRepository.save(reuniao);
+        this.reuniaoRepository.save(reuniao);
+        return ("Solicitação de reunião enviada");
     }
 }

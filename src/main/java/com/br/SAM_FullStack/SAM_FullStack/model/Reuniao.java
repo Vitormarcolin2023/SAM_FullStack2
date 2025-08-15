@@ -23,11 +23,18 @@ public class Reuniao {
     private String assunto;
     private Date data;
     private Time hora;
+
+    @Enumerated(EnumType.STRING)
     private FormatoReuniao formatoReuniao;
+    @Enumerated(EnumType.STRING)
     private StatusReuniao statusReuniao;
 
-    //private Mentor mentor;
+    @OneToOne
+    @JoinColumn(name = "mentor_admin_id")
+    private Mentor mentor;
 
+    @OneToOne
+    @JoinColumn(name = "grupo_id")
     private Grupo grupo;
 
 }

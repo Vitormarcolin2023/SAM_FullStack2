@@ -10,10 +10,10 @@ import java.util.List;
 public interface ReuniaoRepository extends JpaRepository<Reuniao, Long> {
 
     //Recuperar as reuniões conforme o id do grupo
-    @Query("SELECT ALL from Reuniao r  WHERE r.grupo = :id")
+    @Query("SELECT r from Reuniao r  WHERE r.grupo = :id")
     public List<Reuniao> findAllAluno(@Param("id") long id);
 
-    @Query("SELECT ALL from Reuniao r WHERE r.mentor = :idMentor")
+    @Query("SELECT r from Reuniao r WHERE r.mentor = :idMentor")
     public List<Reuniao> findAllMentor(@Param("idMentor") long id);
 
 

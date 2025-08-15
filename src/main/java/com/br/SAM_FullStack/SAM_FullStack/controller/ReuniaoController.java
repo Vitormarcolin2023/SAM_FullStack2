@@ -11,7 +11,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/reuniao")
+@RequestMapping("/api/reunioes")
 public class ReuniaoController {
 
     private final ReuniaoService reuniaoService;
@@ -27,9 +27,9 @@ public class ReuniaoController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<Reuniao> save(@RequestBody Reuniao reuniao){
+    public ResponseEntity<String> save(@RequestBody Reuniao reuniao){
         try {
-            var result = reuniaoService.save(reuniao);
+            String result = reuniaoService.save(reuniao);
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
