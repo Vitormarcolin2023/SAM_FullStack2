@@ -1,5 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,7 +49,7 @@ public class Endereco {
 
     // Relacionamento com Mentor
     @OneToOne(mappedBy = "endereco")
-    @JsonIgnoreProperties("endereco")
+    @JsonBackReference // Indica que esta referência deve ser ignorada na serialização para quebrar o ciclo.
     private Mentor mentor;
 
     @Override
