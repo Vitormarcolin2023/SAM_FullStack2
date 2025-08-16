@@ -1,8 +1,10 @@
 package com.br.SAM_FullStack.SAM_FullStack.controller;
 
 
+import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.model.Curso;
 import com.br.SAM_FullStack.SAM_FullStack.service.CursoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,4 +42,23 @@ public class CursoController {
         }
     }
 
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> update (@PathVariable Long id, @Valid @RequestBody Curso cursoUpdate){
+        try{
+            Curso cursoAtualizado = cursoService.update(id, cursoUpdate);
+            return ResponseEntity.ok(cursoAtualizado);
+        }catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/delet/{id}")
+    public ResponseEntity<?> delete (@PathVariable Long id){
+        try{
+            cursoService.delete(id);
+            return ResponseEntity.noContent().build();
+        }catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
 }
