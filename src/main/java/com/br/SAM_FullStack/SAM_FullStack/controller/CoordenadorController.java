@@ -1,11 +1,14 @@
 package com.br.SAM_FullStack.SAM_FullStack.controller;
 
 import com.br.SAM_FullStack.SAM_FullStack.model.Coordenador;
+import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
 import com.br.SAM_FullStack.SAM_FullStack.service.CoordenadorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/coordenador")
@@ -41,5 +44,11 @@ public class CoordenadorController {
         }catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/mentores")
+    public ResponseEntity<List<Mentor>> findAllMentores(){
+        List<Mentor> mentores = this.coordenadorService.findAllMentores();
+        return new ResponseEntity<>(mentores, HttpStatus.OK);
     }
 }

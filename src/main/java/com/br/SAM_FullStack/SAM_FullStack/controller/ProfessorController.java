@@ -1,5 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.controller;
 
+import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
 import com.br.SAM_FullStack.SAM_FullStack.model.Professor;
 import com.br.SAM_FullStack.SAM_FullStack.service.ProfessorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,12 @@ public class ProfessorController {
         }catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/mentores")
+    public ResponseEntity<List<Mentor>> findAllMentores(){
+        List<Mentor> mentores = this.professorService.findAllMentores();
+        return new ResponseEntity<>(mentores, HttpStatus.OK);
     }
 
 }

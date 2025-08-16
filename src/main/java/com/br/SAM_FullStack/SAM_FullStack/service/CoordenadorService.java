@@ -1,9 +1,12 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
 import com.br.SAM_FullStack.SAM_FullStack.model.Coordenador;
+import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
 import com.br.SAM_FullStack.SAM_FullStack.repository.CoordenadorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class CoordenadorService {
@@ -32,5 +35,9 @@ public class CoordenadorService {
         } catch (Exception e) {
             return "Erro ao tentar ativar o mentor.";
         }
+    }
+
+    public List<Mentor> findAllMentores(){
+        return this.mentorService.listAll();
     }
 }
