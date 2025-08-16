@@ -23,7 +23,7 @@ public class Aluno {
     private String senha;
     private String email;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "grupo_id")
     private Grupo grupo;
 
