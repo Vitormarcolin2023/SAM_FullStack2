@@ -18,7 +18,7 @@ public class AreaDeAtuacao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
     private String nome;
 
     @OneToMany(mappedBy = "areaDeAtuacao", cascade = CascadeType.ALL, orphanRemoval = true)
