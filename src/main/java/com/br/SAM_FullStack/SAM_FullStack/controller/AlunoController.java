@@ -77,6 +77,4 @@ public class AlunoController {
         List<Aluno> alunosSalvos = alunoService.saveAll(alunos);
         return ResponseEntity.status(HttpStatus.CREATED).body(alunosSalvos);
     }
-
-
 }
