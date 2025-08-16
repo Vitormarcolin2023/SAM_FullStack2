@@ -17,7 +17,7 @@ public class AreaDeAtuacaoService {
     private final AreaDeAtuacaoRepository areaDeAtuacaoRepository;
 
 
-    public AreaDeAtuacao findById(Integer id) {
+    public AreaDeAtuacao findById(Long id) {
         return areaDeAtuacaoRepository.findById(id).orElseThrow(() ->
                 new RuntimeException("Area de Atuação não encontrada com ID: " + id));
     }
@@ -29,4 +29,6 @@ public class AreaDeAtuacaoService {
     public AreaDeAtuacao save(AreaDeAtuacao areaDeAtuacao) {
         return areaDeAtuacaoRepository.save(areaDeAtuacao);
     }
+
+
 }
