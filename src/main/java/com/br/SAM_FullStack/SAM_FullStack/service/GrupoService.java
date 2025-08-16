@@ -7,10 +7,12 @@ import com.br.SAM_FullStack.SAM_FullStack.model.StatusAlunoGrupo;
 import com.br.SAM_FullStack.SAM_FullStack.repository.AlunoRepository;
 import com.br.SAM_FullStack.SAM_FullStack.repository.GrupoRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.security.Guard;
 import java.util.List;
 
 @Service
@@ -29,7 +31,7 @@ public class GrupoService {
     public Grupo findById(long id){
         return grupoRepository.findById(id).
                 orElseThrow(()->
-                    new RuntimeException("Aluno não encontrado.")
+                    new RuntimeException("Grupo não encontrado.")
                 );
     }
 
@@ -39,7 +41,13 @@ public class GrupoService {
 
         // Pega referencia de um aluno que já existe usando o id dele
         Aluno admin = alunoRepository.getReferenceById(grupoDTO.alunoAdminId());
-        grupo.setAlunoAdmin(admin);
+
+        // verifica se esse aluno já não está em outro grupo
+        if(admin.getGrupo() != null) {
+            throw new IllegalStateException("Operação não permitida. Aluno já participa de outro grupo");
+        }
+
+        grupo.setAlunoAdmin(admin); // setta  o admin
 
         grupo = grupoRepository.save(grupo); // salva para gerar id do grupo
 
@@ -50,11 +58,25 @@ public class GrupoService {
             throw  new IllegalArgumentException("Um ou mais IDs de alunos não existem");
         }
 
-        // verifica se algum aluno já está em outro grupo
+        // verifica se a quantidade de participantes é permitida
+        if(alunos.size() < 3 || alunos.size() > 6){
+            throw new IllegalStateException("Operação não permitida. Grupo deve conter no mínimo 3 e no máximo 6 participantes!");
+        }
+
+        // verifica se algum aluno já está em outro grupo e se o admin informado também participa do grupo
+        boolean adminInformado = false;
         for (Aluno aluno : alunos){
             if(aluno.getGrupo() != null && aluno.getGrupo().getId() != grupo.getId()){
                 throw new IllegalStateException("Aluno " + aluno.getNome() + " já participa de outro grupo");
             }
+            if(aluno.getId().equals(admin.getId())){
+                adminInformado = true;
+            }
+        }
+
+        // faz a validação do admin no grupo
+        if(!adminInformado){
+            throw new IllegalStateException("Operação não permitida. Administrador informado não participa do grupo");
         }
 
         // setta o grupo no aluno, porque aluno é o dono da relação
@@ -100,5 +122,88 @@ public class GrupoService {
 
         return "Solicitação enviada pera o professor responsável para análise";
     }
+
+    // visualização de lista de grupos que solicitaram exclusão de algum aluno
+    public List<Grupo> findByAlunosStatusAlunoGrupo(StatusAlunoGrupo statusAlunoGrupo){
+        return grupoRepository.findByAlunosStatusAlunoGrupo(statusAlunoGrupo);
+    }
+
+    // validação de exclusão de aluno pelo professor
+    public String analizarExclusaoAluno (long idProf, long idGrupo, boolean resposta){
+        Grupo grupo = grupoRepository.findById(idGrupo).orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado"));
+        Aluno aluno = alunoRepository.findByStatusAlunoGrupo(StatusAlunoGrupo.AGUARDANDO);
+
+        // verifica se o aluno está no grupo
+        if (aluno == null || !grupo.getAlunos().contains(aluno)) {
+            throw new IllegalStateException("Operação não permitida. Não há alunos aguardando exclusão neste grupo.");
+        }
+
+        // FALTA VALIDAR SE O SOLICITANTE É PROFESSOR
+
+        if (resposta) {
+            // Remove o aluno do grupo
+            grupo.getAlunos().remove(aluno);
+            aluno.setGrupo(null);
+            alunoRepository.save(aluno);
+            grupoRepository.save(grupo);
+
+            return "Aluno " + aluno.getNome() + " foi removido do grupo";
+        } else {
+            return "Solicitação de exclusão recusada. O aluno permanece no grupo";
+        }
+    }
+
+    public String deletarGrupo(long idProfessor, long idGrupo) {
+        // Verifica se o grupo existe
+        Grupo grupo = grupoRepository.findById(idGrupo)
+                .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado"));
+
+        // FALTA VALIDAR SE O SOLICITANTE É O PROFESSOR
+
+        // Remove o grupo
+        grupoRepository.delete(grupo);
+
+        return "Grupo deletado com sucesso";
+    }
+
+    public String adicionarAlunoAoGrupo(Integer idAdmin, long idGrupo, Integer idAluno) {
+        //verifica se o grupo existe
+        Grupo grupo = grupoRepository.findById(idGrupo)
+                .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado"));
+
+        //verifica se quem está adicionando é o admin do grupo
+        if(!grupo.getAlunoAdmin().getId().equals(idAdmin)) {
+            throw new IllegalStateException("Apenas o admin do grupo pode adicionar alunos");
+        }
+
+        // localiza o aluno pelo id informado
+        Aluno aluno = alunoRepository.findById(idAluno).orElseThrow(()->
+                new IllegalStateException("Aluno com id " + idAluno + " não encontrado"));
+
+        //verifica se o aluno já está no grupo
+        if(aluno.getGrupo().getId() == grupo.getId()){
+            throw new IllegalStateException("Operação não permitida. Aluno já faz parte do grupo");
+        }
+
+        // verifica se o aluno não está em outro grupo
+        if(aluno.getGrupo() != null && aluno.getGrupo().getId() != grupo.getId()){
+            throw new IllegalStateException("Aluno " + aluno.getNome() + " já participa de outro grupo");
+        }
+
+        if(grupo.getAlunos().size() >= 6){
+            throw new IllegalStateException("Operação não permitida. O grupo já está com a capacidade máxima de alunos");
+        }
+
+        aluno.setStatusAlunoGrupo(StatusAlunoGrupo.ATIVO);
+        aluno.setGrupo(grupo);
+        alunoRepository.save(aluno);
+
+        grupo.getAlunos().add(aluno);
+        // Salva o grupo atualizado
+        grupoRepository.save(grupo);
+
+        return "Aluno adicionado com sucesso ao grupo";
+    }
+
 
 }
