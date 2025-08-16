@@ -3,6 +3,7 @@ package com.br.SAM_FullStack.SAM_FullStack.controller;
 import com.br.SAM_FullStack.SAM_FullStack.dto.GrupoDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.Grupo;
 import com.br.SAM_FullStack.SAM_FullStack.service.GrupoService;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,17 @@ public class GrupoController {
         }
     }
 
+    @GetMapping("/findById/{id}")
+    public ResponseEntity<Grupo> findById(@PathVariable long id){
+        try {
+            Grupo result = grupoService.findById(id);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping("/save")
     public ResponseEntity<String> save(@RequestBody GrupoDTO grupo) {
         try {
@@ -35,7 +47,18 @@ public class GrupoController {
             return new ResponseEntity<>(result, HttpStatus.CREATED);
         } catch (Exception ex) {
             ex.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR); // Status 500
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST); // Status 500
+        }
+    }
+
+    @DeleteMapping("/deleteAlunoById/admin/{}/aluno/{}")
+    public ResponseEntity<String> deleteAlunoById(@PathVariable Integer admin, @PathVariable Integer aluno){
+        try {
+            String result = grupoService.excluirAlunoGrupo(admin, aluno);
+            return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
     }
 
