@@ -1,5 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
+import com.br.SAM_FullStack.SAM_FullStack.model.AreaDeAtuacao;
 import com.br.SAM_FullStack.SAM_FullStack.model.Curso;
 import com.br.SAM_FullStack.SAM_FullStack.repository.CursoRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,18 @@ public class CursoService {
 
     public Curso save(Curso curso){
         return cursoRepository.save(curso);
+    }
+
+    public Curso update(Long id, Curso cursoUpdate){
+        Curso cursoExistente = findById(id);
+        cursoExistente.setNome(cursoUpdate.getNome());
+
+        return cursoRepository.save(cursoUpdate);
+    }
+
+    public void delete(Long id){
+        Curso curso = findById(id);
+        cursoRepository.delete(curso);
     }
 
 }
