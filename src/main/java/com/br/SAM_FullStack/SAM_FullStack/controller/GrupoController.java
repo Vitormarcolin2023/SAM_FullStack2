@@ -1,9 +1,10 @@
 package com.br.SAM_FullStack.SAM_FullStack.controller;
 
+import com.br.SAM_FullStack.SAM_FullStack.dto.AdicionarAlunoDTO;
 import com.br.SAM_FullStack.SAM_FullStack.dto.GrupoDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.Grupo;
+import com.br.SAM_FullStack.SAM_FullStack.model.StatusAlunoGrupo;
 import com.br.SAM_FullStack.SAM_FullStack.service.GrupoService;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,7 @@ public class GrupoController {
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception e){
             e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
@@ -47,29 +48,64 @@ public class GrupoController {
             return new ResponseEntity<>(result, HttpStatus.CREATED);
         } catch (Exception ex) {
             ex.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST); // Status 500
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST); // Status 500
         }
     }
 
-    @DeleteMapping("/deleteAlunoById/admin/{}/aluno/{}")
+    @PostMapping("/adicionar-aluno")
+    public ResponseEntity<String> adicionarAluno(@RequestBody AdicionarAlunoDTO dto) {
+        try {
+            String result = grupoService.adicionarAlunoAoGrupo(dto.getIdAdmin(), dto.getIdGrupo(), dto.getIdAluno());
+            return new ResponseEntity<>(result, HttpStatus.CREATED);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/deleteAlunoById/admin/{admin}/aluno/{aluno}")
     public ResponseEntity<String> deleteAlunoById(@PathVariable Integer admin, @PathVariable Integer aluno){
         try {
             String result = grupoService.excluirAlunoGrupo(admin, aluno);
             return new ResponseEntity<>(result, HttpStatus.ACCEPTED);
         } catch (Exception e){
             e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-    /*
-    @DeleteMapping("/delet/{id}")
-    public ResponseEntity<?> delete (@PathVariable Integer id){
-        try{
-            alunoService.delete(id);
-            return ResponseEntity.noContent().build();
-        }catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    @GetMapping("/findSolicitacoes")
+    public ResponseEntity<List<Grupo>> findByAlunosStatusAlunoGrupo(){
+        try {
+            List<Grupo> result = grupoService.findByAlunosStatusAlunoGrupo(StatusAlunoGrupo.AGUARDANDO);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-    }*/
+    }
+
+    // para professor aceitar ou recusar a exclusao do aluno do grupo
+    @PutMapping("analizarSolicitacao/{idGrupo}/professor/{idProf}")
+    public ResponseEntity<String> analizarExclusaoAluno(
+            @PathVariable long idProf,
+            @PathVariable long idGrupo,
+            @RequestParam boolean resposta) {
+        try {
+            String result = grupoService.analizarExclusaoAluno(idProf, idGrupo, resposta);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // deletar grupo -> PROFESSOR
+    @DeleteMapping("delete/{idGrupo}/professor/{idProfessor}")
+    public ResponseEntity<String> deletarGrupo(@PathVariable Long idGrupo, @PathVariable Long idProfessor){
+        try{
+            String result = grupoService.deletarGrupo(idGrupo, idProfessor);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
