@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface GrupoRepository extends JpaRepository<Grupo, Long> {
 
     // Retorna o grupo em que o aluno está inserido
-    Optional<Grupo> findByAlunosId(Integer id);
+    Optional<Grupo> findByAlunosId(Long id);
 
     List<Grupo> findByAlunosStatusAlunoGrupo(StatusAlunoGrupo statusAlunoGrupo);
 

@@ -6,8 +6,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AdicionarAlunoDTO {
-        private Integer idAdmin;
+        private Long idAdmin;
         private long idGrupo;
-        private Integer idAluno;
+        private Long idAluno;
 }
 
