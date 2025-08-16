@@ -87,4 +87,11 @@ public class AlunoController {
         }
         return ResponseEntity.ok(alunosEncontrados);
     }
+
+    //alunos/ordenados-por-nome
+    @GetMapping("/ordenados-por-nome")
+    public ResponseEntity<List<Aluno>> getAlunoOrdenadosPorNome() {
+        List<Aluno> alunosOrdenados = alunoService.buscarTodosOrdenadoPorNome();
+        return ResponseEntity.ok(alunosOrdenados);
+    }
 }

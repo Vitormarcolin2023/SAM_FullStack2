@@ -52,4 +52,8 @@ public class CursoService {
     public List<Curso> buscarPorCurso(String curso) {
         return cursoRepository.findByNomeContainingIgnoreCase(curso);
     }
+
+    public List<Curso> buscarPorNomeDaArea(String nomeArea) {
+        return cursoRepository.findByAreaDeAtuacaoNomeContainingIgnoreCase(nomeArea);
+    }
 }
