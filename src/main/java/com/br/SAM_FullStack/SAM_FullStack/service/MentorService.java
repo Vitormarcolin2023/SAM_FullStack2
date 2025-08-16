@@ -54,4 +54,15 @@ public class MentorService {
         Mentor mentor = findById(id);
         mentorRepository.delete(mentor);
     }
+
+    public String updateStatus(long id, String statusString){
+        Mentor mentor = mentorRepository.findById(id).orElseThrow(() -> new RuntimeException("Mentor não encontrado."));
+
+        StatusMentor novoStatus = StatusMentor.valueOf(statusString.toUpperCase());
+
+        mentor.setStatusMentor(novoStatus);
+        mentorRepository.save(mentor);
+
+        return "Status do mentor atualizado com sucesso!";
+    }
 }

@@ -33,5 +33,13 @@ public class CoordenadorController {
         }
     }
 
-
+    @PutMapping("/ativarMentor/{id}")
+    public ResponseEntity<String> ativarMentor(@PathVariable long id){
+        try {
+            String mensagem = this.coordenadorService.ativarMentor(id);
+            return new ResponseEntity<>(mensagem, HttpStatus.OK);
+        }catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

@@ -11,6 +11,9 @@ public class CoordenadorService {
     @Autowired
     private CoordenadorRepository coordenadorRepository;
 
+    @Autowired
+    private MentorService mentorService;
+
     public String save(Coordenador coordenador){
         this.coordenadorRepository.save(coordenador);
         return "Coordenador salvo com sucesso!";
@@ -20,5 +23,14 @@ public class CoordenadorService {
         coordenador.setId(id);
         this.coordenadorRepository.save(coordenador);
         return "Coordenador atualizado com sucesso!";
+    }
+
+    public String ativarMentor(long mentorId){
+        try {
+            String mensagem = this.mentorService.updateStatus(mentorId, "CONCLUIDO");
+            return "Mentor ativado com sucesso!";
+        } catch (Exception e) {
+            return "Erro ao tentar ativar o mentor.";
+        }
     }
 }
