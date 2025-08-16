@@ -1,5 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
+import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.model.AreaDeAtuacao;
 import com.br.SAM_FullStack.SAM_FullStack.model.Curso;
 import com.br.SAM_FullStack.SAM_FullStack.repository.CursoRepository;
@@ -48,4 +49,7 @@ public class CursoService {
         return cursos;
     }
 
+    public List<Curso> buscarPorCurso(String curso) {
+        return cursoRepository.findByNomeContainingIgnoreCase(curso);
+    }
 }

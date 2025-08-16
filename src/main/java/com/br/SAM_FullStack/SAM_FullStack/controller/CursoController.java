@@ -68,4 +68,14 @@ public class CursoController {
         List<Curso> cursosSalvos = cursoService.saveAll(cursos);
         return ResponseEntity.status(HttpStatus.CREATED).body(cursosSalvos);
     }
+
+    //buscar-por-curso?curso=sistemas
+    @GetMapping("/buscar-por-curso")
+    public ResponseEntity<List<Curso>> getCyrsosPorNome(@RequestParam("curso") String curso) {
+        List<Curso> cursosEncontrados = cursoService.buscarPorCurso(curso);
+        if (cursosEncontrados.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(cursosEncontrados);
+    }
 }
