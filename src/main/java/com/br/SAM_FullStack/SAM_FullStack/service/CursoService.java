@@ -41,4 +41,11 @@ public class CursoService {
         cursoRepository.delete(curso);
     }
 
+    public List<Curso> saveAll(List<Curso> cursos) {
+        for (Curso curso : cursos) {
+            this.save(curso);
+        }
+        return cursos;
+    }
+
 }

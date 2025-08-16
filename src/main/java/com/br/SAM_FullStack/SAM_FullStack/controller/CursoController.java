@@ -2,6 +2,7 @@ package com.br.SAM_FullStack.SAM_FullStack.controller;
 
 
 import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
+import com.br.SAM_FullStack.SAM_FullStack.model.AreaDeAtuacao;
 import com.br.SAM_FullStack.SAM_FullStack.model.Curso;
 import com.br.SAM_FullStack.SAM_FullStack.service.CursoService;
 import jakarta.validation.Valid;
@@ -60,5 +61,11 @@ public class CursoController {
         }catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PostMapping("/batch")
+    public ResponseEntity<List<Curso>> saveAll(@RequestBody List<Curso> cursos) {
+        List<Curso> cursosSalvos = cursoService.saveAll(cursos);
+        return ResponseEntity.status(HttpStatus.CREATED).body(cursosSalvos);
     }
 }
