@@ -30,5 +30,15 @@ public class AreaDeAtuacaoService {
         return areaDeAtuacaoRepository.save(areaDeAtuacao);
     }
 
+    public AreaDeAtuacao update(Long id, AreaDeAtuacao areaDeAtuacaoUpdate){
+        AreaDeAtuacao areaDeAtuacaoExistente = findById(id);
+        areaDeAtuacaoExistente.setNome(areaDeAtuacaoUpdate.getNome());
 
+        return areaDeAtuacaoRepository.save(areaDeAtuacaoExistente);
+    }
+
+    public void delete(Long id){
+        AreaDeAtuacao areaDeAtuacao = findById(id);
+        areaDeAtuacaoRepository.delete(areaDeAtuacao);
+    }
 }
