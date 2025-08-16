@@ -1,4 +1,9 @@
 package com.br.SAM_FullStack.SAM_FullStack.dto;
 
-public record GrupoDTO() {
-}
+import java.util.List;
+
+public record GrupoDTO(
+   String nome,
+   Integer alunoAdminId,
+   List<Integer> alunosIds
+) {}
