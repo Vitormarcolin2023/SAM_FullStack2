@@ -3,6 +3,7 @@ package com.br.SAM_FullStack.SAM_FullStack.service;
 import com.br.SAM_FullStack.SAM_FullStack.dto.GrupoDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.model.Grupo;
+import com.br.SAM_FullStack.SAM_FullStack.model.StatusAlunoGrupo;
 import com.br.SAM_FullStack.SAM_FullStack.repository.AlunoRepository;
 import com.br.SAM_FullStack.SAM_FullStack.repository.GrupoRepository;
 import jakarta.persistence.EntityManager;
@@ -23,6 +24,13 @@ public class GrupoService {
 
     public List<Grupo> findAll(){
         return grupoRepository.findAll();
+    }
+
+    public Grupo findById(long id){
+        return grupoRepository.findById(id).
+                orElseThrow(()->
+                    new RuntimeException("Aluno não encontrado.")
+                );
     }
 
     public String save(GrupoDTO grupoDTO){
@@ -51,6 +59,7 @@ public class GrupoService {
 
         // setta o grupo no aluno, porque aluno é o dono da relação
         for (Aluno aluno : alunos){
+            aluno.setStatusAlunoGrupo(StatusAlunoGrupo.ATIVO);
             aluno.setGrupo(grupo);
         }
         alunoRepository.saveAll(alunos); // atualiza as alterações feitas em alunos depois de adionar o id do grupo para cada
@@ -60,5 +69,36 @@ public class GrupoService {
         return "Novo grupo cadastrado com sucesso!";
     }
 
+    // Apenas o professor pode deletar um grupo
+    public void delete(long idGrupo, long idSolicitante){
+
+    }
+
+    // O aluno admin do grupo solicita a exclusão de um integrante do grupo e o professor aceita ou declina
+    public String excluirAlunoGrupo(Integer idSolicitante, Integer idAlunoExcluir){
+        // localiza o grupo que o aluno solicitante faz parte
+        Grupo grupo = grupoRepository.findByAlunosId(idSolicitante).orElseThrow(()->
+                new IllegalArgumentException("Nenhum Grupo encontrado para o aluno solicitante"));
+
+        // verifica se o solicitante é o admin do grupo
+        if(!idSolicitante.equals(grupo.getAlunoAdmin().getId())){
+            throw new IllegalStateException("Operação apenas atourizada para o Administrador do grupo!");
+        }
+
+        // localiza o aluno pelo id informado
+        Aluno alunoExc = alunoRepository.findById(idAlunoExcluir).orElseThrow(()->
+                new IllegalStateException("Aluno com id " + idAlunoExcluir + " não encontrado"));
+
+        // verifica se o aluno informado pertence ao grupo do solicitante
+        if(alunoExc.getGrupo() == null || alunoExc.getGrupo().getId() != grupo.getId()){
+            throw new IllegalStateException("Aluno informado não pertence ao grupo do solicitante");
+        }
+
+        // troca o status para AGUARDANDO para que seja feita uma filtragem pelo professor
+        alunoExc.setStatusAlunoGrupo(StatusAlunoGrupo.AGUARDANDO);
+        alunoRepository.save(alunoExc);
+
+        return "Solicitação enviada pera o professor responsável para análise";
+    }
 
 }
