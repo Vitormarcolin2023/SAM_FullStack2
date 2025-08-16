@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/alunos")
+@RequestMapping("/alunos")
 @RequiredArgsConstructor
 public class AlunoController {
 
@@ -70,6 +70,12 @@ public class AlunoController {
         }catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PostMapping("/batch")
+    public ResponseEntity<List<Aluno>> saveAll(@RequestBody List<Aluno> alunos) {
+        List<Aluno> alunosSalvos = alunoService.saveAll(alunos);
+        return ResponseEntity.status(HttpStatus.CREATED).body(alunosSalvos);
     }
 
 

@@ -52,7 +52,7 @@ public class AlunoService {
             emailService.enviarEmailTexto(
                     alunoSalvo.getEmail(),
                     "Aluno Cadastrado com Sucesso",
-                    "Olá " + alunoSalvo.getNome() + ", seu cadastro foi realizado com sucesso! Seu RA é: " + alunoSalvo.getRa()
+                    "Olá " + alunoSalvo.getNome() + ", seu cadastro foi realizado com sucesso! RA é: " + alunoSalvo.getRa() + "Curso: " + alunoSalvo.getCurso()
             );
             return alunoSalvo;
         }
@@ -73,6 +73,13 @@ public class AlunoService {
     public void delete(Long id){
         Aluno aluno = findById(id);
         alunoRepository.delete(aluno);
+    }
+
+    public List<Aluno> saveAll(List<Aluno> alunos) {
+        for (Aluno aluno : alunos) {
+            this.save(aluno);
+        }
+        return alunos;
     }
 }
 
