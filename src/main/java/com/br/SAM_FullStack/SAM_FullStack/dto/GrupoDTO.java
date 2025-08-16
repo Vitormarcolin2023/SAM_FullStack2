@@ -4,6 +4,6 @@ import java.util.List;
 
 public record GrupoDTO(
    String nome,
-   Integer alunoAdminId,
-   List<Integer> alunosIds
+   Long alunoAdminId,
+   List<Long> alunosIds
 ) {}

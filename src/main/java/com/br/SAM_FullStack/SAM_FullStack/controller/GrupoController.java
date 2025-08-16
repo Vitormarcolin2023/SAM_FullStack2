@@ -64,7 +64,7 @@ public class GrupoController {
     }
 
     @DeleteMapping("/deleteAlunoById/admin/{admin}/aluno/{aluno}")
-    public ResponseEntity<String> deleteAlunoById(@PathVariable Integer admin, @PathVariable Integer aluno){
+    public ResponseEntity<String> deleteAlunoById(@PathVariable Long admin, @PathVariable Long aluno){
         try {
             String result = grupoService.excluirAlunoGrupo(admin, aluno);
             return new ResponseEntity<>(result, HttpStatus.ACCEPTED);

@@ -97,7 +97,7 @@ public class GrupoService {
     }
 
     // O aluno admin do grupo solicita a exclusão de um integrante do grupo e o professor aceita ou declina
-    public String excluirAlunoGrupo(Integer idSolicitante, Integer idAlunoExcluir){
+    public String excluirAlunoGrupo(Long idSolicitante, Long idAlunoExcluir){
         // localiza o grupo que o aluno solicitante faz parte
         Grupo grupo = grupoRepository.findByAlunosId(idSolicitante).orElseThrow(()->
                 new IllegalArgumentException("Nenhum Grupo encontrado para o aluno solicitante"));
@@ -144,6 +144,7 @@ public class GrupoService {
             // Remove o aluno do grupo
             grupo.getAlunos().remove(aluno);
             aluno.setGrupo(null);
+            aluno.setStatusAlunoGrupo(null);
             alunoRepository.save(aluno);
             grupoRepository.save(grupo);
 
@@ -166,7 +167,7 @@ public class GrupoService {
         return "Grupo deletado com sucesso";
     }
 
-    public String adicionarAlunoAoGrupo(Integer idAdmin, long idGrupo, Integer idAluno) {
+    public String adicionarAlunoAoGrupo(Long idAdmin, long idGrupo, Long idAluno) {
         //verifica se o grupo existe
         Grupo grupo = grupoRepository.findById(idGrupo)
                 .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado"));
