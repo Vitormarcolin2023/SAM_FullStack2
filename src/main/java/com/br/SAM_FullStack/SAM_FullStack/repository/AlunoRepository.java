@@ -26,14 +26,6 @@ public interface AlunoRepository extends JpaRepository<Aluno, Long> {
     )
     List<Aluno> getByRa(@Param("ra") Integer ra);
 
-    // Busca um aluno pelo seu endereço de e-mail exato, ignorando maiúsculas/minúsculas.
-    Optional<Aluno> findByEmailIgnoreCase(String email);
-
     // Busca uma lista de alunos cujo nome contenha um determinado texto, ignorando maiúsculas/minúsculas.
     List<Aluno> findByNomeContainingIgnoreCase(String nome);
-
-    // Combinando filtros com 'And'
-    // Encontra um aluno que tenha um RA específico E um e-mail específico.
-    Optional<Aluno> findByRaAndEmail(Integer ra, String email);
-
 }

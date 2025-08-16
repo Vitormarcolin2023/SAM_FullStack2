@@ -78,18 +78,13 @@ public class AlunoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(alunosSalvos);
     }
 
-    // @GetMapping é usado para consultas/buscas
+    //buscar-por-nome?nome=silva
     @GetMapping("/buscar-por-nome")
     public ResponseEntity<List<Aluno>> getAlunosPorNome(@RequestParam("nome") String nome) {
-        // Chama o novo método que criamos no service
         List<Aluno> alunosEncontrados = alunoService.buscarPorNome(nome);
-
-        // Se a lista estiver vazia, é uma boa prática retornar "204 No Content"
         if (alunosEncontrados.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-
-        // Se encontrou, retorna a lista com status "200 OK"
         return ResponseEntity.ok(alunosEncontrados);
     }
 }
