@@ -1,5 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.controller;
 
+import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.model.AreaDeAtuacao;
 import com.br.SAM_FullStack.SAM_FullStack.model.Curso;
 import com.br.SAM_FullStack.SAM_FullStack.service.AreaDeAtuacaoService;
@@ -61,4 +62,9 @@ public class AreaDeAtuacaoController {
         }
     }
 
+    @PostMapping("/batch")
+    public ResponseEntity<List<AreaDeAtuacao>> saveAll(@RequestBody List<AreaDeAtuacao> areaDeAtuacoes) {
+        List<AreaDeAtuacao> areaDeAtuacoesSalvos = areaDeAtuacaoService.saveAll(areaDeAtuacoes);
+        return ResponseEntity.status(HttpStatus.CREATED).body(areaDeAtuacoesSalvos);
+    }
 }

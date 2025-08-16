@@ -1,12 +1,11 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
+
 import com.br.SAM_FullStack.SAM_FullStack.model.AreaDeAtuacao;
 import com.br.SAM_FullStack.SAM_FullStack.repository.AreaDeAtuacaoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.awt.geom.Area;
 import java.util.List;
 
 @Service
@@ -40,5 +39,12 @@ public class AreaDeAtuacaoService {
     public void delete(Long id){
         AreaDeAtuacao areaDeAtuacao = findById(id);
         areaDeAtuacaoRepository.delete(areaDeAtuacao);
+    }
+
+    public List<AreaDeAtuacao> saveAll(List<AreaDeAtuacao> areaDeAtuacoes) {
+        for (AreaDeAtuacao areaDeAtuacao : areaDeAtuacoes) {
+            this.save(areaDeAtuacao);
+        }
+        return areaDeAtuacoes;
     }
 }
