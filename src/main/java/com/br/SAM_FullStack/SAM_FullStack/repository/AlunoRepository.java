@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface AlunoRepository extends JpaRepository<Aluno, Integer> {
+public interface AlunoRepository extends JpaRepository<Aluno, Long> {
 
     Optional<Aluno> findByNome(String nome);
 

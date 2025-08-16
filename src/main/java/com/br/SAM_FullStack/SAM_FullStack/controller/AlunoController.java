@@ -28,6 +28,16 @@ public class AlunoController {
         }
     }
 
+    @GetMapping("/findById/{id}")
+    public ResponseEntity<Aluno> findById(@PathVariable Long id) {
+        try {
+            Aluno aluno = alunoService.findById(id);
+            return ResponseEntity.ok(aluno);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST); // Status 500
+        }
+    }
+
     @PostMapping("/save")
     public ResponseEntity<Aluno> save(@RequestBody Aluno aluno) {
         try {
@@ -42,7 +52,7 @@ public class AlunoController {
 
     //atualizar
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> update (@PathVariable Integer id, @Valid @RequestBody Aluno alunoUpdate){
+    public ResponseEntity<?> update (@PathVariable Long id, @Valid @RequestBody Aluno alunoUpdate){
         try{
             Aluno alunoAtualizado = alunoService.update(id, alunoUpdate);
             return ResponseEntity.ok(alunoAtualizado);
@@ -53,7 +63,7 @@ public class AlunoController {
 
     //deletar
     @DeleteMapping("/delet/{id}")
-    public ResponseEntity<?> delete (@PathVariable Integer id){
+    public ResponseEntity<?> delete (@PathVariable Long id){
         try{
             alunoService.delete(id);
             return ResponseEntity.noContent().build();
