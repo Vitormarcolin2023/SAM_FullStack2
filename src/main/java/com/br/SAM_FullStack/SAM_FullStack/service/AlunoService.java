@@ -81,5 +81,10 @@ public class AlunoService {
         }
         return alunos;
     }
+
+    public List<Aluno> buscarPorNome(String nome) {
+        // Apenas repassa a chamada para o método mágico do repositório
+        return alunoRepository.findByNomeContainingIgnoreCase(nome);
+    }
 }
 
