@@ -37,21 +37,22 @@ public class EnderecoController {
     }
 
     // Salvar
-    @PostMapping
+    @PostMapping("/save")
     public ResponseEntity<Endereco> save(@RequestBody Endereco endereco) {
         return ResponseEntity.ok(enderecoService.save(endereco));
     }
 
     // Atualizar
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Endereco> update(@PathVariable Long id, @RequestBody Endereco endereco) {
         return ResponseEntity.ok(enderecoService.update(id, endereco));
     }
 
     // Deletar
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         enderecoService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
 }

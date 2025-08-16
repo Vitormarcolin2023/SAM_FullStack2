@@ -20,12 +20,14 @@ public class AlunoService {
     private EmailService emailService;
 
 
-    public Aluno findById(Integer id) {
-        return alunoRepository.findById(id).orElseThrow(() -> new RuntimeException("Aluno não encontrado com ID: " + id));
+    public Aluno findById(Long id) {
+        return alunoRepository.findById(id).orElseThrow(() ->
+                new RuntimeException("Aluno não encontrado com ID: " + id));
     }
 
     public Aluno findByRa(Integer ra){
-        return alunoRepository.findByRa(ra).orElseThrow(() -> new RuntimeException("Aluno não encontrado com RA: " + ra));
+        return alunoRepository.findByRa(ra).orElseThrow(() ->
+                new RuntimeException("Aluno não encontrado com RA: " + ra));
     }
 
     public List<Aluno> findAll(){
@@ -50,15 +52,34 @@ public class AlunoService {
             emailService.enviarEmailTexto(
                     alunoSalvo.getEmail(),
                     "Aluno Cadastrado com Sucesso",
-                    "Olá " + alunoSalvo.getNome() + ", seu cadastro foi realizado com sucesso! Seu RA é: " + alunoSalvo.getRa()
+                    "Olá " + alunoSalvo.getNome() + ", seu cadastro foi realizado com sucesso! RA é: " + alunoSalvo.getRa() + "Curso: " + alunoSalvo.getCurso()
             );
             return alunoSalvo;
         }
     }
 
-    public void delete(Integer id){
+    public Aluno update(Long id, Aluno alunoUpdate){
+
+        Aluno alunoExistente = findById(id);
+        alunoExistente.setNome(alunoUpdate.getNome());
+        alunoExistente.setRa(alunoUpdate.getRa());
+        alunoExistente.setSenha(alunoUpdate.getSenha());
+        alunoExistente.setEmail(alunoUpdate.getEmail());
+
+
+        return alunoRepository.save(alunoExistente);
+    }
+
+    public void delete(Long id){
         Aluno aluno = findById(id);
         alunoRepository.delete(aluno);
+    }
+
+    public List<Aluno> saveAll(List<Aluno> alunos) {
+        for (Aluno aluno : alunos) {
+            this.save(aluno);
+        }
+        return alunos;
     }
 }
 

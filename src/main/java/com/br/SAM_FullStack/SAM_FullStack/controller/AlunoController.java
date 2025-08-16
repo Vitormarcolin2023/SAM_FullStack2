@@ -2,6 +2,7 @@ package com.br.SAM_FullStack.SAM_FullStack.controller;
 
 import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.service.AlunoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/alunos")
+@RequestMapping("/alunos")
 @RequiredArgsConstructor
 public class AlunoController {
 
@@ -27,6 +28,16 @@ public class AlunoController {
         }
     }
 
+    @GetMapping("/findById/{id}")
+    public ResponseEntity<Aluno> findById(@PathVariable Long id) {
+        try {
+            Aluno aluno = alunoService.findById(id);
+            return ResponseEntity.ok(aluno);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST); // Status 500
+        }
+    }
+
     @PostMapping("/save")
     public ResponseEntity<Aluno> save(@RequestBody Aluno aluno) {
         try {
@@ -39,9 +50,20 @@ public class AlunoController {
         }
     }
 
+    //atualizar
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> update (@PathVariable Long id, @Valid @RequestBody Aluno alunoUpdate){
+        try{
+            Aluno alunoAtualizado = alunoService.update(id, alunoUpdate);
+            return ResponseEntity.ok(alunoAtualizado);
+        }catch (Exception e){
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     //deletar
     @DeleteMapping("/delet/{id}")
-    public ResponseEntity<?> delete (@PathVariable Integer id){
+    public ResponseEntity<?> delete (@PathVariable Long id){
         try{
             alunoService.delete(id);
             return ResponseEntity.noContent().build();
@@ -50,5 +72,9 @@ public class AlunoController {
         }
     }
 
-
+    @PostMapping("/batch")
+    public ResponseEntity<List<Aluno>> saveAll(@RequestBody List<Aluno> alunos) {
+        List<Aluno> alunosSalvos = alunoService.saveAll(alunos);
+        return ResponseEntity.status(HttpStatus.CREATED).body(alunosSalvos);
+    }
 }
