@@ -78,4 +78,14 @@ public class CursoController {
         }
         return ResponseEntity.ok(cursosEncontrados);
     }
+
+    //buscar-por-nome-area?nomeArea=saude
+    @GetMapping("/buscar-por-nome-area")
+    public ResponseEntity<List<Curso>> getCursosPorNomeDaArea(@RequestParam("nomeArea") String nomeArea) {
+        List<Curso> cursosEncontrados = cursoService.buscarPorNomeDaArea(nomeArea);
+        if (cursosEncontrados.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(cursosEncontrados);
+    }
 }
