@@ -51,4 +51,14 @@ public class CoordenadorController {
         List<Mentor> mentores = this.coordenadorService.findAllMentores();
         return new ResponseEntity<>(mentores, HttpStatus.OK);
     }
+
+    @PutMapping("/inativarMentor/{id}")
+    public ResponseEntity<String> inativarMentor(@PathVariable long id){
+        try {
+            String mensagem = this.coordenadorService.inativarMentor(id);
+            return new ResponseEntity<>(mensagem, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
 }

@@ -40,4 +40,13 @@ public class CoordenadorService {
     public List<Mentor> findAllMentores(){
         return this.mentorService.listAll();
     }
+
+    public String inativarMentor(long mentorId){
+        try {
+            String mensagem = this.mentorService.updateStatus(mentorId, "PENDENTE");
+            return "Mentor inativado com sucesso!";
+        } catch (Exception e) {
+            return "Erro ao tentar inativar o mentor.";
+        }
+    }
 }
