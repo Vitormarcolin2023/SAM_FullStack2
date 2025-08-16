@@ -43,8 +43,8 @@ public class Mentor {
     @Enumerated(EnumType.STRING)
     private TipoDeVinculo tipoDeVinculo;
 
-    @NotNull(message = "A área de atuação é obrigatória")
-    @Enumerated(EnumType.STRING) // Adicione esta anotação se AreaDeAtuacao for um enum
+    @ManyToOne
+    @JoinColumn(name = "area_de_atuacao_id", nullable = false)
     private AreaDeAtuacao areaDeAtuacao;
 
     // Relacionamento com Endereco
