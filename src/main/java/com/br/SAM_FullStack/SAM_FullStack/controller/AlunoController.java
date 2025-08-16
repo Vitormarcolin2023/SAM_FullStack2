@@ -39,7 +39,7 @@ public class AlunoController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<Aluno> save(@RequestBody Aluno aluno) {
+    public ResponseEntity<Aluno> save(@Valid @RequestBody Aluno aluno) {
         try {
             Aluno result = alunoService.save(aluno);
             return new ResponseEntity<>(result, HttpStatus.CREATED);
