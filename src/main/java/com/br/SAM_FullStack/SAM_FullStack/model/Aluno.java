@@ -1,6 +1,7 @@
 package com.br.SAM_FullStack.SAM_FullStack.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
@@ -23,8 +24,12 @@ public class Aluno {
     private String senha;
     private String email;
 
+    @Enumerated(EnumType.STRING)
+    private StatusAlunoGrupo statusAlunoGrupo;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "grupo_id")
+    @JsonIgnore
     private Grupo grupo;
 
 }
