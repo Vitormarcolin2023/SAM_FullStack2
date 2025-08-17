@@ -30,8 +30,8 @@ public class Projeto {
     @Column(name = "descricao", nullable = false, length = 100)
     private String descricao;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "area_de_atuacao")
+    @ManyToOne
+    @JoinColumn(name = "area_de_atuacao_id", nullable = false)
     private AreaDeAtuacao areaDeAtuacao;
 
     @NotNull(message = "A data de inicio é obrigatória")
