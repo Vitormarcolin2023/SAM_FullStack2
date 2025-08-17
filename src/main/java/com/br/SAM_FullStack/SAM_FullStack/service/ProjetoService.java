@@ -25,12 +25,12 @@ public class ProjetoService {
                     .orElseThrow(() -> new RuntimeException("Projeto não encontrado"));
         }
 
-        public List<Projeto>buscarPorNome(String nome){
-        return projetoRepository.findByNomeIgnoreCaseContaining(nome);
+        public List<Projeto>buscarPorNome(String nomeDoProjeto){
+        return projetoRepository.findByNomeDoProjetoIgnoreCaseContaining(nomeDoProjeto);
         }
 
         public List<Projeto>buscarPorAreaAtuacao(AreaDeAtuacao areaDeAtuacao){
-        return projetoRepository.findByAreaAtuacao(areaDeAtuacao);
+        return projetoRepository.findByAreaDeAtuacao(areaDeAtuacao);
         }
 
         private void atualizarStatusProjeto(Projeto projeto){

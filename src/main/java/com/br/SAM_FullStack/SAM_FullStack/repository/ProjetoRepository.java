@@ -10,8 +10,8 @@ import java.util.List;
 @Repository
 public interface ProjetoRepository extends JpaRepository <Projeto, Long> {
 
-    List<Projeto> findByNomeIgnoreCaseContaining(String nome);
+    List<Projeto> findByNomeDoProjetoIgnoreCaseContaining(String nomeDoProjeto);
 
 
-    List<Projeto> findByAreaAtuacao(AreaDeAtuacao areaDeAtuacao);
+    List<Projeto> findByAreaDeAtuacao(AreaDeAtuacao areaDeAtuacao);
 }
