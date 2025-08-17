@@ -3,37 +3,71 @@ package com.br.SAM_FullStack.SAM_FullStack.service;
 import com.br.SAM_FullStack.SAM_FullStack.model.Reuniao;
 import com.br.SAM_FullStack.SAM_FullStack.model.StatusReuniao;
 import com.br.SAM_FullStack.SAM_FullStack.repository.ReuniaoRepository;
-import lombok.NoArgsConstructor;
-import org.springframework.data.jpa.repository.Query;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class ReuniaoService {
 
-    private ReuniaoRepository reuniaoRepository;
+    private final ReuniaoRepository reuniaoRepository;
 
-    // Método para ser usado por coordenação - para verificar TODAS as reuniões
-    public List<Reuniao> findAll(){
+    // Metodo para coordenação - ver todas
+    public List<Reuniao> findAll() {
         return reuniaoRepository.findAll();
     }
 
-    //Método para ser usado por GRUPO para filtrar APENAS as reuniões que o grupo dele participa
-    public List<Reuniao> findAllAluno(long id){
-        return reuniaoRepository.findAllAluno(id);
+    // Metodo para grupo - ver só reuniões do grupo
+    public List<Reuniao> findAllByGrupo(long idGrupo) {
+        return reuniaoRepository.findAllAluno(idGrupo);
     }
 
-    // Método para ser usado por MENTORES para filtrar APENAS as reuniões que o mentor participa
-    public List<Reuniao> findAllMentor(long idMentor){
+    // Metodo para mentor - ver só reuniões do mentor
+    public List<Reuniao> findAllByMentor(long idMentor) {
         return reuniaoRepository.findAllMentor(idMentor);
     }
 
-    // Método para salvar uma reuniao requisitada
-    public String save (Reuniao reuniao){
+    // Buscar por ID
+    public Reuniao findById(long id) {
+        return reuniaoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Reunião não encontrada com id " + id));
+    }
+
+    // Salvar uma reunião (nova solicitação sempre começa como PENDENTE)
+    public String save(Reuniao reuniao) {
         reuniao.setStatusReuniao(StatusReuniao.PENDENTE);
-        this.reuniaoRepository.save(reuniao);
-        return ("Solicitação de reunião enviada");
+        reuniaoRepository.save(reuniao);
+        return "Solicitação de reunião enviada";
+    }
+
+    // Atualizar reunião
+    public String update(long id, Reuniao reuniaoAtualizada) {
+        Reuniao reuniao = this.findById(id);
+
+        if(reuniao == null){
+         throw new IllegalStateException("Reunião com id " + id + " não encontrada");
+        }
+        reuniao.setAssunto(reuniaoAtualizada.getAssunto());
+        reuniao.setData(reuniaoAtualizada.getData());
+        reuniao.setHora(reuniaoAtualizada.getHora());
+        reuniao.setFormatoReuniao(reuniaoAtualizada.getFormatoReuniao());
+        reuniao.setStatusReuniao(reuniaoAtualizada.getStatusReuniao());
+        reuniao.setGrupo(reuniaoAtualizada.getGrupo());
+        reuniao.setMentor(reuniaoAtualizada.getMentor());
+
+        reuniaoRepository.save(reuniao);
+        return ("Reunião atualizada com sucesso!");
+    }
+
+    // Deletar reunião
+    public String delete(long id) {
+        Reuniao reuniao = this.findById(id);
+        if (reuniao == null){
+            throw new IllegalStateException("Reunião não encontrada");
+        }
+        reuniaoRepository.delete(reuniao);
+        return ("Reunião deletada com sucesso");
     }
 }

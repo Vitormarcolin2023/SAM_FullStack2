@@ -3,9 +3,11 @@ package com.br.SAM_FullStack.SAM_FullStack.service;
 import com.br.SAM_FullStack.SAM_FullStack.dto.GrupoDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.model.Grupo;
+import com.br.SAM_FullStack.SAM_FullStack.model.Professor;
 import com.br.SAM_FullStack.SAM_FullStack.model.StatusAlunoGrupo;
 import com.br.SAM_FullStack.SAM_FullStack.repository.AlunoRepository;
 import com.br.SAM_FullStack.SAM_FullStack.repository.GrupoRepository;
+import com.br.SAM_FullStack.SAM_FullStack.repository.ProfessorRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.transaction.Transactional;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Guard;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +25,7 @@ public class GrupoService {
 
     private final GrupoRepository grupoRepository;
     private final AlunoRepository alunoRepository;
+    private final ProfessorRepository professorRepository;
     private final EntityManager em;
 
     public List<Grupo> findAll(){
@@ -129,19 +133,18 @@ public class GrupoService {
     }
 
     // validação de exclusão de aluno pelo professor
-    public String analizarExclusaoAluno (long idProf, long idGrupo, boolean resposta){
-        Grupo grupo = grupoRepository.findById(idGrupo).orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado"));
-        Aluno aluno = alunoRepository.findByStatusAlunoGrupo(StatusAlunoGrupo.AGUARDANDO);
+    public String analizarExclusaoAluno(long idProf, long idGrupo, long idAluno, boolean resposta) {
+        Grupo grupo = grupoRepository.findById(idGrupo)
+                .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado"));
 
-        // verifica se o aluno está no grupo
-        if (aluno == null || !grupo.getAlunos().contains(aluno)) {
-            throw new IllegalStateException("Operação não permitida. Não há alunos aguardando exclusão neste grupo.");
-        }
+        Professor professor = professorRepository.findById(idProf)
+                .orElseThrow(() -> new IllegalArgumentException("Professor não encontrado"));
 
-        // FALTA VALIDAR SE O SOLICITANTE É PROFESSOR
+        Aluno aluno = alunoRepository
+                .findByIdAndGrupoAndStatusAlunoGrupo(idAluno, grupo, StatusAlunoGrupo.AGUARDANDO)
+                .orElseThrow(() -> new IllegalStateException("Esse aluno não está aguardando exclusão nesse grupo."));
 
         if (resposta) {
-            // Remove o aluno do grupo
             grupo.getAlunos().remove(aluno);
             aluno.setGrupo(null);
             aluno.setStatusAlunoGrupo(null);
@@ -154,12 +157,15 @@ public class GrupoService {
         }
     }
 
+
+
     public String deletarGrupo(long idProfessor, long idGrupo) {
         // Verifica se o grupo existe
         Grupo grupo = grupoRepository.findById(idGrupo)
                 .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado"));
 
-        // FALTA VALIDAR SE O SOLICITANTE É O PROFESSOR
+        Professor professor = professorRepository.findById(idProfessor)
+                .orElseThrow(() -> new IllegalArgumentException("Professor não encontrado"));
 
         // Remove o grupo
         grupoRepository.delete(grupo);

@@ -1,6 +1,7 @@
 package com.br.SAM_FullStack.SAM_FullStack.controller;
 
 import com.br.SAM_FullStack.SAM_FullStack.dto.AdicionarAlunoDTO;
+import com.br.SAM_FullStack.SAM_FullStack.dto.AnalizarExclusaoDTO;
 import com.br.SAM_FullStack.SAM_FullStack.dto.GrupoDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.Grupo;
 import com.br.SAM_FullStack.SAM_FullStack.model.StatusAlunoGrupo;
@@ -85,18 +86,23 @@ public class GrupoController {
     }
 
     // para professor aceitar ou recusar a exclusao do aluno do grupo
-    @PutMapping("analizarSolicitacao/{idGrupo}/professor/{idProf}")
-    public ResponseEntity<String> analizarExclusaoAluno(
-            @PathVariable long idProf,
-            @PathVariable long idGrupo,
-            @RequestParam boolean resposta) {
+    @PutMapping("analizarSolicitacao")
+    public ResponseEntity<String> analizarExclusaoAluno(@RequestBody AnalizarExclusaoDTO pedido) {
         try {
-            String result = grupoService.analizarExclusaoAluno(idProf, idGrupo, resposta);
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (IllegalStateException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            String result = grupoService.analizarExclusaoAluno(
+                    pedido.getIdProf(),
+                    pedido.getIdGrupo(),
+                    pedido.getIdAluno(),
+                    pedido.isResposta()
+            );
+            return ResponseEntity.ok(result);
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Erro inesperado: " + e.getMessage());
         }
     }
+
 
     // deletar grupo -> PROFESSOR
     @DeleteMapping("delete/{idGrupo}/professor/{idProfessor}")
