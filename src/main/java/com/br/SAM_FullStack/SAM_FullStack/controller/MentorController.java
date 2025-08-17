@@ -46,7 +46,8 @@ public class MentorController {
         try {
             Mentor savedMentor = mentorService.save(mentor);
             // Retorna o mentor salvo se a operação for bem-sucedida.
-            return ResponseEntity.ok(savedMentor);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Mentor cadastrado com sucesso!");
+
         } catch (Exception e) {
             // Retorna uma mensagem de erro e o status BAD_REQUEST em caso de falha.
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao salvar mentor: " + e.getMessage());
