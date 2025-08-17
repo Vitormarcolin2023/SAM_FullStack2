@@ -92,9 +92,6 @@
             reuniao.setGrupo(grupo);
             reuniao.setMentor(mentor);
 
-            // O status também pode vir do DTO, se for o caso
-            // reuniao.setStatusReuniao(reuniaoAtualizadaDTO.getStatusReuniao());
-
             reuniaoRepository.save(reuniao);
             return ("Reunião atualizada com sucesso!");
         }
