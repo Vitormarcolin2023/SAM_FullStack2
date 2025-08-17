@@ -2,6 +2,7 @@ package com.br.SAM_FullStack.SAM_FullStack.controller;
 
 import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
 import com.br.SAM_FullStack.SAM_FullStack.model.Professor;
+import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
 import com.br.SAM_FullStack.SAM_FullStack.service.ProfessorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -61,6 +62,12 @@ public class ProfessorController {
     public ResponseEntity<List<Mentor>> findAllMentores(){
         List<Mentor> mentores = this.professorService.findAllMentores();
         return new ResponseEntity<>(mentores, HttpStatus.OK);
+    }
+
+    @GetMapping("/projetos")
+    public ResponseEntity<List<Projeto>> findAllProjetos(){
+        List<Projeto> projetos = this.professorService.findAllProjetos();
+        return new ResponseEntity<>(projetos, HttpStatus.OK);
     }
 
 }

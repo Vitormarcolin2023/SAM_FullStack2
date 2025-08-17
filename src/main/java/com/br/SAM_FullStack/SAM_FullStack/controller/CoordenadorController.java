@@ -2,6 +2,7 @@ package com.br.SAM_FullStack.SAM_FullStack.controller;
 
 import com.br.SAM_FullStack.SAM_FullStack.model.Coordenador;
 import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
+import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
 import com.br.SAM_FullStack.SAM_FullStack.service.CoordenadorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,12 +47,6 @@ public class CoordenadorController {
         }
     }
 
-    @GetMapping("/mentores")
-    public ResponseEntity<List<Mentor>> findAllMentores(){
-        List<Mentor> mentores = this.coordenadorService.findAllMentores();
-        return new ResponseEntity<>(mentores, HttpStatus.OK);
-    }
-
     @PutMapping("/inativarMentor/{id}")
     public ResponseEntity<String> inativarMentor(@PathVariable long id){
         try {
@@ -60,5 +55,17 @@ public class CoordenadorController {
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/mentores")
+    public ResponseEntity<List<Mentor>> findAllMentores(){
+        List<Mentor> mentores = this.coordenadorService.findAllMentores();
+        return new ResponseEntity<>(mentores, HttpStatus.OK);
+    }
+
+    @GetMapping("/projetos")
+    public ResponseEntity<List<Projeto>> findAllProjetos(){
+        List<Projeto> projetos = this.coordenadorService.findAllProjetos();
+        return new ResponseEntity<>(projetos, HttpStatus.OK);
     }
 }
