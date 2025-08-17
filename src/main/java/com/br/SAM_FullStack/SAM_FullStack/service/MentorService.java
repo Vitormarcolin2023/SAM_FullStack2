@@ -3,13 +3,18 @@ package com.br.SAM_FullStack.SAM_FullStack.service;
 import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
 import com.br.SAM_FullStack.SAM_FullStack.model.StatusMentor;
 import com.br.SAM_FullStack.SAM_FullStack.repository.MentorRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MentorService {
     private final MentorRepository mentorRepository;
+    @Autowired
+    private EmailService emailService;
+
 
     public MentorService(MentorRepository mentorRepository){
         this.mentorRepository = mentorRepository;
@@ -30,6 +35,14 @@ public class MentorService {
     public Mentor save(Mentor mentor) {
         // Status inicial até a coordenação aprovar
         mentor.setStatusMentor(StatusMentor.PENDENTE);
+
+        //Envio de email
+        String destinatario = mentor.getEmail();
+        String assunto = "Bem-vindo(a) ao SAM - Cadastro em Análise";
+        Map<String, Object> variaveis = Map.of("nomeMentor", mentor.getNome());
+        String template = "emails/boasVindasMentor";
+        emailService.enviarEmailComTemplate(destinatario, assunto, template, variaveis);
+
         return mentorRepository.save(mentor);
     }
 

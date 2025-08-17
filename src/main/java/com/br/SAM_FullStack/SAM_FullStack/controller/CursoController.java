@@ -68,4 +68,24 @@ public class CursoController {
         List<Curso> cursosSalvos = cursoService.saveAll(cursos);
         return ResponseEntity.status(HttpStatus.CREATED).body(cursosSalvos);
     }
+
+    //buscar-por-curso?curso=sistemas
+    @GetMapping("/buscar-por-curso")
+    public ResponseEntity<List<Curso>> getCyrsosPorNome(@RequestParam("curso") String curso) {
+        List<Curso> cursosEncontrados = cursoService.buscarPorCurso(curso);
+        if (cursosEncontrados.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(cursosEncontrados);
+    }
+
+    //buscar-por-nome-area?nomeArea=saude
+    @GetMapping("/buscar-por-nome-area")
+    public ResponseEntity<List<Curso>> getCursosPorNomeDaArea(@RequestParam("nomeArea") String nomeArea) {
+        List<Curso> cursosEncontrados = cursoService.buscarPorNomeDaArea(nomeArea);
+        if (cursosEncontrados.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(cursosEncontrados);
+    }
 }
