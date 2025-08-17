@@ -52,7 +52,7 @@ public class AreaDeAtuacaoController {
         }
     }
 
-    @DeleteMapping("/delet/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> delete (@PathVariable Long id){
         try{
             areaDeAtuacaoService.delete(id);
