@@ -39,10 +39,10 @@ public class AlunoController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<Aluno> save(@Valid @RequestBody Aluno aluno) {
+    public ResponseEntity<String> save(@Valid @RequestBody Aluno aluno) {
         try {
             Aluno result = alunoService.save(aluno);
-            return new ResponseEntity<>(result, HttpStatus.CREATED);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Aluno cadastrado com sucesso!");
         } catch (Exception ex) {
             // Logar o erro
             ex.printStackTrace();
