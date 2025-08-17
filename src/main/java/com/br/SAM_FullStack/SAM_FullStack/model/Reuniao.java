@@ -1,5 +1,7 @@
 package com.br.SAM_FullStack.SAM_FullStack.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -26,23 +28,29 @@ public class Reuniao {
     @NotBlank(message = "O campo 'assunto' não pode ser nulo")
     private String assunto;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "É necessário informar a data da reunião")
     private Date data;
 
+    @JsonFormat(pattern = "HH:mm:ss")
     @NotNull(message = "É necessário informar a hora da reunião")
     private Time hora;
+
 
     @Enumerated(EnumType.STRING)
     private FormatoReuniao formatoReuniao;
     @Enumerated(EnumType.STRING)
     private StatusReuniao statusReuniao;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "mentor_admin_id")
+    @JsonIgnore
     private Mentor mentor;
 
-    @OneToOne
+
+    @ManyToOne
     @JoinColumn(name = "grupo_id")
+    @JsonIgnore
     private Grupo grupo;
 
 }

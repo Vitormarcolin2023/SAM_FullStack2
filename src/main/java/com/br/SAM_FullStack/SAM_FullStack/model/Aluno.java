@@ -12,6 +12,9 @@ import lombok.Setter;
 import lombok.ToString;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @Entity
 @Table(name = "tb_aluno")

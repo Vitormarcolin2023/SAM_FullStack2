@@ -30,8 +30,11 @@ public class Grupo {
     @JoinColumn(name = "aluno_admin_id")
     private Aluno alunoAdmin;
 
-
     @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL)
     private List<Aluno> alunos;
+
+    @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reuniao> reunioes = new ArrayList<>();
+
 
 }

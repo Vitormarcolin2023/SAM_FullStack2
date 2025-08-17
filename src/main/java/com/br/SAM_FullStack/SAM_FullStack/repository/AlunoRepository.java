@@ -20,6 +20,8 @@ public interface AlunoRepository extends JpaRepository<Aluno, Long> {
 
     Optional<Aluno> findByIdAndGrupoAndStatusAlunoGrupo(Long idAluno, Grupo grupo, StatusAlunoGrupo status);
 
+    List<Aluno> findAllByGrupoId(long id);
+
 
     @Query(
             "Select a from Aluno a where a.nome = :nome"

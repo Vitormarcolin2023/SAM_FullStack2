@@ -76,9 +76,6 @@ public class GrupoService {
             if(aluno.getId().equals(admin.getId())){
                 adminInformado = true;
             }
-            if(!aluno.getCurso().getId().equals(admin)){
-                throw new IllegalStateException("Todos os alunos devem pertencer ao mesmo curso do administrador!");
-            }
         }
 
         // faz a validação do admin no grupo

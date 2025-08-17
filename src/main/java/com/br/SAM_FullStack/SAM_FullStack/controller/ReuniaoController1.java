@@ -1,7 +1,8 @@
 package com.br.SAM_FullStack.SAM_FullStack.controller;
 
+import com.br.SAM_FullStack.SAM_FullStack.dto.ReuniaoDTO; // Importe o DTO
 import com.br.SAM_FullStack.SAM_FullStack.model.Reuniao;
-import com.br.SAM_FullStack.SAM_FullStack.service.ReuniaoService;
+import com.br.SAM_FullStack.SAM_FullStack.service.ReuniaoService1;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +15,7 @@ import java.util.List;
 @RequestMapping("/reunioes")
 public class ReuniaoController1 {
 
-    private final ReuniaoService reuniaoService;
+    private final ReuniaoService1 reuniaoService;
 
     // Listar todas as reuniões
     @GetMapping("/findAll")
@@ -62,25 +63,29 @@ public class ReuniaoController1 {
         }
     }
 
-    // Criar uma reunião
+    // Criar uma reunião - AGORA RECEBE UM DTO!
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody Reuniao reuniao) {
+    public ResponseEntity<String> save(@RequestBody ReuniaoDTO reuniaoDTO) {
         try {
-            String result = reuniaoService.save(reuniao);
+            String result = reuniaoService.save(reuniaoDTO);
             return new ResponseEntity<>(result, HttpStatus.CREATED);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Erro ao salvar a reunião", HttpStatus.BAD_REQUEST);
         }
     }
 
-    // Atualizar reunião existente
+    // Atualizar reunião existente - AGORA RECEBE UM DTO!
     @PutMapping("/update/{id}")
-    public ResponseEntity<String> update(@PathVariable Long id, @RequestBody Reuniao reuniao) {
+    public ResponseEntity<String> update(@PathVariable Long id, @RequestBody ReuniaoDTO reuniaoDTO) {
         try {
-            String result = reuniaoService.update(id, reuniao);
+            String result = reuniaoService.update(id, reuniaoDTO);
             return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Erro ao atualizar a reunião", HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -90,8 +95,10 @@ public class ReuniaoController1 {
         try {
             String result = reuniaoService.delete(id);
             return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception e) {
+        } catch (IllegalStateException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Erro ao deletar a reunião", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
