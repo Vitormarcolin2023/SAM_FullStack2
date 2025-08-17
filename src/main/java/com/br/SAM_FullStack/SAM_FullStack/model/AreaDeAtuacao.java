@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @Entity
@@ -25,4 +26,17 @@ public class AreaDeAtuacao {
     @ToString.Exclude
     @JsonIgnoreProperties("areaDeAtuacao")
     private List<Curso> cursos;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AreaDeAtuacao that = (AreaDeAtuacao) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

@@ -1,5 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
+import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.model.AreaDeAtuacao;
 import com.br.SAM_FullStack.SAM_FullStack.model.Grupo;
 import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
@@ -51,22 +52,28 @@ public class ProjetoService {
         }
 
          // SALVAR
-         public Projeto save (Projeto projeto) {
-             // 1. Verificar se o Projeto tem um Grupo associado
+         public Projeto save(Projeto projeto) {
              if (projeto.getGrupo() != null && projeto.getGrupo().getId() != 0) {
-
-                 // 2. Buscar a entidade 'Grupo' do banco de dados para garantir que esteja 'Managed'
-                 Grupo grupoGerenciado = grupoRepository.findById(projeto.getGrupo().getId())
+                 // Use a nova query para buscar o grupo com os alunos já carregados
+                 Grupo grupoGerenciado = grupoRepository.findByIdWithAlunos(projeto.getGrupo().getId())
                          .orElseThrow(() -> new RuntimeException("Grupo não encontrado"));
 
-                 // 3. Associar a entidade 'Grupo' gerenciada ao 'Projeto'
                  projeto.setGrupo(grupoGerenciado);
+
+                 if (grupoGerenciado.getAlunos() != null && !grupoGerenciado.getAlunos().isEmpty()) {
+
+                     AreaDeAtuacao areaDoProjeto = projeto.getAreaDeAtuacao();
+                     for (Aluno aluno : grupoGerenciado.getAlunos()) {
+                         if (!aluno.getCurso().getAreaDeAtuacao().getId().equals(areaDoProjeto.getId())) {
+                             throw new IllegalArgumentException("A área de atuação do projeto deve ser a mesma de todos os alunos do grupo.");
+                         }
+                     }
+                 } else {
+                     throw new IllegalArgumentException("O grupo associado ao projeto não possui alunos.");
+                 }
              }
 
-             // O resto do seu código
              atualizarStatusProjeto(projeto);
-
-             // 4. Salvar o Projeto (agora com uma entidade 'Grupo' gerenciada)
              return projetoRepository.save(projeto);
          }
 
