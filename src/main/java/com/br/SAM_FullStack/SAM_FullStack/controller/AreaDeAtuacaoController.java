@@ -67,4 +67,14 @@ public class AreaDeAtuacaoController {
         List<AreaDeAtuacao> areaDeAtuacoesSalvos = areaDeAtuacaoService.saveAll(areaDeAtuacoes);
         return ResponseEntity.status(HttpStatus.CREATED).body(areaDeAtuacoesSalvos);
     }
+
+    //areas/buscar-por-inicio?prefixo=e
+    @GetMapping("/buscar-por-inicio")
+    public ResponseEntity<List<AreaDeAtuacao>> getAreaPorInicioDoNome(@RequestParam("prefixo") String prefixo) {
+        List<AreaDeAtuacao> areasEncontradas = areaDeAtuacaoService.buscarPorInicioDoNome(prefixo);
+        if (areasEncontradas.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(areasEncontradas);
+    }
 }
