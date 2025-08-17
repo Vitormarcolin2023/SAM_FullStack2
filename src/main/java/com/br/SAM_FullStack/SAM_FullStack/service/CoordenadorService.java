@@ -2,6 +2,7 @@ package com.br.SAM_FullStack.SAM_FullStack.service;
 
 import com.br.SAM_FullStack.SAM_FullStack.model.Coordenador;
 import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
+import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
 import com.br.SAM_FullStack.SAM_FullStack.repository.CoordenadorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,9 @@ public class CoordenadorService {
 
     @Autowired
     private MentorService mentorService;
+
+    @Autowired
+    private ProjetoService projetoService;
 
     public String save(Coordenador coordenador){
         this.coordenadorRepository.save(coordenador);
@@ -37,10 +41,6 @@ public class CoordenadorService {
         }
     }
 
-    public List<Mentor> findAllMentores(){
-        return this.mentorService.listAll();
-    }
-
     public String inativarMentor(long mentorId){
         try {
             String mensagem = this.mentorService.updateStatus(mentorId, "PENDENTE");
@@ -48,5 +48,13 @@ public class CoordenadorService {
         } catch (Exception e) {
             return "Erro ao tentar inativar o mentor.";
         }
+    }
+
+    public List<Mentor> findAllMentores(){
+        return this.mentorService.listAll();
+    }
+
+    public List<Projeto> findAllProjetos(){
+        return this.projetoService.listAll();
     }
 }

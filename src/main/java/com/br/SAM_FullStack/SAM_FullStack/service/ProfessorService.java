@@ -2,6 +2,7 @@ package com.br.SAM_FullStack.SAM_FullStack.service;
 
 import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
 import com.br.SAM_FullStack.SAM_FullStack.model.Professor;
+import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
 import com.br.SAM_FullStack.SAM_FullStack.repository.ProfessorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,9 @@ public class ProfessorService {
 
     @Autowired
     private MentorService mentorService;
+
+    @Autowired
+    private ProjetoService projetoService;
 
     public String save(Professor professor){
         this.professorRepository.save(professor);
@@ -39,6 +43,10 @@ public class ProfessorService {
 
     public List<Mentor> findAllMentores(){
         return this.mentorService.listAll();
+    }
+
+    public List<Projeto> findAllProjetos(){
+        return this.projetoService.listAll();
     }
 
 }
