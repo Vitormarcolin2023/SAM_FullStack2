@@ -12,8 +12,11 @@ import java.util.Map;
 @Service
 public class MentorService {
     private final MentorRepository mentorRepository;
+
+
     @Autowired
     private EmailService emailService;
+
 
 
     public MentorService(MentorRepository mentorRepository){
@@ -36,12 +39,16 @@ public class MentorService {
         // Status inicial até a coordenação aprovar
         mentor.setStatusMentor(StatusMentor.PENDENTE);
 
+
+
         //Envio de email
         String destinatario = mentor.getEmail();
         String assunto = "Bem-vindo(a) ao SAM - Cadastro em Análise";
         Map<String, Object> variaveis = Map.of("nomeMentor", mentor.getNome());
         String template = "emails/boasVindasMentor";
         emailService.enviarEmailComTemplate(destinatario, assunto, template, variaveis);
+
+
 
         return mentorRepository.save(mentor);
     }
@@ -51,13 +58,12 @@ public class MentorService {
         Mentor mentorExistente = findById(id);
         mentorExistente.setNome(mentorUpdate.getNome());
         mentorExistente.setCpf(mentorUpdate.getCpf());
-        mentorExistente.setEmail(mentorUpdate.getEmail());
+        //mentorExistente.setEmail(mentorUpdate.getEmail());
         mentorExistente.setSenha(mentorUpdate.getSenha());
         mentorExistente.setTipoDeVinculo(mentorUpdate.getTipoDeVinculo());
-        //mentorExistente.setTipoDeUsuario(mentorUpdate.getTipoDeUsuario());
         mentorExistente.setTempoDeExperiencia(mentorUpdate.getTempoDeExperiencia());
-        //mentorExistente.setAreaDeAtuacao(mentorUpdate.getAreaDeAtuacao());
-        //enderecp
+        mentorExistente.setAreaDeAtuacao(mentorUpdate.getAreaDeAtuacao());
+        mentorExistente.setEndereco(mentorExistente.getEndereco());
 
         return mentorRepository.save(mentorExistente);
     }
