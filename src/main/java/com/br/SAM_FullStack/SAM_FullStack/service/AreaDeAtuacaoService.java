@@ -47,4 +47,8 @@ public class AreaDeAtuacaoService {
         }
         return areaDeAtuacoes;
     }
+
+    public List<AreaDeAtuacao> buscarPorInicioDoNome(String prefixo) {
+        return areaDeAtuacaoRepository.findByNomeStartingWithIgnoreCase(prefixo);
+    }
 }

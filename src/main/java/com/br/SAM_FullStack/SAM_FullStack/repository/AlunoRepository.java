@@ -28,4 +28,9 @@ public interface AlunoRepository extends JpaRepository<Aluno, Long> {
             "Select a from Aluno a where a.ra = :ra"
     )
     List<Aluno> getByRa(@Param("ra") Integer ra);
+
+    // Busca uma lista de alunos cujo nome contenha um determinado texto, ignorando maiúsculas/minúsculas.
+    List<Aluno> findByNomeContainingIgnoreCase(String nome);
+
+    List<Aluno> findAllByOrderByNomeAsc();
 }

@@ -39,7 +39,7 @@ public class AlunoController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<Aluno> save(@RequestBody Aluno aluno) {
+    public ResponseEntity<Aluno> save(@Valid @RequestBody Aluno aluno) {
         try {
             Aluno result = alunoService.save(aluno);
             return new ResponseEntity<>(result, HttpStatus.CREATED);
@@ -76,5 +76,22 @@ public class AlunoController {
     public ResponseEntity<List<Aluno>> saveAll(@RequestBody List<Aluno> alunos) {
         List<Aluno> alunosSalvos = alunoService.saveAll(alunos);
         return ResponseEntity.status(HttpStatus.CREATED).body(alunosSalvos);
+    }
+
+    //buscar-por-nome?nome=silva
+    @GetMapping("/buscar-por-nome")
+    public ResponseEntity<List<Aluno>> getAlunosPorNome(@RequestParam("nome") String nome) {
+        List<Aluno> alunosEncontrados = alunoService.buscarPorNome(nome);
+        if (alunosEncontrados.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(alunosEncontrados);
+    }
+
+    //alunos/ordenados-por-nome
+    @GetMapping("/ordenados-por-nome")
+    public ResponseEntity<List<Aluno>> getAlunoOrdenadosPorNome() {
+        List<Aluno> alunosOrdenados = alunoService.buscarTodosOrdenadoPorNome();
+        return ResponseEntity.ok(alunosOrdenados);
     }
 }
