@@ -10,9 +10,8 @@ import java.util.List;
 @Repository
 public interface ProjetoRepository extends JpaRepository <Projeto, Long> {
 
-    //FILTRA PROJETOS QUE CONTENHAM PARTE DO NOME
     List<Projeto> findByNomeIgnoreCaseContaining(String nome);
 
-    //FILTRA POR AREA DE ATUAÇÃO
+
     List<Projeto> findByAreaAtuacao(AreaDeAtuacao areaDeAtuacao);
 }

@@ -3,7 +3,7 @@ package com.br.SAM_FullStack.SAM_FullStack.controller;
 import com.br.SAM_FullStack.SAM_FullStack.model.AreaDeAtuacao;
 import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
 import com.br.SAM_FullStack.SAM_FullStack.service.ProjetoService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,26 +12,22 @@ import java.util.List;
 
     @RestController
     @RequestMapping("/projetos")
+    @RequiredArgsConstructor
     public class ProjetoController {
 
-    @Autowired
     private ProjetoService projetoService;
 
-    public ProjetoController(ProjetoService projetoService) {
-        this.projetoService = projetoService;
-    }
 
-    //LISTAR TODOS OS PROJETO
     @GetMapping("/findAll")
     public ResponseEntity<List<Projeto>> listAll() {
         try {
             var result = projetoService.listAll();
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception ex) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    //BUSCAR POR ID
+
     @GetMapping("/findById/{id}")
     public ResponseEntity<Object> findById(@PathVariable Long id) {
         try {
@@ -51,7 +47,6 @@ import java.util.List;
         return projetoService.buscarPorAreaAtuacao(areaDeAtuacao);
     }
 
-    //SALVAR PROJETO
     @PostMapping("/save")
     public ResponseEntity<Object> save(@RequestBody Projeto projeto) {
         try {
@@ -63,7 +58,7 @@ import java.util.List;
         }
     }
 
-    //ATUALIZAR PROJETO
+
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> update (@PathVariable Long id, @RequestBody Projeto projeto) {
         try {
@@ -74,7 +69,7 @@ import java.util.List;
                     .body("Não foi possível atualizar o projeto. Verifique o ID ou os dados fornecidos.");
         }
     }
-        //DELETAR PROJETO
+
         @DeleteMapping("/delete/{id}")
         public ResponseEntity<String> delete (@PathVariable Long id){
             try {

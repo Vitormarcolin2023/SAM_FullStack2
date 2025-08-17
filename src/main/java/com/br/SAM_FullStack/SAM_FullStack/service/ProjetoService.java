@@ -66,6 +66,9 @@ public class ProjetoService {
             projetoExistente.setPeriodo(projetoUpdate.getPeriodo());
             projetoExistente.setAreaDeAtuacao(projetoUpdate.getAreaDeAtuacao());
             projetoExistente.setTamanhoDoGrupo(projetoUpdate.getTamanhoDoGrupo());
+            if (projetoUpdate.getTamanhoDoGrupo() < 2 || projetoUpdate.getTamanhoDoGrupo() >6){
+                throw new RuntimeException("Tamanho do grupo deve ser no minimo 2 alunos e no maximo 6.");
+            }
 
             atualizarStatusProjeto(projetoExistente);
 
