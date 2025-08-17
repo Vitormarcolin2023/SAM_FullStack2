@@ -27,7 +27,7 @@ public class Projeto {
     private String nomeDoProjeto;
 
     @NotBlank(message = "Favor adicionar uma descrição do projeto")
-    @Column(name = "descricao", nullable = false, length = 100)
+    @Column(name = "descricao", nullable = false)
     private String descricao;
 
     @ManyToOne
@@ -42,10 +42,6 @@ public class Projeto {
     @Column(name = "data_final_projeto", nullable = false)
     private LocalDate dataFinalProjeto;
 
-    @Min(value = 1, message = "É obrigatório adicionar a quantidade de alunos no projeto")
-    @Column(name = "tamanho_do_grupo")
-    private int tamanhoDoGrupo;
-
     @NotBlank(message = "É obrigatório adicionar o periodo da faculdade")
     @Column(name = "periodo", nullable = false, length = 45)
     private String periodo;
@@ -57,16 +53,8 @@ public class Projeto {
 
     private String statusProjeto;
 
-   /* @ManyToMany
-    @JoinTable(
-            name = "projeto_aluno",
-            joinColumns = @JoinColumn(name = "projeto_id"),
-            inverseJoinColumns = @JoinColumn(name = "aluno_id")
-    )
-
+    @ManyToOne(cascade = CascadeType.ALL)
     @JsonIgnoreProperties("projetos")
-    private List<Aluno> alunos;
-}
-*/
+    private Grupo grupo;
 
 }

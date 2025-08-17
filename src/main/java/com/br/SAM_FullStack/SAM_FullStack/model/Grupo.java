@@ -36,5 +36,9 @@ public class Grupo {
     @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reuniao> reunioes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("grupo")
+    private List<Projeto> projetos;
+
 
 }
