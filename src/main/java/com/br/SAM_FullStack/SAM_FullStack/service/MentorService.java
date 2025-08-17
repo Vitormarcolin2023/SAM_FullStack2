@@ -54,10 +54,9 @@ public class MentorService {
         mentorExistente.setEmail(mentorUpdate.getEmail());
         mentorExistente.setSenha(mentorUpdate.getSenha());
         mentorExistente.setTipoDeVinculo(mentorUpdate.getTipoDeVinculo());
-        //mentorExistente.setTipoDeUsuario(mentorUpdate.getTipoDeUsuario());
         mentorExistente.setTempoDeExperiencia(mentorUpdate.getTempoDeExperiencia());
-        //mentorExistente.setAreaDeAtuacao(mentorUpdate.getAreaDeAtuacao());
-        //enderecp
+        mentorExistente.setAreaDeAtuacao(mentorUpdate.getAreaDeAtuacao());
+        mentorExistente.setEndereco(mentorExistente.getEndereco());
 
         return mentorRepository.save(mentorExistente);
     }
