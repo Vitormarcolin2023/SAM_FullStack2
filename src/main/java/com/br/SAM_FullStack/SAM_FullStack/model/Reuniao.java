@@ -1,6 +1,8 @@
 package com.br.SAM_FullStack.SAM_FullStack.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,8 +22,14 @@ public class Reuniao {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
+    @NotBlank(message = "O campo 'assunto' não pode ser nulo")
     private String assunto;
+
+    @NotNull(message = "É necessário informar a data da reunião")
     private Date data;
+
+    @NotNull(message = "É necessário informar a hora da reunião")
     private Time hora;
 
     @Enumerated(EnumType.STRING)

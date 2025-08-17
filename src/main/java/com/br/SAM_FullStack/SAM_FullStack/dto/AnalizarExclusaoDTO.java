@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AnalizarExclusaoDTO {
-    private long idProf;
+    private String senhaProf;
     private long idGrupo;
     private Long idAluno;
     private boolean resposta;

@@ -76,6 +76,9 @@ public class GrupoService {
             if(aluno.getId().equals(admin.getId())){
                 adminInformado = true;
             }
+            if(!aluno.getCurso().getId().equals(admin)){
+                throw new IllegalStateException("Todos os alunos devem pertencer ao mesmo curso do administrador!");
+            }
         }
 
         // faz a validação do admin no grupo
@@ -133,11 +136,11 @@ public class GrupoService {
     }
 
     // validação de exclusão de aluno pelo professor
-    public String analizarExclusaoAluno(long idProf, long idGrupo, long idAluno, boolean resposta) {
+    public String analizarExclusaoAluno(String senhaProf, long idGrupo, long idAluno, boolean resposta) {
         Grupo grupo = grupoRepository.findById(idGrupo)
                 .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado"));
 
-        Professor professor = professorRepository.findById(idProf)
+        Professor professor = professorRepository.findBySenha(senhaProf)
                 .orElseThrow(() -> new IllegalArgumentException("Professor não encontrado"));
 
         Aluno aluno = alunoRepository

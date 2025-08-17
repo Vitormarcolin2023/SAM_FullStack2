@@ -11,8 +11,8 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/reunioes")
-public class ReuniaoController {
+@RequestMapping("/reunioes")
+public class ReuniaoController1 {
 
     private final ReuniaoService reuniaoService;
 

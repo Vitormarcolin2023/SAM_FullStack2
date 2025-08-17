@@ -15,7 +15,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/grupos")
+@RequestMapping("/grupos")
 public class GrupoController {
 
     private final GrupoService grupoService;
@@ -90,7 +90,7 @@ public class GrupoController {
     public ResponseEntity<String> analizarExclusaoAluno(@RequestBody AnalizarExclusaoDTO pedido) {
         try {
             String result = grupoService.analizarExclusaoAluno(
-                    pedido.getIdProf(),
+                    pedido.getSenhaProf(),
                     pedido.getIdGrupo(),
                     pedido.getIdAluno(),
                     pedido.isResposta()
