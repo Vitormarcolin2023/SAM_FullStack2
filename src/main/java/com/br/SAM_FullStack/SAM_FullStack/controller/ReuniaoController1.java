@@ -2,8 +2,10 @@ package com.br.SAM_FullStack.SAM_FullStack.controller;
 
 import com.br.SAM_FullStack.SAM_FullStack.dto.ReuniaoDTO; // Importe o DTO
 import com.br.SAM_FullStack.SAM_FullStack.model.Reuniao;
+import com.br.SAM_FullStack.SAM_FullStack.model.StatusReuniao;
 import com.br.SAM_FullStack.SAM_FullStack.service.ReuniaoService1;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,7 @@ import java.util.List;
 @RequestMapping("/reunioes")
 public class ReuniaoController1 {
 
+    @Autowired
     private final ReuniaoService1 reuniaoService;
 
     // Listar todas as reuniões
@@ -78,9 +81,22 @@ public class ReuniaoController1 {
 
     // Atualizar reunião existente - AGORA RECEBE UM DTO!
     @PutMapping("/update/{id}")
-    public ResponseEntity<String> update(@PathVariable Long id, @RequestBody ReuniaoDTO reuniaoDTO) {
+    public ResponseEntity<String> update(@PathVariable long id, @RequestBody Reuniao reuniao) {
         try {
-            String result = reuniaoService.update(id, reuniaoDTO);
+            String result = reuniaoService.update(id, reuniao);
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (IllegalStateException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Erro ao atualizar a reunião", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/confirmarReuniao/{id}/status/{status}")
+    public ResponseEntity<String> confirmarReuniao(@PathVariable long id, @PathVariable String status) {
+        try {
+            StatusReuniao statusEnum = StatusReuniao.valueOf(status.toUpperCase()); // converte para enum
+            String result = reuniaoService.aceitarReuniao(id, statusEnum);
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (IllegalStateException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
