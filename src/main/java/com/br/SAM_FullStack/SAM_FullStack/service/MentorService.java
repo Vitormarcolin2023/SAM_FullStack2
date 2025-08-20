@@ -58,7 +58,7 @@ public class MentorService {
         Mentor mentorExistente = findById(id);
         mentorExistente.setNome(mentorUpdate.getNome());
         mentorExistente.setCpf(mentorUpdate.getCpf());
-        //mentorExistente.setEmail(mentorUpdate.getEmail());
+        mentorExistente.setEmail(mentorUpdate.getEmail());
         mentorExistente.setSenha(mentorUpdate.getSenha());
         mentorExistente.setTipoDeVinculo(mentorUpdate.getTipoDeVinculo());
         mentorExistente.setTempoDeExperiencia(mentorUpdate.getTempoDeExperiencia());
