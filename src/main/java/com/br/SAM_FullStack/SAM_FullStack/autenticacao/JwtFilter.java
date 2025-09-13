@@ -8,16 +8,26 @@ import java.io.IOException;
 
 public class JwtFilter implements Filter {
 
-    @Autowired
     private TokenService tokenService;
+
+    public void setTokenService(TokenService tokenService) {
+        this.tokenService = tokenService;
+    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
         HttpServletRequest req = (HttpServletRequest) request;
-        String authHeader = req.getHeader("Authorization");
+        String path = req.getRequestURI(); // pega a URL da requisição
 
+        // Ignora login (e outras rotas públicas, se quiser)
+        if (path.equals("/auth/login")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        String authHeader = req.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             try {
@@ -26,8 +36,12 @@ public class JwtFilter implements Filter {
             } catch (Exception e) {
                 throw new ServletException("Token inválido ou expirado");
             }
+        } else {
+            throw new ServletException("Token ausente");
         }
+
         chain.doFilter(request, response);
     }
+
 }
 
