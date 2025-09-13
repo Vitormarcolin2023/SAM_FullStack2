@@ -22,6 +22,7 @@ public interface AlunoRepository extends JpaRepository<Aluno, Long> {
 
     List<Aluno> findAllByGrupoId(long id);
 
+    Optional<Aluno> findByEmailAndSenha(String email, String senha);
 
     @Query(
             "Select a from Aluno a where a.nome = :nome"

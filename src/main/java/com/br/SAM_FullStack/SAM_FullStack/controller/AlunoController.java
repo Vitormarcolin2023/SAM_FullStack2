@@ -1,9 +1,12 @@
 package com.br.SAM_FullStack.SAM_FullStack.controller;
 
+import com.br.SAM_FullStack.SAM_FullStack.dto.LoginDTO;
+import com.br.SAM_FullStack.SAM_FullStack.dto.RespostaLoginDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.service.AlunoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +19,17 @@ import java.util.List;
 public class AlunoController {
 
     private final AlunoService alunoService;
+
+    @PostMapping("/login")
+    public  ResponseEntity<RespostaLoginDTO> login(@RequestBody LoginDTO loginDTO){
+        try{
+            RespostaLoginDTO response = alunoService.login(loginDTO);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e){
+            e.printStackTrace();
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @GetMapping("/findAll")
     public ResponseEntity<List<Aluno>> findAll(){
