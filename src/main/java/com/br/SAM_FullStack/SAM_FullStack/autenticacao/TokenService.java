@@ -1,4 +1,4 @@
-package com.br.SAM_FullStack.SAM_FullStack.security;
+package com.br.SAM_FullStack.SAM_FullStack.autenticacao;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -13,15 +13,16 @@ import java.time.ZoneOffset;
 
 @Service
 public class TokenService {
-    @Value("${api.security.token.secret}")
-    private String secret;
 
-    public String generateToken(String email){
+    private String secret = "segredodejusticaessetoken";
+
+    public String generateToken(String email, String role){
         try{
             Algorithm algorithm = Algorithm.HMAC256(secret);
             String token = JWT.create()
                     .withIssuer("auth-api")
                     .withSubject(email)
+                    .withClaim("Role", role)
                     .withExpiresAt(generateExpirationDate())
                     .sign(algorithm);
             return token;
