@@ -20,17 +20,6 @@ public class AlunoController {
 
     private final AlunoService alunoService;
 
-    @PostMapping("/login")
-    public  ResponseEntity<RespostaLoginDTO> login(@RequestBody LoginDTO loginDTO){
-        try{
-            RespostaLoginDTO response = alunoService.login(loginDTO);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e){
-            e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-    }
-
     @GetMapping("/findAll")
     public ResponseEntity<List<Aluno>> findAll(){
         try {

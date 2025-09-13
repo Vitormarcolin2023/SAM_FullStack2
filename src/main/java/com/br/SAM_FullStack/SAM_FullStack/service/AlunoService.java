@@ -4,6 +4,7 @@ import com.br.SAM_FullStack.SAM_FullStack.dto.LoginDTO;
 import com.br.SAM_FullStack.SAM_FullStack.dto.RespostaLoginDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.repository.AlunoRepository;
+import com.br.SAM_FullStack.SAM_FullStack.autenticacao.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +22,8 @@ public class AlunoService {
     @Autowired
     private EmailService emailService;
 
-    public RespostaLoginDTO login(LoginDTO loginDTO){
-
-        Aluno alunoLogado = alunoRepository.findByEmailAndSenha(loginDTO.getEmail(), loginDTO.getSenha()).orElseThrow(() ->
-                    new RuntimeException("Email ou senha inválidos")
-                );
-
-
-    }
+    @Autowired
+    private TokenService tokenService;
 
     public Aluno findById(Long id) {
         return alunoRepository.findById(id).orElseThrow(() ->
