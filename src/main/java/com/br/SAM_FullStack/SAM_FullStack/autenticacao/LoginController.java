@@ -26,7 +26,9 @@ public class LoginController {
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e){
             e.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new RespostaLoginDTO(e.getMessage()));    
         }
     }
 }
