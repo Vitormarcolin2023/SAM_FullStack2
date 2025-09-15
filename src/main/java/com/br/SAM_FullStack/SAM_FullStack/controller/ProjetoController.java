@@ -14,8 +14,11 @@ import java.util.List;
     @RestController
     @RequestMapping("/projetos")
     @RequiredArgsConstructor
+    @CrossOrigin("*")
     public class ProjetoController {
     @Autowired
+
+
     private ProjetoService projetoService;
 
 
