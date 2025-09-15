@@ -15,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/areas")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class AreaDeAtuacaoController {
 
     private final AreaDeAtuacaoService areaDeAtuacaoService;
