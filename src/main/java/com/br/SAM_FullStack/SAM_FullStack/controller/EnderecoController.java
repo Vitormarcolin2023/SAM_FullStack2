@@ -13,6 +13,7 @@ import java.util.List;
 public class EnderecoController {
 
 
+    //injeção de dependencia via construtor
     private final EnderecoService enderecoService;
 
     public EnderecoController(EnderecoService enderecoService) {
