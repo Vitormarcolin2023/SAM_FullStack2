@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/mentores")
+@CrossOrigin("*")
 public class MentorController {
 
 

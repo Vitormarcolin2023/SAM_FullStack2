@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/endereco")
+@CrossOrigin("*")
 public class EnderecoController {
 
 

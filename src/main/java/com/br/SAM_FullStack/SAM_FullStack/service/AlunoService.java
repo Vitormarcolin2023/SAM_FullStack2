@@ -1,7 +1,10 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
+import com.br.SAM_FullStack.SAM_FullStack.dto.LoginDTO;
+import com.br.SAM_FullStack.SAM_FullStack.dto.RespostaLoginDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.repository.AlunoRepository;
+import com.br.SAM_FullStack.SAM_FullStack.autenticacao.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,8 @@ public class AlunoService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private TokenService tokenService;
 
     public Aluno findById(Long id) {
         return alunoRepository.findById(id).orElseThrow(() ->
@@ -65,7 +70,6 @@ public class AlunoService {
         alunoExistente.setRa(alunoUpdate.getRa());
         alunoExistente.setSenha(alunoUpdate.getSenha());
         alunoExistente.setEmail(alunoUpdate.getEmail());
-
 
         return alunoRepository.save(alunoExistente);
     }

@@ -7,6 +7,7 @@
     import com.br.SAM_FullStack.SAM_FullStack.repository.MentorRepository;
     import com.br.SAM_FullStack.SAM_FullStack.repository.ReuniaoRepository;
     import lombok.RequiredArgsConstructor;
+    import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.stereotype.Service;
 
     import java.util.List;
@@ -15,6 +16,7 @@
     @RequiredArgsConstructor
     public class ReuniaoService1 {
 
+        @Autowired
         private final ReuniaoRepository reuniaoRepository;
         private final GrupoRepository grupoRepository;
         private final MentorRepository mentorRepository;
@@ -69,31 +71,46 @@
             return "Solicitação de reunião enviada";
         }
 
-        // Atualizado para receber um ReuniaoDTO
-        public String update(long id, ReuniaoDTO reuniaoAtualizadaDTO) {
-            Reuniao reuniao = this.findById(id);
+        public String update(long id, Reuniao reuniaoAtualizada) {
 
-            if (reuniao == null) {
-                throw new IllegalStateException("Reunião com id " + id + " não encontrada");
+            Reuniao reuniaoexiste = reuniaoRepository.findById(id)
+                    .orElseThrow(() -> new IllegalStateException("Reunião não encontrada"));
+
+            if(!reuniaoexiste.getStatusReuniao().equals(StatusReuniao.PENDENTE)){
+                throw new IllegalStateException("Operação não permitida. A reunião já foi avaliada pelo solicitado");
             }
 
-            // Busque as entidades novamente com base nos IDs do DTO
-            Grupo grupo = grupoRepository.findById(reuniaoAtualizadaDTO.getGrupoId())
-                    .orElseThrow(() -> new IllegalStateException("Grupo não encontrado"));
-            Mentor mentor = mentorRepository.findById(reuniaoAtualizadaDTO.getMentorId())
-                    .orElseThrow(() -> new IllegalStateException("Mentor não encontrado"));
+            if (reuniaoAtualizada.getAssunto() != null) {
+                reuniaoexiste.setAssunto(reuniaoAtualizada.getAssunto());
+            }
+            if (reuniaoAtualizada.getData() != null) {
+                reuniaoexiste.setData(reuniaoAtualizada.getData());
+            }
+            if (reuniaoAtualizada.getHora() != null) {
+                reuniaoexiste.setHora(reuniaoAtualizada.getHora());
+            }
+            if (reuniaoAtualizada.getFormatoReuniao() != null) {
+                reuniaoexiste.setFormatoReuniao(reuniaoAtualizada.getFormatoReuniao());
+            }
 
-            reuniao.setAssunto(reuniaoAtualizadaDTO.getAssunto());
-            reuniao.setData(reuniaoAtualizadaDTO.getData());
-            reuniao.setHora(reuniaoAtualizadaDTO.getHora());
-            reuniao.setFormatoReuniao(reuniaoAtualizadaDTO.getFormatoReuniao());
 
-            // Atribua as entidades atualizadas
-            reuniao.setGrupo(grupo);
-            reuniao.setMentor(mentor);
+            reuniaoRepository.save(reuniaoexiste);
+            return "Reunião atualizada e reenviada para aprovação";
+        }
 
-            reuniaoRepository.save(reuniao);
-            return ("Reunião atualizada com sucesso!");
+        public String aceitarReuniao(long id, StatusReuniao novoStatus) {
+
+            Reuniao reuniaoExiste = reuniaoRepository.findById(id)
+                    .orElseThrow(() -> new IllegalStateException("Reunião não encontrada"));
+
+            reuniaoExiste.setStatusReuniao(novoStatus);
+            try {
+                reuniaoRepository.save(reuniaoExiste);
+                return "Status reunião: " + novoStatus.toString().toLowerCase();
+            } catch (Exception e) {
+                System.err.println("Erro ao salvar a reunião: " + e.getMessage());
+                throw new RuntimeException("Erro ao atualizar o status da reunião", e);
+            }
         }
 
         // Deletar reunião
