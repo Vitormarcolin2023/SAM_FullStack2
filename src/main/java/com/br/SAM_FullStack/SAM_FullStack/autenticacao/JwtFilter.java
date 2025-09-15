@@ -24,7 +24,8 @@ public class JwtFilter implements Filter {
         // Ignora login (e outras rotas públicas, se quiser)
         if (path.equals("/auth/login") ||
                 path.equals("/areas/findAll") ||
-                path.equals("/mentores/save") ) {
+                path.equals("/mentores/save") ||
+                path.equals("/alunos/save")) {
             chain.doFilter(request, response);
             return;
         }
