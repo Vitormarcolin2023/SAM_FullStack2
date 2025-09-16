@@ -1,9 +1,11 @@
 package com.br.SAM_FullStack.SAM_FullStack.controller;
 
+import com.br.SAM_FullStack.SAM_FullStack.dto.CoordenadorDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.Coordenador;
 import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
 import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
 import com.br.SAM_FullStack.SAM_FullStack.service.CoordenadorService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +20,10 @@ public class CoordenadorController {
     private CoordenadorService coordenadorService;
 
     @PostMapping("/save")
-    public ResponseEntity<String> save(@RequestBody Coordenador coordenador){
+    public ResponseEntity<Coordenador> save(@Valid @RequestBody CoordenadorDTO coordenadorDTO){
         try {
-            String mensagem = this.coordenadorService.save(coordenador);
-            return new ResponseEntity<>(mensagem, HttpStatus.OK);
+            Coordenador novoCoordenador = this.coordenadorService.save(coordenadorDTO);
+            return new ResponseEntity<>(novoCoordenador, HttpStatus.CREATED);
         }catch (Exception e){
             return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
