@@ -32,7 +32,13 @@ public class AuthService {
                 autenticado = alunoRepository.findByEmailAndSenha(loginDTO.getEmail(), loginDTO.getSenha()).isPresent();
                 break;
             case "MENTOR":
-                autenticado = mentorRepository.findByEmailAndSenha(loginDTO.getEmail(), loginDTO.getSenha()).isPresent();
+                var mentor = mentorRepository.findByEmailAndSenha(loginDTO.getEmail(), loginDTO.getSenha())
+                        .orElseThrow(() -> new RuntimeException("Email ou senha inválidos"));
+
+                if (!"CONCLUIDO".equalsIgnoreCase(String.valueOf(mentor.getTipoDeVinculo()))) {
+                    throw new RuntimeException("Cadastro de mentor ainda não concluído!");
+                }
+                autenticado = true;
                 break;
             case "PROFESSOR":
                 autenticado = professorRepository.findByEmailAndSenha(loginDTO.getEmail(), loginDTO.getSenha()).isPresent();
