@@ -8,6 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -43,8 +46,8 @@ public class Mentor {
     @Enumerated(EnumType.STRING)
     private TipoDeVinculo tipoDeVinculo;
 
-    @NotNull(message = "A área de atuação é obrigatória")
-    @Enumerated(EnumType.STRING) // Adicione esta anotação se AreaDeAtuacao for um enum
+    @ManyToOne
+    @JoinColumn(name = "area_de_atuacao_id", nullable = false)
     private AreaDeAtuacao areaDeAtuacao;
 
     // Relacionamento com Endereco
@@ -52,6 +55,9 @@ public class Mentor {
     @JoinColumn(name = "endereco_id", referencedColumnName = "id")
     @JsonManagedReference //evita o efeito sanduiche q estava acontecendo <mentor><endereco><mentor>
     private Endereco endereco;
+
+    @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Reuniao> reunioes = new ArrayList<>();
 
 
 }

@@ -10,9 +10,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/endereco")
+@CrossOrigin("*")
 public class EnderecoController {
 
 
+    //injeção de dependencia via construtor
     private final EnderecoService enderecoService;
 
     public EnderecoController(EnderecoService enderecoService) {
@@ -54,4 +56,5 @@ public class EnderecoController {
         enderecoService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
 }

@@ -4,14 +4,15 @@ import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
 import com.br.SAM_FullStack.SAM_FullStack.service.MentorService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/mentores")
+@CrossOrigin("*")
 public class MentorController {
+
 
     private final MentorService mentorService;
 
@@ -47,7 +48,8 @@ public class MentorController {
         try {
             Mentor savedMentor = mentorService.save(mentor);
             // Retorna o mentor salvo se a operação for bem-sucedida.
-            return ResponseEntity.ok(savedMentor);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Mentor cadastrado com sucesso!");
+
         } catch (Exception e) {
             // Retorna uma mensagem de erro e o status BAD_REQUEST em caso de falha.
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erro ao salvar mentor: " + e.getMessage());
