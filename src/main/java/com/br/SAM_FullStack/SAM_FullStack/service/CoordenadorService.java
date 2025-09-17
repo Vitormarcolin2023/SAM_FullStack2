@@ -1,29 +1,43 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
+import com.br.SAM_FullStack.SAM_FullStack.dto.CoordenadorDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.Coordenador;
+import com.br.SAM_FullStack.SAM_FullStack.model.Curso;
 import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
 import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
 import com.br.SAM_FullStack.SAM_FullStack.repository.CoordenadorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.br.SAM_FullStack.SAM_FullStack.repository.CursoRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CoordenadorService {
 
-    @Autowired
-    private CoordenadorRepository coordenadorRepository;
+    private final CoordenadorRepository coordenadorRepository;
+    private final CursoRepository cursoRepository; // Adicionado
+    private final MentorService mentorService;
+    private final ProjetoService projetoService;
 
-    @Autowired
-    private MentorService mentorService;
+    @Transactional
+    public Coordenador save(CoordenadorDTO coordenadorDTO) {
+        Coordenador coordenador = new Coordenador();
+        coordenador.setNome(coordenadorDTO.getNome());
+        coordenador.setEmail(coordenadorDTO.getEmail());
+        coordenador.setSenha(coordenadorDTO.getSenha());
 
-    @Autowired
-    private ProjetoService projetoService;
+        List<Curso> cursos = cursoRepository.findAllById(coordenadorDTO.getCursosIds());
 
-    public String save(Coordenador coordenador){
-        this.coordenadorRepository.save(coordenador);
-        return "Coordenador salvo com sucesso!";
+        for (Curso curso : cursos) {
+            curso.setCoordenador(coordenador);
+        }
+
+        coordenador.setCursos(cursos);
+
+        return coordenadorRepository.save(coordenador);
     }
 
     public String update(Coordenador coordenador, long id){
@@ -44,7 +58,7 @@ public class CoordenadorService {
     public String inativarMentor(long mentorId){
         try {
             String mensagem = this.mentorService.updateStatus(mentorId, "PENDENTE");
-            return "Mentor inativado com sucesso!";
+            return "Mentor inativado com sucesso.";
         } catch (Exception e) {
             return "Erro ao tentar inativar o mentor.";
         }
