@@ -25,32 +25,55 @@ public class AuthService {
 
     public RespostaLoginDTO login(LoginDTO loginDTO){
 
-        boolean autenticado = false;
+        String email = loginDTO.getEmail();
+        String senha = loginDTO.getSenha();
+        String role = loginDTO.getRole().toUpperCase();
 
-        switch (loginDTO.getRole().toUpperCase()){
+        String token = null;
+        String status = null;
+
+        switch (role){
             case "ALUNO":
-                autenticado = alunoRepository.findByEmailAndSenha(loginDTO.getEmail(), loginDTO.getSenha()).isPresent();
+                var aluno = alunoRepository.findByEmailAndSenha(email, senha);
+                if(aluno.isPresent()){
+                    token = tokenService.generateToken(email, role);
+                    // Definindo um status padrão para Aluno
+                    status = "COMPLETO";
+                }
                 break;
             case "MENTOR":
-                autenticado = mentorRepository.findByEmailAndSenha(loginDTO.getEmail(), loginDTO.getSenha()).isPresent();
+                var mentor = mentorRepository.findByEmailAndSenha(email, senha);
+                if(mentor.isPresent()){
+                    token = tokenService.generateToken(email, role);
+                    // Obtendo o status do objeto mentor
+                    status = mentor.get().getStatusMentor().toString();
+                }
                 break;
             case "PROFESSOR":
-                autenticado = professorRepository.findByEmailAndSenha(loginDTO.getEmail(), loginDTO.getSenha()).isPresent();
+                var professor = professorRepository.findByEmailAndSenha(email, senha);
+                if(professor.isPresent()){
+                    token = tokenService.generateToken(email, role);
+                    // Definindo um status padrão para Professor
+                    status = "COMPLETO";
+                }
                 break;
             case "COORDENADOR":
-                autenticado = coordenadorRepository.findByEmailAndSenha(loginDTO.getEmail(), loginDTO.getSenha()).isPresent();
+                var coordenador = coordenadorRepository.findByEmailAndSenha(email, senha);
+                if(coordenador.isPresent()){
+                    token = tokenService.generateToken(email, role);
+                    // Definindo um status padrão para Coordenador
+                    status = "COMPLETO";
+                }
                 break;
             default:
                 throw new RuntimeException("Tipo de usuário não informado!");
         }
 
-        if(!autenticado){
+        if(token == null){
             throw new RuntimeException("Email ou senha inválidos");
         }
 
-        var token = tokenService.generateToken(loginDTO.getEmail(), loginDTO.getRole());
-
-        return new RespostaLoginDTO(token);
+        // Retorna o objeto de resposta completo com token, role e status
+        return new RespostaLoginDTO(token, role, status);
     }
-
 }
