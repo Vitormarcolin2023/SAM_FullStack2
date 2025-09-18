@@ -48,7 +48,7 @@ public class CoordenadorService {
 
     public String ativarMentor(long mentorId){
         try {
-            String mensagem = this.mentorService.updateStatus(mentorId, "CONCLUIDO");
+            String mensagem = this.mentorService.updateStatus(mentorId, "ATIVO");
             return "Mentor ativado com sucesso!";
         } catch (Exception e) {
             return "Erro ao tentar ativar o mentor.";
@@ -57,7 +57,7 @@ public class CoordenadorService {
 
     public String inativarMentor(long mentorId){
         try {
-            String mensagem = this.mentorService.updateStatus(mentorId, "PENDENTE");
+            String mensagem = this.mentorService.updateStatus(mentorId, "INATIVO");
             return "Mentor inativado com sucesso.";
         } catch (Exception e) {
             return "Erro ao tentar inativar o mentor.";
