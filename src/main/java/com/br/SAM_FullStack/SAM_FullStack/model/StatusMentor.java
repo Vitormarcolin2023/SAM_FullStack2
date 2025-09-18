@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum StatusMentor {
     PENDENTE,
-    PROCESSANDO,
-    CONCLUIDO;
+    ATIVO,
+    INATIVO;
 
     @JsonCreator
     public static StatusMentor from(String value) {
