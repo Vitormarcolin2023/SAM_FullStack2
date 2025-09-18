@@ -2,6 +2,7 @@ package com.br.SAM_FullStack.SAM_FullStack.controller;
 
 import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
 import com.br.SAM_FullStack.SAM_FullStack.service.MentorService;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -83,6 +84,21 @@ public class MentorController {
         } catch (Exception e) {
             // Se ocorrer um erro (por exemplo, mentor não encontrado), retorna a mensagem de erro com status 400
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Não foi possível excluir o mentor. O ID fornecido não existe.");
+        }
+    }
+
+    @GetMapping("/me") //mentor email
+    public ResponseEntity<Mentor> getMentorProfile(Authentication authentication) {
+        // Obtém o e-mail do usuário autenticado a partir do token
+        String email = authentication.name();
+
+        // Busca o mentor pelo e-mail usando o seu MentorService
+        Mentor mentor = mentorService.findByEmail(email);
+
+        if (mentor != null) {
+            return ResponseEntity.ok(mentor);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
