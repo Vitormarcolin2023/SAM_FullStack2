@@ -27,7 +27,9 @@ public class JwtFilter implements Filter {
                 path.equals("/mentores/save") ||
                 path.equals("/alunos/save") ||
                 path.equals("/api/coordenador/save") ||
-                path.equals("/api/professor/save")) {
+                path.equals("/api/professor/save") ||
+                path.equals("/mentores/findByEmail"))
+        {
             chain.doFilter(request, response);
             return;
         }

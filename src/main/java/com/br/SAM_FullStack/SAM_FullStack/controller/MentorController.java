@@ -2,7 +2,6 @@ package com.br.SAM_FullStack.SAM_FullStack.controller;
 
 import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
 import com.br.SAM_FullStack.SAM_FullStack.service.MentorService;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -87,19 +86,14 @@ public class MentorController {
         }
     }
 
-    @GetMapping("/me") //mentor email
-    public ResponseEntity<Mentor> getMentorProfile(Authentication authentication) {
-        // Obtém o e-mail do usuário autenticado a partir do token
-        String email = authentication.name();
-
-        // Busca o mentor pelo e-mail usando o seu MentorService
+    @GetMapping("/findByEmail")
+    public ResponseEntity<Mentor> findByEmail(@RequestParam String email) {
         Mentor mentor = mentorService.findByEmail(email);
 
-        if (mentor != null) {
-            return ResponseEntity.ok(mentor);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        if (mentor == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+        return ResponseEntity.ok(mentor);
     }
 
 }

@@ -79,7 +79,8 @@
 			<version>4.5.0</version>
 		</dependency>
 
-		<!-- dependencias do Spring Security - em stand by por enquanto
+
+		<!--security
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
@@ -90,6 +91,8 @@
 			<scope>test</scope>
 		</dependency>
 		-->
+
+
 	</dependencies>
 
 	<build>
