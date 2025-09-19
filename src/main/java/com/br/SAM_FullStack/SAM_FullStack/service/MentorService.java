@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class MentorService {
@@ -77,5 +78,11 @@ public class MentorService {
         mentorRepository.save(mentor);
 
         return "Status do mentor atualizado com sucesso!";
+    }
+
+    public Mentor findByEmail(String email) {
+        // Usa o repositório para buscar o mentor por e-mail e retorna o objeto ou null
+        Optional<Mentor> mentor = mentorRepository.findByEmail(email);
+        return mentor.orElse(null);
     }
 }

@@ -33,7 +33,7 @@ public class EnderecoController {
     }
 
     // Buscar por ID
-    @GetMapping("/{id}")
+    @GetMapping("/findById/{id}")
     public ResponseEntity<Endereco> findById(@PathVariable Long id) {
         return ResponseEntity.ok(enderecoService.findById(id));
     }
