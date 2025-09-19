@@ -19,10 +19,11 @@ public class JwtFilter implements Filter {
             throws IOException, ServletException {
 
         HttpServletRequest req = (HttpServletRequest) request;
-        String path = req.getRequestURI(); // pega a URL da requisição
+        String path = req.getRequestURI();
 
-        // Ignora login (e outras rotas públicas, se quiser)
-        if (path.equals("/auth/login") ||
+        // Libera login, rotas públicas e preflight OPTIONS
+        if (req.getMethod().equalsIgnoreCase("OPTIONS") ||
+                path.equals("/auth/login") ||
                 path.equals("/areas/findAll") ||
                 path.equals("/mentores/save") ||
                 path.equals("/alunos/save") ||
@@ -30,9 +31,12 @@ public class JwtFilter implements Filter {
                 path.equals("/api/professor/save")) {
             chain.doFilter(request, response);
             return;
+
         }
 
         String authHeader = req.getHeader("Authorization");
+        System.out.println("imprimindo cabecalho " + authHeader);
+
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             try {

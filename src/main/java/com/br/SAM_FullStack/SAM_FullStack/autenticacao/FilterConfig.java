@@ -16,7 +16,7 @@ public class FilterConfig {
 
         registrationBean.setFilter(filter);
         registrationBean.addUrlPatterns("/*"); // todas as rotas protegidas
-        registrationBean.setOrder(1); // ordem do filtro, se houver outros
+        registrationBean.setOrder(2); // ordem do filtro, se houver outros
         return registrationBean;
     }
 }
