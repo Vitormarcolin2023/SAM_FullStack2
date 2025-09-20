@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface CoordenadorRepository extends JpaRepository<Coordenador, Long> {
 
-    Optional<Coordenador> findByEmailAndSenha(String email, String senha);
+    Optional<Coordenador> findByEmail(String email);
 }
