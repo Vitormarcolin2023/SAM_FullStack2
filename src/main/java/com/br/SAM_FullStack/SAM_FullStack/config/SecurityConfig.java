@@ -74,6 +74,7 @@ public class SecurityConfig {
 						.requestMatchers("/alunos/save").permitAll()
 						.requestMatchers("/api/coordenador/save").permitAll()
 						.requestMatchers("/api/professor/save").permitAll()
+						.requestMatchers("/grupos/save").permitAll()
 						.anyRequest().authenticated()
 				)
 				.authenticationProvider(authenticationProvider())
