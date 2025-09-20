@@ -16,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/alunos")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:4200")
 public class AlunoController {
 
     private final AlunoService alunoService;
@@ -96,5 +97,19 @@ public class AlunoController {
     public ResponseEntity<List<Aluno>> getAlunoOrdenadosPorNome() {
         List<Aluno> alunosOrdenados = alunoService.buscarTodosOrdenadoPorNome();
         return ResponseEntity.ok(alunosOrdenados);
+    }
+
+    @GetMapping("/findByEmail")
+    public ResponseEntity<Aluno> findByEmail(@RequestParam("email") String email) {
+        try {
+            Aluno aluno = alunoService.findByEmail(email);
+            return ResponseEntity.ok(aluno);
+        } catch (RuntimeException e) {
+            // Retorna 404 Not Found se o aluno não for encontrado pelo serviço
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            // Retorna 500 para outros erros inesperados
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

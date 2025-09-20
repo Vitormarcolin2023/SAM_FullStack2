@@ -64,12 +64,29 @@ public class AlunoService {
     }
 
     public Aluno update(Long id, Aluno alunoUpdate){
-
+        // 1. Busca o aluno que você quer atualizar
         Aluno alunoExistente = findById(id);
+
+        // 2. Verifica se o e-mail foi alterado
+        if (!alunoExistente.getEmail().equals(alunoUpdate.getEmail())) {
+            // 3. Se mudou, verifica se o novo e-mail já existe para OUTRO aluno
+            Optional<Aluno> outroAlunoComMesmoEmail = alunoRepository.findByEmail(alunoUpdate.getEmail());
+
+            // 4. Se encontrou, lança uma exceção clara
+            if (outroAlunoComMesmoEmail.isPresent()) {
+                throw new RuntimeException("O e-mail '" + alunoUpdate.getEmail() + "' já está cadastrado.");
+            }
+        }
+
+        // Se passou em todas as validações, atualiza os dados
         alunoExistente.setNome(alunoUpdate.getNome());
-        alunoExistente.setRa(alunoUpdate.getRa());
-        alunoExistente.setSenha(alunoUpdate.getSenha());
         alunoExistente.setEmail(alunoUpdate.getEmail());
+        // Não é recomendado permitir a alteração do RA, mas se precisar, mantenha a linha abaixo
+        alunoExistente.setRa(alunoUpdate.getRa());
+
+        if (alunoUpdate.getSenha() != null && !alunoUpdate.getSenha().isEmpty()) {
+            alunoExistente.setSenha(alunoUpdate.getSenha());
+        }
 
         return alunoRepository.save(alunoExistente);
     }
@@ -93,6 +110,11 @@ public class AlunoService {
 
     public List<Aluno> buscarTodosOrdenadoPorNome() {
         return alunoRepository.findAllByOrderByNomeAsc();
+    }
+
+    public Aluno findByEmail(String email) {
+        return alunoRepository.findByEmail(email).orElseThrow(() ->
+                new RuntimeException("Aluno não encontrado com o E-mail: " + email));
     }
 }
 

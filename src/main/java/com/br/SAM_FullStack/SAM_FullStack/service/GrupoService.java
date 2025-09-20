@@ -39,6 +39,47 @@ public class GrupoService {
                 );
     }
 
+    public GrupoDTO save(GrupoDTO grupoDTO) {
+        Grupo grupo = new Grupo();
+        grupo.setNome(grupoDTO.nome());
+
+        Aluno admin = alunoRepository.getReferenceById(grupoDTO.alunoAdminId());
+
+        if (admin.getGrupo() != null) {
+            throw new IllegalStateException("Operação não permitida. Aluno já participa de outro grupo");
+        }
+
+        grupo.setAlunoAdmin(admin);
+        grupo = grupoRepository.save(grupo);
+
+        List<Aluno> alunos = alunoRepository.findAllById(grupoDTO.alunosIds());
+        if (alunos.size() != grupoDTO.alunosIds().size()) {
+            throw new IllegalArgumentException("Um ou mais IDs de alunos não existem");
+        }
+
+        if (alunos.size() < 3 || alunos.size() > 6) {
+            throw new IllegalStateException("Grupo deve ter entre 3 e 6 participantes");
+        }
+
+        boolean adminInformado = alunos.stream().anyMatch(a -> a.getId().equals(admin.getId()));
+        if (!adminInformado) {
+            throw new IllegalStateException("Administrador informado não participa do grupo");
+        }
+
+        for (Aluno aluno : alunos) {
+            aluno.setStatusAlunoGrupo(StatusAlunoGrupo.ATIVO);
+            aluno.setGrupo(grupo);
+        }
+        alunoRepository.saveAll(alunos);
+        grupo.setAlunos(alunos);
+
+        Grupo salvo = grupoRepository.save(grupo);
+
+        return new GrupoDTO(salvo.getId(), salvo.getNome(), admin.getId(), alunos.stream().map(Aluno::getId).toList());
+    }
+
+
+    /*
     public String save(GrupoDTO grupoDTO){
         Grupo grupo = new Grupo();
         grupo.setNome(grupoDTO.nome());
@@ -94,6 +135,7 @@ public class GrupoService {
 
         return "Novo grupo cadastrado com sucesso!";
     }
+    */
 
     // Apenas o professor pode deletar um grupo
     public void delete(long idGrupo, long idSolicitante){
