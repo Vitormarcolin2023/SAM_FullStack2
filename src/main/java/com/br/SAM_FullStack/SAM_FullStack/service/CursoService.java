@@ -56,4 +56,8 @@ public class CursoService {
     public List<Curso> buscarPorNomeDaArea(String nomeArea) {
         return cursoRepository.findByAreaDeAtuacaoNomeContainingIgnoreCase(nomeArea);
     }
+
+    public List<Curso> findByCoordenadorId(Long coordenadorId) {
+        return cursoRepository.findByCoordenadorId(coordenadorId);
+    }
 }

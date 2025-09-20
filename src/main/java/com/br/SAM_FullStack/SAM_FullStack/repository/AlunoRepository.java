@@ -39,5 +39,4 @@ public interface AlunoRepository extends JpaRepository<Aluno, Long> {
 
     List<Aluno> findAllByOrderByNomeAsc();
 
-    Optional<Aluno> findByEmail(String email);
 }

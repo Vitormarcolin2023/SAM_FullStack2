@@ -70,4 +70,15 @@ public class CoordenadorController {
         List<Projeto> projetos = this.coordenadorService.findAllProjetos();
         return new ResponseEntity<>(projetos, HttpStatus.OK);
     }
+
+    @GetMapping("/buscar-por-email")
+    public ResponseEntity<Coordenador> buscarPorEmail(@RequestParam("email") String email) {
+        Coordenador coordenador = coordenadorService.buscarPorEmail(email);
+
+        if (coordenador != null) {
+            return ResponseEntity.ok(coordenador);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
