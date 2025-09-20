@@ -32,17 +32,11 @@ public class SecurityConfig {
 	@Autowired
 	private CustomUserDetailsService userDetailsService;
 
-	// -------------------------------
-	// PasswordEncoder
-	// -------------------------------
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
-	// -------------------------------
-	// AuthenticationProvider
-	// -------------------------------
 	@Bean
 	public DaoAuthenticationProvider authenticationProvider() {
 		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -51,17 +45,12 @@ public class SecurityConfig {
 		return authProvider;
 	}
 
-	// -------------------------------
-	// AuthenticationManager
-	// -------------------------------
+
 	@Bean
 	public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
 		return http.getSharedObject(AuthenticationManager.class);
 	}
 
-	// -------------------------------
-	// SecurityFilterChain
-	// -------------------------------
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
@@ -83,9 +72,6 @@ public class SecurityConfig {
 		return http.build();
 	}
 
-	// -------------------------------
-	// Configuração global de CORS
-	// -------------------------------
 	@Bean
 	public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
