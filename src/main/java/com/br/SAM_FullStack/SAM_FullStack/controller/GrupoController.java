@@ -43,6 +43,13 @@ public class GrupoController {
     }
 
     @PostMapping("/save")
+    public ResponseEntity<GrupoDTO> save(@RequestBody GrupoDTO grupo) {
+        GrupoDTO result = grupoService.save(grupo);
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
+    }
+
+    /*
+    @PostMapping("/save")
     public ResponseEntity<String> save(@RequestBody GrupoDTO grupo) {
         try {
             String result = grupoService.save(grupo);
@@ -52,6 +59,9 @@ public class GrupoController {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST); // Status 500
         }
     }
+     */
+
+
 
     @PostMapping("/adicionar-aluno")
     public ResponseEntity<String> adicionarAluno(@RequestBody AdicionarAlunoDTO dto) {
