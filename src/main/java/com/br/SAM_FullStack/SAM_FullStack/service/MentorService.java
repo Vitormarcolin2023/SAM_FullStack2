@@ -1,8 +1,11 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
 import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
+import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
 import com.br.SAM_FullStack.SAM_FullStack.model.StatusMentor;
 import com.br.SAM_FullStack.SAM_FullStack.repository.MentorRepository;
+import com.br.SAM_FullStack.SAM_FullStack.repository.ProjetoRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
