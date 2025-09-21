@@ -37,7 +37,6 @@ public class Aluno implements UserDetails {
     @NotNull(message = "O campo RA é obrigatório")
     private Integer ra;
 
-    @NotBlank(message = "O campo senha é obrigatório")
     private String senha;
 
     @NotBlank(message = "O campo e-mail é obrigatório")
