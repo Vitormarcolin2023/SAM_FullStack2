@@ -3,7 +3,7 @@ package com.br.SAM_FullStack.SAM_FullStack.controller;
 import com.br.SAM_FullStack.SAM_FullStack.dto.AdicionarAlunoDTO;
 import com.br.SAM_FullStack.SAM_FullStack.dto.AnalizarExclusaoDTO;
 import com.br.SAM_FullStack.SAM_FullStack.dto.GrupoDTO;
-import com.br.SAM_FullStack.SAM_FullStack.dto.GrupoUpdateDTO; // DTO para a função de update
+import com.br.SAM_FullStack.SAM_FullStack.dto.GrupoUpdateDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.Grupo;
 import com.br.SAM_FullStack.SAM_FullStack.model.StatusAlunoGrupo;
 import com.br.SAM_FullStack.SAM_FullStack.service.GrupoService;
@@ -23,33 +23,21 @@ public class GrupoController {
     private final GrupoService grupoService;
 
     @GetMapping("/findAll")
-    public ResponseEntity<List<Grupo>> findAll(){
-        try {
-            List<Grupo> result = grupoService.findAll();
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception ex) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<List<Grupo>> findAll() {
+        List<Grupo> result = grupoService.findAll();
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/findById/{id}")
-    public ResponseEntity<Grupo> findById(@PathVariable long id){
-        try {
-            Grupo result = grupoService.findById(id);
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<Grupo> findById(@PathVariable long id) {
+        Grupo result = grupoService.findById(id);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/findByAluno/{alunoId}")
     public ResponseEntity<Grupo> findByAlunoId(@PathVariable Long alunoId) {
-        try {
-            Grupo result = grupoService.findByAlunoId(alunoId);
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
+        Grupo result = grupoService.findByAlunoId(alunoId);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PostMapping("/save")
@@ -63,24 +51,14 @@ public class GrupoController {
             @PathVariable Long groupId,
             @PathVariable Long adminId,
             @RequestBody GrupoUpdateDTO grupoUpdateDTO) {
-        try {
-            String result = grupoService.updateGrupoInfo(groupId, adminId, grupoUpdateDTO);
-            return ResponseEntity.ok(result);
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        String result = grupoService.updateGrupoInfo(groupId, adminId, grupoUpdateDTO);
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/adicionar-aluno")
     public ResponseEntity<String> adicionarAluno(@RequestBody AdicionarAlunoDTO dto) {
-        try {
-            String result = grupoService.adicionarAlunoAoGrupo(dto.getIdAdmin(), dto.getIdGrupo(), dto.getIdAluno());
-            return new ResponseEntity<>(result, HttpStatus.CREATED);
-        } catch (Exception ex) {
-            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        String result = grupoService.adicionarAlunoAoGrupo(dto.getIdAdmin(), dto.getIdGrupo(), dto.getIdAluno());
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{idGrupo}/remover-aluno/{idAlunoRemover}/admin/{idAdmin}")
@@ -88,50 +66,30 @@ public class GrupoController {
             @PathVariable Long idGrupo,
             @PathVariable Long idAlunoRemover,
             @PathVariable Long idAdmin) {
-        try {
-            String resultado = grupoService.removerAlunoDiretamente(idGrupo, idAlunoRemover, idAdmin);
-            return ResponseEntity.ok(resultado);
-        } catch (IllegalStateException | IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Erro inesperado ao remover aluno.");
-        }
+        String resultado = grupoService.removerAlunoDiretamente(idGrupo, idAlunoRemover, idAdmin);
+        return ResponseEntity.ok(resultado);
     }
 
     @GetMapping("/findSolicitacoes")
-    public ResponseEntity<List<Grupo>> findByAlunosStatusAlunoGrupo(){
-        try {
-            List<Grupo> result = grupoService.findByAlunosStatusAlunoGrupo(StatusAlunoGrupo.AGUARDANDO);
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<List<Grupo>> findByAlunosStatusAlunoGrupo() {
+        List<Grupo> result = grupoService.findByAlunosStatusAlunoGrupo(StatusAlunoGrupo.AGUARDANDO);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PutMapping("/analizarSolicitacao")
     public ResponseEntity<String> analizarExclusaoAluno(@RequestBody AnalizarExclusaoDTO pedido) {
-        try {
-            String result = grupoService.analizarExclusaoAluno(
-                    pedido.getSenhaProf(),
-                    pedido.getIdGrupo(),
-                    pedido.getIdAluno(),
-                    pedido.isResposta()
-            );
-            return ResponseEntity.ok(result);
-        } catch (IllegalStateException | IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Erro inesperado: " + e.getMessage());
-        }
+        String result = grupoService.analizarExclusaoAluno(
+                pedido.getSenhaProf(),
+                pedido.getIdGrupo(),
+                pedido.getIdAluno(),
+                pedido.isResposta()
+        );
+        return ResponseEntity.ok(result);
     }
 
     @DeleteMapping("/delete/{idGrupo}/professor/{idProfessor}")
-    public ResponseEntity<String> deletarGrupo(@PathVariable Long idGrupo, @PathVariable Long idProfessor){
-        try{
-            String result = grupoService.deletarGrupo(idGrupo, idProfessor);
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        }catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<String> deletarGrupo(@PathVariable Long idGrupo, @PathVariable Long idProfessor) {
+        String result = grupoService.deletarGrupo(idGrupo, idProfessor);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }

@@ -17,67 +17,48 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/coordenador")
 public class CoordenadorController {
+
     @Autowired
     private CoordenadorService coordenadorService;
 
     @PostMapping("/save")
-    public ResponseEntity<Coordenador> save(@Valid @RequestBody CoordenadorDTO coordenadorDTO){
-        try {
-            Coordenador novoCoordenador = this.coordenadorService.save(coordenadorDTO);
-            return new ResponseEntity<>(novoCoordenador, HttpStatus.CREATED);
-        }catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<Coordenador> save(@Valid @RequestBody CoordenadorDTO coordenadorDTO) {
+        Coordenador novoCoordenador = this.coordenadorService.save(coordenadorDTO);
+        return new ResponseEntity<>(novoCoordenador, HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<String> update(@RequestBody CoordenadorUpdateDTO coordenadorDTO, @PathVariable long id){
-        try {
-            String mensagem = this.coordenadorService.update(coordenadorDTO, id);
-            return new ResponseEntity<>(mensagem, HttpStatus.OK);
-        }catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<String> update(@RequestBody CoordenadorUpdateDTO coordenadorDTO, @PathVariable long id) {
+        String mensagem = this.coordenadorService.update(coordenadorDTO, id);
+        return new ResponseEntity<>(mensagem, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) {
-        try {
-            coordenadorService.delete(id);
-            return ResponseEntity.ok("Coordenador excluído com sucesso");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Não foi possível excluir o coordenador. O ID fornecido não existe.");
-        }
+        coordenadorService.delete(id);
+        return ResponseEntity.ok("Coordenador excluído com sucesso");
     }
 
     @PutMapping("/ativarMentor/{id}")
-    public ResponseEntity<String> ativarMentor(@PathVariable long id){
-        try {
-            String mensagem = this.coordenadorService.ativarMentor(id);
-            return new ResponseEntity<>(mensagem, HttpStatus.OK);
-        }catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<String> ativarMentor(@PathVariable long id) {
+        String mensagem = this.coordenadorService.ativarMentor(id);
+        return new ResponseEntity<>(mensagem, HttpStatus.OK);
     }
 
     @PutMapping("/inativarMentor/{id}")
-    public ResponseEntity<String> inativarMentor(@PathVariable long id){
-        try {
-            String mensagem = this.coordenadorService.inativarMentor(id);
-            return new ResponseEntity<>(mensagem, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<String> inativarMentor(@PathVariable long id) {
+        String mensagem = this.coordenadorService.inativarMentor(id);
+        return new ResponseEntity<>(mensagem, HttpStatus.OK);
     }
 
     @GetMapping("/mentores")
-    public ResponseEntity<List<Mentor>> findAllMentores(){
+    public ResponseEntity<List<Mentor>> findAllMentores() {
         List<Mentor> mentores = this.coordenadorService.findAllMentores();
         return new ResponseEntity<>(mentores, HttpStatus.OK);
     }
 
     @GetMapping("/projetos")
-    public ResponseEntity<List<Projeto>> findAllProjetos(){
+    public ResponseEntity<List<Projeto>> findAllProjetos() {
         List<Projeto> projetos = this.coordenadorService.findAllProjetos();
         return new ResponseEntity<>(projetos, HttpStatus.OK);
     }
@@ -85,7 +66,6 @@ public class CoordenadorController {
     @GetMapping("/buscar-por-email")
     public ResponseEntity<Coordenador> buscarPorEmail(@RequestParam("email") String email) {
         Coordenador coordenador = coordenadorService.buscarPorEmail(email);
-
         if (coordenador != null) {
             return ResponseEntity.ok(coordenador);
         } else {

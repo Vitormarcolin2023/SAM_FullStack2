@@ -24,12 +24,8 @@ public class EnderecoController {
     // Listar todos
     @GetMapping("/findAll")
     public ResponseEntity<List<Endereco>> listAll() {
-        try {
-            var result = enderecoService.listAll();
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception ex) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+        var result = enderecoService.listAll();
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     // Buscar por ID
@@ -56,5 +52,4 @@ public class EnderecoController {
         enderecoService.delete(id);
         return ResponseEntity.noContent().build();
     }
-
 }

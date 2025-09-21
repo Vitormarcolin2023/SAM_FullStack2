@@ -6,7 +6,6 @@ import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.service.AlunoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.AllNestedConditions;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,57 +22,34 @@ public class AlunoController {
 
     @GetMapping("/findAll")
     public ResponseEntity<List<Aluno>> findAll(){
-        try {
-            List<Aluno> result = alunoService.findAll();
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        List<Aluno> result = alunoService.findAll();
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/findById/{id}")
     public ResponseEntity<Aluno> findById(@PathVariable Long id) {
-        try {
-            Aluno aluno = alunoService.findById(id);
-            return ResponseEntity.ok(aluno);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST); // Status 500
-        }
+        Aluno aluno = alunoService.findById(id);
+        return ResponseEntity.ok(aluno);
     }
 
     @PostMapping("/save")
     public ResponseEntity<String> save(@Valid @RequestBody Aluno aluno) {
-        try {
-            Aluno result = alunoService.save(aluno);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Aluno cadastrado com sucesso!");
-        } catch (Exception ex) {
-            // Logar o erro
-            ex.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR); // Status 500
-        }
+        Aluno result = alunoService.save(aluno);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Aluno cadastrado com sucesso!");
     }
 
     //atualizar
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> update (@PathVariable Long id, @Valid @RequestBody Aluno alunoUpdate){
-        try{
-            Aluno alunoAtualizado = alunoService.update(id, alunoUpdate);
-            return ResponseEntity.ok(alunoAtualizado);
-        }catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<Aluno> update (@PathVariable Long id, @Valid @RequestBody Aluno alunoUpdate){
+        Aluno alunoAtualizado = alunoService.update(id, alunoUpdate);
+        return ResponseEntity.ok(alunoAtualizado);
     }
 
     //deletar
     @DeleteMapping("/delet/{id}")
-    public ResponseEntity<?> delete (@PathVariable Long id){
-        try{
-            alunoService.delete(id);
-            return ResponseEntity.noContent().build();
-        }catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<Void> delete (@PathVariable Long id){
+        alunoService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/batch")
@@ -101,15 +77,7 @@ public class AlunoController {
 
     @GetMapping("/findByEmail")
     public ResponseEntity<Aluno> findByEmail(@RequestParam("email") String email) {
-        try {
-            Aluno aluno = alunoService.findByEmail(email);
-            return ResponseEntity.ok(aluno);
-        } catch (RuntimeException e) {
-            // Retorna 404 Not Found se o aluno não for encontrado pelo serviço
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        } catch (Exception e) {
-            // Retorna 500 para outros erros inesperados
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        Aluno aluno = alunoService.findByEmail(email);
+        return ResponseEntity.ok(aluno);
     }
 }
