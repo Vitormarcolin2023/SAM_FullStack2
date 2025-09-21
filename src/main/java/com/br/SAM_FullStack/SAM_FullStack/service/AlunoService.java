@@ -1,11 +1,13 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
+import com.br.SAM_FullStack.SAM_FullStack.config.SecurityConfig;
 import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.repository.AlunoRepository;
 import com.br.SAM_FullStack.SAM_FullStack.autenticacao.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +21,9 @@ public class AlunoService {
     private final AlunoRepository alunoRepository;
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private TokenService tokenService;
@@ -51,6 +56,10 @@ public class AlunoService {
 
         } else {
             log.info("RA {} disponível. Cadastrando novo aluno: {}", aluno.getRa(), aluno.getNome());
+
+            String senhaEncript = passwordEncoder.encode(aluno.getPassword());
+            aluno.setSenha(senhaEncript);
+
             Aluno alunoSalvo = alunoRepository.save(aluno);
             emailService.enviarEmailTexto(
                     alunoSalvo.getEmail(),
@@ -83,7 +92,8 @@ public class AlunoService {
         alunoExistente.setRa(alunoUpdate.getRa());
 
         if (alunoUpdate.getSenha() != null && !alunoUpdate.getSenha().isEmpty()) {
-            alunoExistente.setSenha(alunoUpdate.getSenha());
+            String senhaEncript = passwordEncoder.encode(alunoUpdate.getSenha());
+            alunoExistente.setSenha(senhaEncript);
         }
 
         return alunoRepository.save(alunoExistente);
