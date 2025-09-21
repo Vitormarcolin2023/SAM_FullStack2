@@ -1,6 +1,7 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
 import com.br.SAM_FullStack.SAM_FullStack.dto.CoordenadorDTO;
+import com.br.SAM_FullStack.SAM_FullStack.dto.CoordenadorUpdateDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.Coordenador;
 import com.br.SAM_FullStack.SAM_FullStack.model.Curso;
 import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
@@ -19,7 +20,7 @@ import java.util.Optional;
 public class CoordenadorService {
 
     private final CoordenadorRepository coordenadorRepository;
-    private final CursoRepository cursoRepository; // Adicionado
+    private final CursoRepository cursoRepository;
     private final MentorService mentorService;
     private final ProjetoService projetoService;
 
@@ -41,9 +42,35 @@ public class CoordenadorService {
         return coordenadorRepository.save(coordenador);
     }
 
-    public String update(Coordenador coordenador, long id){
-        coordenador.setId(id);
-        this.coordenadorRepository.save(coordenador);
+    @Transactional
+    public String update(CoordenadorUpdateDTO coordenadorDTO, long id) {
+
+        Coordenador coordenadorExistente = coordenadorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Coordenador não encontrado com o ID: " + id));
+
+        coordenadorExistente.setNome(coordenadorDTO.getNome());
+        coordenadorExistente.setEmail(coordenadorDTO.getEmail());
+        coordenadorExistente.setSenha(coordenadorDTO.getSenha());
+
+        if (coordenadorExistente.getCursos() != null) {
+            coordenadorExistente.getCursos().forEach(curso -> curso.setCoordenador(null));
+        }
+        coordenadorExistente.getCursos().clear();
+
+        if (coordenadorDTO.getCursosIds() != null && !coordenadorDTO.getCursosIds().isEmpty()) {
+
+            for (Long cursoId : coordenadorDTO.getCursosIds()) {
+                Curso cursoDoBanco = cursoRepository.findById(cursoId)
+                        .orElseThrow(() -> new RuntimeException("Curso não encontrado com o ID: " + cursoId));
+
+                cursoDoBanco.setCoordenador(coordenadorExistente);
+
+                coordenadorExistente.getCursos().add(cursoDoBanco);
+            }
+        }
+
+        coordenadorRepository.save(coordenadorExistente);
+
         return "Coordenador atualizado com sucesso!";
     }
 
