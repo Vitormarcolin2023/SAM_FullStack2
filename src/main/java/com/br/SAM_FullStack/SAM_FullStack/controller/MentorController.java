@@ -3,6 +3,7 @@ package com.br.SAM_FullStack.SAM_FullStack.controller;
 import com.br.SAM_FullStack.SAM_FullStack.autenticacao.TokenService;
 import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
 import com.br.SAM_FullStack.SAM_FullStack.service.MentorService;
+import com.br.SAM_FullStack.SAM_FullStack.service.ProjetoService;
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,8 @@ public class MentorController {
     @Autowired
     TokenService tokenService;
     private final MentorService mentorService;
+    @Autowired
+    private ProjetoService projetoService;
 
     public MentorController(MentorService mentorService){
         this.mentorService=mentorService;
@@ -89,6 +92,13 @@ public class MentorController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Não foi possível excluir o mentor. O ID fornecido não existe.");
         }
     }
+
+    @PutMapping("/mentor/{id}/desvincular-projetos")
+    public ResponseEntity<?> desvincularProjetos(@PathVariable Long id) {
+        projetoService.desvincularMentor(id); // atualiza mentor_id para NULL
+        return ResponseEntity.ok().build();
+    }
+
 
     @GetMapping("/me")
     public ResponseEntity<Mentor> getMentorProfile(

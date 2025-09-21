@@ -6,6 +6,7 @@ import com.br.SAM_FullStack.SAM_FullStack.model.Grupo;
 import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
 import com.br.SAM_FullStack.SAM_FullStack.repository.GrupoRepository;
 import com.br.SAM_FullStack.SAM_FullStack.repository.ProjetoRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -96,5 +97,14 @@ public class ProjetoService {
         public void delete(Long id){
              Projeto projeto = findById(id);
              projetoRepository.delete(projeto);
+    }
+
+    @Transactional
+    public void desvincularMentor(Long mentorId) {
+        List<Projeto> projetos = projetoRepository.findByMentorId(mentorId);
+        for (Projeto p : projetos) {
+            p.setMentor(null);
+            projetoRepository.save(p);
+        }
     }
 }
