@@ -74,6 +74,22 @@ public class CoordenadorService {
         return "Coordenador atualizado com sucesso!";
     }
 
+    @Transactional
+    public void delete(Long id) {
+        Coordenador coordenadorExistente = coordenadorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Coordenador não encontrado com o ID: " + id));
+
+        if (coordenadorExistente.getCursos() != null) {
+            coordenadorExistente.getCursos().forEach(curso -> curso.setCoordenador(null));
+        }
+
+        coordenadorExistente.getCursos().clear();
+
+        cursoRepository.saveAll(coordenadorExistente.getCursos());
+
+        coordenadorRepository.delete(coordenadorExistente);
+    }
+
     public String ativarMentor(long mentorId){
         try {
             String mensagem = this.mentorService.updateStatus(mentorId, "ATIVO");

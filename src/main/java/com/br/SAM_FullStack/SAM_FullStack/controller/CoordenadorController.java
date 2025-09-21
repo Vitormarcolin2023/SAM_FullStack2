@@ -40,6 +40,16 @@ public class CoordenadorController {
         }
     }
 
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> delete(@PathVariable Long id) {
+        try {
+            coordenadorService.delete(id);
+            return ResponseEntity.ok("Coordenador excluído com sucesso");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Não foi possível excluir o coordenador. O ID fornecido não existe.");
+        }
+    }
+
     @PutMapping("/ativarMentor/{id}")
     public ResponseEntity<String> ativarMentor(@PathVariable long id){
         try {
