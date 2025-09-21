@@ -33,6 +33,19 @@ public class Coordenador implements UserDetails {
     @JsonIgnoreProperties("coordenador")
     private List<Curso> cursos;
 
+    public void addCurso(Curso curso) {
+        if (cursos == null) {
+            cursos = new ArrayList<>();
+        }
+        cursos.add(curso);
+        curso.setCoordenador(this);
+    }
+
+    public void removeCurso(Curso curso) {
+        cursos.remove(curso);
+        curso.setCoordenador(null);
+    }
+
 
     // Metodos obrigatórios do Spring Security
 

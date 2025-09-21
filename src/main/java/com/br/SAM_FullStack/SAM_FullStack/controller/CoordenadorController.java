@@ -1,6 +1,7 @@
 package com.br.SAM_FullStack.SAM_FullStack.controller;
 
 import com.br.SAM_FullStack.SAM_FullStack.dto.CoordenadorDTO;
+import com.br.SAM_FullStack.SAM_FullStack.dto.CoordenadorUpdateDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.Coordenador;
 import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
 import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
@@ -30,12 +31,22 @@ public class CoordenadorController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<String> update(@RequestBody Coordenador coordenador, @PathVariable long id){
+    public ResponseEntity<String> update(@RequestBody CoordenadorUpdateDTO coordenadorDTO, @PathVariable long id){
         try {
-            String mensagem = this.coordenadorService.update(coordenador, id);
+            String mensagem = this.coordenadorService.update(coordenadorDTO, id);
             return new ResponseEntity<>(mensagem, HttpStatus.OK);
         }catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> delete(@PathVariable Long id) {
+        try {
+            coordenadorService.delete(id);
+            return ResponseEntity.ok("Coordenador excluído com sucesso");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Não foi possível excluir o coordenador. O ID fornecido não existe.");
         }
     }
 
