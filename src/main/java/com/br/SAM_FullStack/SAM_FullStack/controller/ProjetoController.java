@@ -85,6 +85,13 @@ import java.util.List;
             }
         }
 
+        @GetMapping("/mentor/{id}")
+        public ResponseEntity<List<Projeto>> findByMentor(@PathVariable Long id) {
+            List<Projeto> projetos = projetoService.findByMentor(id);
+            return ResponseEntity.ok(projetos);
+        }
+
+
     }
 
 
