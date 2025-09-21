@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -70,5 +71,10 @@ public class CoordenadorService {
 
     public List<Projeto> findAllProjetos(){
         return this.projetoService.listAll();
+    }
+
+    public Coordenador buscarPorEmail(String email) {
+        Optional<Coordenador> coordenador = coordenadorRepository.findByEmail(email);
+        return coordenador.orElse(null);
     }
 }

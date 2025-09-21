@@ -12,4 +12,7 @@ public interface CursoRepository extends JpaRepository<Curso, Long> {
 
     // Busca cursos cujo NOME da área de atuação contenha o texto informado.
     List<Curso> findByAreaDeAtuacaoNomeContainingIgnoreCase(String nomeArea);
+
+    List<Curso> findByCoordenadorId(Long coordenadorId);
+
 }

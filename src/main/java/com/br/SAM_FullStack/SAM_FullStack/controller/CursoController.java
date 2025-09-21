@@ -88,4 +88,15 @@ public class CursoController {
         }
         return ResponseEntity.ok(cursosEncontrados);
     }
+
+    @GetMapping("/coordenador/{coordenadorId}")
+    public ResponseEntity<List<Curso>> getCursosByCoordenadorId(@PathVariable Long coordenadorId) {
+        List<Curso> cursos = cursoService.findByCoordenadorId(coordenadorId);
+
+        if (cursos.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(cursos);
+    }
 }
