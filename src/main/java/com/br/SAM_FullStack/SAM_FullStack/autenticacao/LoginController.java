@@ -19,14 +19,7 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<RespostaLoginDTO> login(@RequestBody LoginDTO loginDTO){
-        try{
-            RespostaLoginDTO response = authService.login(loginDTO);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e){
-            e.printStackTrace();
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(new RespostaLoginDTO(e.getMessage()));    
-        }
+        RespostaLoginDTO response = authService.login(loginDTO);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
