@@ -48,20 +48,23 @@ public class MentorService {
         return mentorRepository.save(mentor);
     }
 
-    //atualizar
-    public Mentor update(Long id, Mentor mentorUpdate){
+    public Mentor update(Long id, Mentor mentorUpdate) {
         Mentor mentorExistente = findById(id);
-        mentorExistente.setNome(mentorUpdate.getNome());
-        mentorExistente.setCpf(mentorUpdate.getCpf());
-        mentorExistente.setEmail(mentorUpdate.getEmail());
-        mentorExistente.setSenha(mentorUpdate.getSenha());
-        mentorExistente.setTipoDeVinculo(mentorUpdate.getTipoDeVinculo());
-        mentorExistente.setTempoDeExperiencia(mentorUpdate.getTempoDeExperiencia());
-        mentorExistente.setAreaDeAtuacao(mentorUpdate.getAreaDeAtuacao());
-        mentorExistente.setEndereco(mentorExistente.getEndereco());
+
+        // Atualiza campos apenas se vierem preenchidos
+        if (mentorUpdate.getNome() != null) mentorExistente.setNome(mentorUpdate.getNome());
+        if (mentorUpdate.getCpf() != null) mentorExistente.setCpf(mentorUpdate.getCpf());
+        if (mentorUpdate.getEmail() != null) mentorExistente.setEmail(mentorUpdate.getEmail());
+        if (mentorUpdate.getSenha() != null) mentorExistente.setSenha(mentorUpdate.getSenha());
+        if (mentorUpdate.getTipoDeVinculo() != null) mentorExistente.setTipoDeVinculo(mentorUpdate.getTipoDeVinculo());
+        if (mentorUpdate.getTempoDeExperiencia() != null) mentorExistente.setTempoDeExperiencia(mentorUpdate.getTempoDeExperiencia());
+        if (mentorUpdate.getAreaDeAtuacao() != null) mentorExistente.setAreaDeAtuacao(mentorUpdate.getAreaDeAtuacao());
+        if (mentorUpdate.getEndereco() != null) mentorExistente.setEndereco(mentorUpdate.getEndereco());
+        if (mentorUpdate.getResumo() != null) mentorExistente.setResumo(mentorUpdate.getResumo());
 
         return mentorRepository.save(mentorExistente);
     }
+
 
     //deletar
     public void delete(Long id){

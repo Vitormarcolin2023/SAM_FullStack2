@@ -73,6 +73,9 @@ public class Aluno implements UserDetails {
         return senha;
     }
 
+    @JsonIgnore
+    private List<GrantedAuthority> authorities;
+
     @Override
     public String getUsername() {
         return email;

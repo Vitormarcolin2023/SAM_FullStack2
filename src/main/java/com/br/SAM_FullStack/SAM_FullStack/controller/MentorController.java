@@ -1,8 +1,10 @@
 package com.br.SAM_FullStack.SAM_FullStack.controller;
 
+import com.br.SAM_FullStack.SAM_FullStack.autenticacao.TokenService;
 import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
 import com.br.SAM_FullStack.SAM_FullStack.service.MentorService;
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +16,8 @@ import java.util.List;
 @CrossOrigin("*")
 public class MentorController {
 
-
+    @Autowired
+    TokenService tokenService;
     private final MentorService mentorService;
 
     public MentorController(MentorService mentorService){
@@ -87,12 +90,20 @@ public class MentorController {
         }
     }
 
-    @GetMapping("/me") //mentor email
-    public ResponseEntity<Mentor> getMentorProfile(Authentication authentication) {
-        // Obtém o e-mail do usuário autenticado a partir do token
-        String email = authentication.name();
+    @GetMapping("/me")
+    public ResponseEntity<Mentor> getMentorProfile(
+            @RequestHeader("Authorization") String authorizationHeader) {
 
-        // Busca o mentor pelo e-mail usando o seu MentorService
+        String token = null;
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            token = authorizationHeader.substring(7); // remove "Bearer "
+        }
+
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String email = tokenService.extractEmail(token);
+
         Mentor mentor = mentorService.findByEmail(email);
 
         if (mentor != null) {
@@ -101,5 +112,6 @@ public class MentorController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
 
 }

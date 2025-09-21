@@ -55,7 +55,7 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
 				.csrf(csrf -> csrf.disable())
-				.cors(cors -> {}) // ✅ ativa CORS para Spring Security
+				.cors(cors -> {})
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/auth/login").permitAll()
 						.requestMatchers("/areas/findAll").permitAll()

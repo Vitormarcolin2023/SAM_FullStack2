@@ -1,5 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*; // Importa todas as anotações do JPA, incluindo @Id
 import jakarta.validation.constraints.NotBlank;
@@ -63,6 +64,8 @@ public class Mentor implements UserDetails {
     @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reuniao> reunioes = new ArrayList<>();
 
+    private String resumo;
+
 
     // Metodos obrigatórios do Spring Security
 
@@ -72,6 +75,10 @@ public class Mentor implements UserDetails {
         authorities.add(new SimpleGrantedAuthority("ROLE_MENTOR"));
         return authorities;
     }
+
+    @JsonIgnore
+    private List<GrantedAuthority> authorities;
+
 
     @Override
     public String getPassword() {

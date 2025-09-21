@@ -1,5 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -51,4 +52,7 @@ public class Coordenador implements UserDetails {
     public String getUsername() {
         return email;
     }
+
+    @JsonIgnore
+    private List<GrantedAuthority> authorities;
 }

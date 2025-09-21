@@ -1,5 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -51,6 +52,9 @@ public class Professor implements UserDetails {
         return authorities;
     }
 
+    @JsonIgnore
+    private List<GrantedAuthority> authorities;
+
     @Override
     public String getPassword() {
         return senha;
@@ -60,4 +64,5 @@ public class Professor implements UserDetails {
     public String getUsername() {
         return email;
     }
+
 }
