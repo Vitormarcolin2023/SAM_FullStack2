@@ -34,12 +34,9 @@ public class GrupoController {
 
     @GetMapping("/findById/{id}")
     public ResponseEntity<Grupo> findById(@PathVariable long id){
-        try {
-            Grupo result = grupoService.findById(id);
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
+        // Sem try-catch! O código foca apenas no caminho feliz.
+        Grupo result = grupoService.findById(id);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/findByAluno/{alunoId}")
