@@ -54,6 +54,6 @@ public class AuthService {
         }
 
         String token = tokenService.generateToken(email, role, nome);
-        return new RespostaLoginDTO(token, role, "CONCLUIDO");
+        return new RespostaLoginDTO(token, role);
     }
 }

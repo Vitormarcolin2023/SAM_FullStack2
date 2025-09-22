@@ -7,6 +7,7 @@ import com.br.SAM_FullStack.SAM_FullStack.repository.MentorRepository;
 import com.br.SAM_FullStack.SAM_FullStack.repository.ProjetoRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +21,8 @@ public class MentorService {
 
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public MentorService(MentorRepository mentorRepository){
         this.mentorRepository = mentorRepository;
@@ -41,6 +44,9 @@ public class MentorService {
         // Status inicial até a coordenação aprovar
         mentor.setStatusMentor(StatusMentor.PENDENTE);
 
+        String senhaEncript = passwordEncoder.encode(mentor.getSenha());
+        mentor.setSenha(senhaEncript);
+
         //Envio de email
         String destinatario = mentor.getEmail();
         String assunto = "Bem-vindo(a) ao SAM - Cadastro em Análise";
@@ -58,12 +64,16 @@ public class MentorService {
         if (mentorUpdate.getNome() != null) mentorExistente.setNome(mentorUpdate.getNome());
         if (mentorUpdate.getCpf() != null) mentorExistente.setCpf(mentorUpdate.getCpf());
         if (mentorUpdate.getEmail() != null) mentorExistente.setEmail(mentorUpdate.getEmail());
-        if (mentorUpdate.getSenha() != null) mentorExistente.setSenha(mentorUpdate.getSenha());
         if (mentorUpdate.getTipoDeVinculo() != null) mentorExistente.setTipoDeVinculo(mentorUpdate.getTipoDeVinculo());
         if (mentorUpdate.getTempoDeExperiencia() != null) mentorExistente.setTempoDeExperiencia(mentorUpdate.getTempoDeExperiencia());
         if (mentorUpdate.getAreaDeAtuacao() != null) mentorExistente.setAreaDeAtuacao(mentorUpdate.getAreaDeAtuacao());
         if (mentorUpdate.getEndereco() != null) mentorExistente.setEndereco(mentorUpdate.getEndereco());
         if (mentorUpdate.getResumo() != null) mentorExistente.setResumo(mentorUpdate.getResumo());
+
+        if (mentorUpdate.getSenha() != null){
+            String senhaEncrip = passwordEncoder.encode(mentorUpdate.getSenha());
+            mentorExistente.setSenha(senhaEncrip);
+        }
 
         return mentorRepository.save(mentorExistente);
     }

@@ -1,8 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.controller;
 
-import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.model.AreaDeAtuacao;
-import com.br.SAM_FullStack.SAM_FullStack.model.Curso;
 import com.br.SAM_FullStack.SAM_FullStack.service.AreaDeAtuacaoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,45 +20,26 @@ public class AreaDeAtuacaoController {
 
     @GetMapping("/findAll")
     public ResponseEntity<List<AreaDeAtuacao>> findAll(){
-        try {
-            List<AreaDeAtuacao> result = areaDeAtuacaoService.findAll();
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        List<AreaDeAtuacao> result = areaDeAtuacaoService.findAll();
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @PostMapping("/save")
     public ResponseEntity<AreaDeAtuacao> save(@RequestBody AreaDeAtuacao areaDeAtuacao) {
-        try {
-            AreaDeAtuacao result = areaDeAtuacaoService.save(areaDeAtuacao);
-            return new ResponseEntity<>(result, HttpStatus.CREATED);
-        } catch (Exception ex) {
-            // Logar o erro
-            ex.printStackTrace();
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR); // Status 500
-        }
+        AreaDeAtuacao result = areaDeAtuacaoService.save(areaDeAtuacao);
+        return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> update (@PathVariable Long id, @Valid @RequestBody AreaDeAtuacao areaDeAtuacaoUpdate){
-        try{
-            AreaDeAtuacao areaDeAtuacaoAtualizado = areaDeAtuacaoService.update(id, areaDeAtuacaoUpdate);
-            return ResponseEntity.ok(areaDeAtuacaoAtualizado);
-        }catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<AreaDeAtuacao> update (@PathVariable Long id, @Valid @RequestBody AreaDeAtuacao areaDeAtuacaoUpdate){
+        AreaDeAtuacao areaDeAtuacaoAtualizado = areaDeAtuacaoService.update(id, areaDeAtuacaoUpdate);
+        return ResponseEntity.ok(areaDeAtuacaoAtualizado);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> delete (@PathVariable Long id){
-        try{
-            areaDeAtuacaoService.delete(id);
-            return ResponseEntity.noContent().build();
-        }catch (Exception e){
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<Void> delete (@PathVariable Long id){
+        areaDeAtuacaoService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/batch")

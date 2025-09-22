@@ -9,6 +9,8 @@ import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
 import com.br.SAM_FullStack.SAM_FullStack.repository.CoordenadorRepository;
 import com.br.SAM_FullStack.SAM_FullStack.repository.CursoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 
@@ -24,12 +26,16 @@ public class CoordenadorService {
     private final MentorService mentorService;
     private final ProjetoService projetoService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Transactional
     public Coordenador save(CoordenadorDTO coordenadorDTO) {
         Coordenador coordenador = new Coordenador();
         coordenador.setNome(coordenadorDTO.getNome());
         coordenador.setEmail(coordenadorDTO.getEmail());
-        coordenador.setSenha(coordenadorDTO.getSenha());
+        String senhaEncript = passwordEncoder.encode(coordenadorDTO.getSenha());
+        coordenador.setSenha(senhaEncript);
 
         List<Curso> cursos = cursoRepository.findAllById(coordenadorDTO.getCursosIds());
 
@@ -50,7 +56,8 @@ public class CoordenadorService {
 
         coordenadorExistente.setNome(coordenadorDTO.getNome());
         coordenadorExistente.setEmail(coordenadorDTO.getEmail());
-        coordenadorExistente.setSenha(coordenadorDTO.getSenha());
+        String senhaEncript = passwordEncoder.encode(coordenadorDTO.getSenha());
+        coordenadorExistente.setSenha(senhaEncript);
 
         if (coordenadorExistente.getCursos() != null) {
             coordenadorExistente.getCursos().forEach(curso -> curso.setCoordenador(null));
