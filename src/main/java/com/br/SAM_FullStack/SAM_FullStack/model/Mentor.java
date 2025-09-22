@@ -1,5 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*; // Importa todas as anotações do JPA, incluindo @Id
 import jakarta.validation.constraints.NotBlank;
@@ -7,8 +8,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Data
@@ -16,7 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "tb_mentor")
-public class Mentor {
+public class Mentor implements UserDetails {
 
     @Id // Anotação correta do JPA
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,5 +64,30 @@ public class Mentor {
     @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reuniao> reunioes = new ArrayList<>();
 
+    private String resumo;
+
+
+    // Metodos obrigatórios do Spring Security
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_MENTOR"));
+        return authorities;
+    }
+
+    @JsonIgnore
+    private List<GrantedAuthority> authorities;
+
+
+    @Override
+    public String getPassword() {
+        return senha;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
 
 }

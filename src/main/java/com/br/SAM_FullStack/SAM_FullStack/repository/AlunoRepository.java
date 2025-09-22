@@ -22,6 +22,7 @@ public interface AlunoRepository extends JpaRepository<Aluno, Long> {
 
     List<Aluno> findAllByGrupoId(long id);
 
+    Optional<Aluno> findByEmail(String email);
 
     @Query(
             "Select a from Aluno a where a.nome = :nome"
@@ -37,4 +38,5 @@ public interface AlunoRepository extends JpaRepository<Aluno, Long> {
     List<Aluno> findByNomeContainingIgnoreCase(String nome);
 
     List<Aluno> findAllByOrderByNomeAsc();
+
 }

@@ -31,4 +31,13 @@ public class Curso {
     @JsonIgnoreProperties("curso")
     private List<Aluno> alunos;
 
+    @ManyToOne
+    @JoinColumn(name = "coordenador_id")
+    @JsonIgnoreProperties("cursos")
+    private Coordenador coordenador;
+
+    @ManyToMany(mappedBy = "cursos")
+    @JsonIgnoreProperties("cursos")
+    private List<Professor> professores;
+
 }

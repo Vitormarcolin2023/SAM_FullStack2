@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -56,5 +57,13 @@ public class Projeto {
     @ManyToOne(cascade = CascadeType.ALL)
     @JsonIgnoreProperties("projetos")
     private Grupo grupo;
+
+    @ManyToMany
+    @JoinTable(
+            name = "tb_projeto_professor",
+            joinColumns = @JoinColumn(name = "projeto_id"),
+            inverseJoinColumns = @JoinColumn(name = "professor_id"))
+    @JsonIgnoreProperties("projetos")
+    private List<Professor> professores;
 
 }

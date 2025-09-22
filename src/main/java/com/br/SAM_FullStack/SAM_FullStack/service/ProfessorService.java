@@ -5,6 +5,8 @@ import com.br.SAM_FullStack.SAM_FullStack.model.Professor;
 import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
 import com.br.SAM_FullStack.SAM_FullStack.repository.ProfessorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.annotation.AccessType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,15 +20,26 @@ public class ProfessorService {
     private MentorService mentorService;
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private ProjetoService projetoService;
 
     public String save(Professor professor){
+
+        String senhaEncrip = passwordEncoder.encode(professor.getSenha());
+        professor.setSenha(senhaEncrip);
+
         this.professorRepository.save(professor);
         return "Professor salvo com sucesso!";
     }
 
     public String update(Professor professor, long id){
         professor.setId(id);
+
+        String senhaEncript = passwordEncoder.encode(professor.getSenha());
+        professor.setSenha(senhaEncript);
+
         this.professorRepository.save(professor);
         return "Professor atualizado com sucesso!";
     }
@@ -48,5 +61,7 @@ public class ProfessorService {
     public List<Projeto> findAllProjetos(){
         return this.projetoService.listAll();
     }
+
+
 
 }
