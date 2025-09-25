@@ -6,13 +6,6 @@ import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.model.Coordenador;
 import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
 import com.br.SAM_FullStack.SAM_FullStack.model.Professor;
-import com.br.SAM_FullStack.SAM_FullStack.repository.AlunoRepository;
-import com.br.SAM_FullStack.SAM_FullStack.repository.CoordenadorRepository;
-import com.br.SAM_FullStack.SAM_FullStack.repository.MentorRepository;
-import com.br.SAM_FullStack.SAM_FullStack.repository.ProfessorRepository;
-import com.br.SAM_FullStack.SAM_FullStack.service.AlunoService;
-import com.br.SAM_FullStack.SAM_FullStack.service.CoordenadorService;
-import com.br.SAM_FullStack.SAM_FullStack.service.ProfessorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,10 +34,15 @@ public class AuthService {
 
         // pega o nome dinamicamente
         String nome;
+        // ALTERADO: A variável status deve ser String e inicializada como null
+        String status = null;
+
         if(user instanceof Aluno) {
             nome = ((Aluno) user).getNome();
         } else if(user instanceof Mentor) {
             nome = ((Mentor) user).getNome();
+            // ALTERADO: Converte o Enum para String usando .name()
+            status = ((Mentor) user).getStatusMentor().name();
         } else if(user instanceof Professor) {
             nome = ((Professor) user).getNome();
         } else if(user instanceof Coordenador) {
@@ -54,6 +52,8 @@ public class AuthService {
         }
 
         String token = tokenService.generateToken(email, role, nome);
-        return new RespostaLoginDTO(token, role);
+
+        // ALTERADO: Usa o novo construtor com todos os 4 campos
+        return new RespostaLoginDTO(token, role, email, status);
     }
 }
