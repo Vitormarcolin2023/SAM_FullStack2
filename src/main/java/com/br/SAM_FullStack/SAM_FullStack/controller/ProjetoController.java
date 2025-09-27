@@ -64,4 +64,15 @@ public class ProjetoController {
         List<Projeto> projetos = projetoService.findByMentor(id);
         return ResponseEntity.ok(projetos);
     }
+
+    @GetMapping("/professor/{professorId}")
+    public ResponseEntity<List<Projeto>> buscarProjetosPorProfessor(@PathVariable("professorId") Long professorId) {
+
+        List<Projeto> projetos = projetoService.buscarProjetosPorProfessor(professorId);
+
+        if (projetos.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(projetos);
+    }
 }

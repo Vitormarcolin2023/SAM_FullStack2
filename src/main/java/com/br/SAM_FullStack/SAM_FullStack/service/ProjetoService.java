@@ -121,4 +121,8 @@ public class ProjetoService {
         return projetos;
     }
 
+    public List<Projeto> buscarProjetosPorProfessor(Long professorId) {
+        return projetoRepository.findAllByProfessoresId(professorId);
+    }
+
 }

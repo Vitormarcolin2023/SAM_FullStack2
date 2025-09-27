@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/professor")
@@ -63,11 +64,9 @@ public class ProfessorController {
 
     @GetMapping("/getById/{id}")
     public ResponseEntity<Professor> getProfessorPorId(@PathVariable Long id) {
-        try {
-            Professor professor = this.professorService.findById(id);
-            return new ResponseEntity<>(professor, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        Optional<Professor> optionalProfessor = Optional.ofNullable(this.professorService.findById(id));
+        return optionalProfessor
+                .map(professor -> new ResponseEntity<>(professor, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 }
