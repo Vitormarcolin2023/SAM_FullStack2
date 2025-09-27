@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -126,5 +127,10 @@ public class CoordenadorService {
     public Coordenador buscarPorEmail(String email) {
         Optional<Coordenador> coordenador = coordenadorRepository.findByEmail(email);
         return coordenador.orElse(null);
+    }
+
+    public Coordenador findById(Long id) {
+        return coordenadorRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Coordenador com ID " + id + " não encontrado."));
     }
 }

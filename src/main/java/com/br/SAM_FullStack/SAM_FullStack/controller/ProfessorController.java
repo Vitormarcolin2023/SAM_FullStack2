@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/professor")
@@ -58,5 +59,15 @@ public class ProfessorController {
     public ResponseEntity<Professor> getProfessorPorEmail(@RequestParam String email) {
         Professor professor = this.professorService.findByEmail(email);
         return new ResponseEntity<>(professor, HttpStatus.OK);
+    }
+
+    @GetMapping("/getById/{id}")
+    public ResponseEntity<Professor> getProfessorPorId(@PathVariable Long id) {
+        try {
+            Professor professor = this.professorService.findById(id);
+            return new ResponseEntity<>(professor, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }

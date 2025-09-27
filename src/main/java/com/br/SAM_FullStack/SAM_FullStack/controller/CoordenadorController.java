@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/coordenador")
@@ -70,6 +71,16 @@ public class CoordenadorController {
             return ResponseEntity.ok(coordenador);
         } else {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/getById/{id}")
+    public ResponseEntity<Coordenador> getCoordenadorPorId(@PathVariable Long id) {
+        try {
+            Coordenador coordenador = this.coordenadorService.findById(id);
+            return new ResponseEntity<>(coordenador, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }

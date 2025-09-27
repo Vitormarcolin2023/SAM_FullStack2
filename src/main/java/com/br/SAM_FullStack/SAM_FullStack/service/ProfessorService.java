@@ -68,4 +68,9 @@ public class ProfessorService {
                 .orElseThrow(() -> new NoSuchElementException("Professor com email " + email + " não encontrado."));
     }
 
+    public Professor findById(Long id) {
+        return professorRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Professor com ID " + id + " não encontrado."));
+    }
+
 }
