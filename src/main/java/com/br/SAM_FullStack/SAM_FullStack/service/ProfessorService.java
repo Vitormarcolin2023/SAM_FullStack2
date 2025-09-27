@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class ProfessorService {
@@ -62,6 +63,9 @@ public class ProfessorService {
         return this.projetoService.listAll();
     }
 
-
+    public Professor findByEmail(String email) {
+        return professorRepository.findByEmail(email)
+                .orElseThrow(() -> new NoSuchElementException("Professor com email " + email + " não encontrado."));
+    }
 
 }

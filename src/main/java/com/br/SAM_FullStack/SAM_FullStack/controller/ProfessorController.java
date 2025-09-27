@@ -53,4 +53,10 @@ public class ProfessorController {
         List<Projeto> projetos = this.professorService.findAllProjetos();
         return new ResponseEntity<>(projetos, HttpStatus.OK);
     }
+
+    @GetMapping("/buscar-por-email")
+    public ResponseEntity<Professor> getProfessorPorEmail(@RequestParam String email) {
+        Professor professor = this.professorService.findByEmail(email);
+        return new ResponseEntity<>(professor, HttpStatus.OK);
+    }
 }
