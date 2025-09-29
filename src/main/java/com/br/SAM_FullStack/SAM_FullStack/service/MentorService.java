@@ -101,4 +101,8 @@ public class MentorService {
         Optional<Mentor> mentor = mentorRepository.findByEmail(email);
         return mentor.orElse(null);
     }
+
+    public List<Mentor> findByArea(Long idArea) {
+        return mentorRepository.findByAreaDeAtuacaoId(idArea);
+    }
 }
