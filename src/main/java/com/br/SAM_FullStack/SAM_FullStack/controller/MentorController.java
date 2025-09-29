@@ -96,4 +96,10 @@ public class MentorController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
+    @GetMapping("/area/{id}")
+    public ResponseEntity<List<Mentor>> findByAreaDeAtuacao(@PathVariable("id") Long id) {
+        List<Mentor> mentores = mentorService.findByArea(id);
+        return ResponseEntity.ok(mentores);
+    }
 }
