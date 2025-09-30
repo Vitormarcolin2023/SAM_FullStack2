@@ -197,4 +197,12 @@ public class GrupoService {
 
         return "Grupo deletado com sucesso";
     }
+
+    public GrupoDTO findByAluno(Aluno aluno) {
+        Grupo grupo = aluno.getGrupo();
+        if (grupo != null) {
+            return new GrupoDTO(grupo.getId(), grupo.getNome(), null, null);
+        }
+        return null;
+    }
 }
