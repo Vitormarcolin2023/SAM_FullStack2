@@ -103,6 +103,6 @@ public class MentorService {
     }
 
     public List<Mentor> findByArea(Long idArea) {
-        return mentorRepository.findByAreaDeAtuacaoId(idArea);
+        return mentorRepository.findByAreaDeAtuacaoIdAndStatusMentor(idArea, StatusMentor.ATIVO);
     }
 }
