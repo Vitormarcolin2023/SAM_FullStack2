@@ -124,5 +124,15 @@ public class AlunoService {
         return alunoRepository.findByEmail(email).orElseThrow(() ->
                 new RuntimeException("Aluno não encontrado com o E-mail: " + email));
     }
+
+    public List<Aluno> findByCurso(Long idGrupo){
+        List<Aluno> alunos = alunoRepository.findByCursoId(idGrupo);
+
+        if(alunos.isEmpty()){
+            throw new RuntimeException("Nenhum aluno encontrado nesse curso");
+        }
+
+        return alunos;
+    }
 }
 

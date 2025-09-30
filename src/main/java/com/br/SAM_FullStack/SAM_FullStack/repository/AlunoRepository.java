@@ -39,4 +39,6 @@ public interface AlunoRepository extends JpaRepository<Aluno, Long> {
 
     List<Aluno> findAllByOrderByNomeAsc();
 
+    List<Aluno> findByCursoId(Long id);
+
 }

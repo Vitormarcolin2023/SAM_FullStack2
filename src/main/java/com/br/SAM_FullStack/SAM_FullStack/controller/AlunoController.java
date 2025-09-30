@@ -1,8 +1,10 @@
 package com.br.SAM_FullStack.SAM_FullStack.controller;
 
+import com.br.SAM_FullStack.SAM_FullStack.autenticacao.TokenService;
 import com.br.SAM_FullStack.SAM_FullStack.dto.LoginDTO;
 import com.br.SAM_FullStack.SAM_FullStack.dto.RespostaLoginDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
+import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
 import com.br.SAM_FullStack.SAM_FullStack.service.AlunoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import java.util.List;
 public class AlunoController {
 
     private final AlunoService alunoService;
+    private final TokenService tokenService;
 
     @GetMapping("/findAll")
     public ResponseEntity<List<Aluno>> findAll(){
@@ -79,5 +82,35 @@ public class AlunoController {
     public ResponseEntity<Aluno> findByEmail(@RequestParam("email") String email) {
         Aluno aluno = alunoService.findByEmail(email);
         return ResponseEntity.ok(aluno);
+    }
+
+
+    @GetMapping("/findByCurso/{cursoId}")
+    public ResponseEntity<List<Aluno>> findByCurso(@PathVariable Long cursoId) {
+        List<Aluno> alunos = alunoService.findByCurso(cursoId);
+        return ResponseEntity.ok(alunos);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<Aluno> getAlunoProfile(
+            @RequestHeader("Authorization") String authorizationHeader) {
+
+        String token = null;
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            token = authorizationHeader.substring(7); // remove "Bearer "
+        }
+
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String email = tokenService.extractEmail(token);
+
+        Aluno aluno = alunoService.findByEmail(email);
+
+        if (aluno != null) {
+            return ResponseEntity.ok(aluno);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 }
