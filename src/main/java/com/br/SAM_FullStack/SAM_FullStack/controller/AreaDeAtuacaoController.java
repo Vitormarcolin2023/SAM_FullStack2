@@ -57,4 +57,15 @@ public class AreaDeAtuacaoController {
         }
         return ResponseEntity.ok(areasEncontradas);
     }
+
+    @GetMapping("/por-aluno-logado")
+    public ResponseEntity<AreaDeAtuacao> getAreaDeAtuacaoDoAlunoLogado() {
+        AreaDeAtuacao area = areaDeAtuacaoService.findByAlunoLogado();
+
+        if (area != null) {
+            return ResponseEntity.ok(area);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
