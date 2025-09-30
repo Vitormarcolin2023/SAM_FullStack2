@@ -64,7 +64,7 @@
 							.requestMatchers("/api/coordenador/save").permitAll()
 							.requestMatchers("/api/professor/save").permitAll()
 							.requestMatchers("/grupos/save").permitAll()
-							.requestMatchers("cursos/findAll").permitAll()
+							.requestMatchers("/cursos/findAll").permitAll()
 							.anyRequest().authenticated()
 					)
 					.authenticationProvider(authenticationProvider())
