@@ -24,7 +24,10 @@ public class Grupo {
     private long id;
 
     @NotBlank(message = "O campo 'nome' não pode ser nulo")
-    private String nome; // Definido conforme o ID do grupo
+    private String nome;
+
+    @Enumerated(EnumType.STRING)
+    private StatusGrupo statusGrupo;
 
     @OneToOne
     @JoinColumn(name = "aluno_admin_id")

@@ -79,6 +79,7 @@ public class GrupoService {
         alunoRepository.saveAll(alunos);
         grupo.setAlunos(alunos);
 
+
         Grupo salvo = grupoRepository.save(grupo);
 
         return new GrupoDTO(salvo.getId(), salvo.getNome(), admin.getId(), alunos.stream().map(Aluno::getId).toList());
