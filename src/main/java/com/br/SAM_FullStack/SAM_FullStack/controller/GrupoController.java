@@ -4,12 +4,14 @@ import com.br.SAM_FullStack.SAM_FullStack.dto.AdicionarAlunoDTO;
 import com.br.SAM_FullStack.SAM_FullStack.dto.AnalizarExclusaoDTO;
 import com.br.SAM_FullStack.SAM_FullStack.dto.GrupoDTO;
 import com.br.SAM_FullStack.SAM_FullStack.dto.GrupoUpdateDTO; // DTO para a função de update
+import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.model.Grupo;
 import com.br.SAM_FullStack.SAM_FullStack.model.StatusAlunoGrupo;
 import com.br.SAM_FullStack.SAM_FullStack.service.GrupoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -91,5 +93,17 @@ public class GrupoController {
     public ResponseEntity<String> deletarGrupo(@PathVariable Long idGrupo, @PathVariable Long idProfessor) {
         String result = grupoService.deletarGrupo(idGrupo, idProfessor);
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+    @GetMapping("/por-aluno-logado")
+    public ResponseEntity<GrupoDTO> getGrupoDoAlunoLogado(@AuthenticationPrincipal Aluno alunoLogado) {
+        if (alunoLogado == null) {
+            return ResponseEntity.status(401).build();
+        }
+        GrupoDTO grupoDTO = grupoService.findByAluno(alunoLogado);
+        if (grupoDTO == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(grupoDTO);
     }
 }

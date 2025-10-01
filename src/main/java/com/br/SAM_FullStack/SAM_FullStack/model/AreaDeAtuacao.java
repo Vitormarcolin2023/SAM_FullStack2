@@ -1,5 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -25,6 +26,7 @@ public class AreaDeAtuacao {
     @OneToMany(mappedBy = "areaDeAtuacao", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @JsonIgnoreProperties("areaDeAtuacao")
+    @JsonIgnore
     private List<Curso> cursos;
 
     @Override

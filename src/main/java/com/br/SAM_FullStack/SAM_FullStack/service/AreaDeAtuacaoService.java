@@ -1,10 +1,14 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
 
+import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.model.AreaDeAtuacao;
 import com.br.SAM_FullStack.SAM_FullStack.repository.AreaDeAtuacaoRepository;
+import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
+import org.springframework.security.core.Authentication;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -50,5 +54,20 @@ public class AreaDeAtuacaoService {
 
     public List<AreaDeAtuacao> buscarPorInicioDoNome(String prefixo) {
         return areaDeAtuacaoRepository.findByNomeStartingWithIgnoreCase(prefixo);
+    }
+
+    public AreaDeAtuacao findByAlunoLogado() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof Aluno) {
+            Aluno alunoLogado = (Aluno) principal;
+            if (alunoLogado.getCurso() != null) {
+                return alunoLogado.getCurso().getAreaDeAtuacao();
+            }
+        }
+        return null;
     }
 }
