@@ -52,10 +52,9 @@ public class Aluno implements UserDetails {
     @Enumerated(EnumType.STRING)
     private StatusAlunoGrupo statusAlunoGrupo;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "grupo_id")
+    @ManyToMany(mappedBy = "alunos") // lado inverso
     @JsonIgnore
-    private Grupo grupo;
+    private List<Grupo> grupos = new ArrayList<>();
 
 
     // Metodos obrigatórios do Spring Security

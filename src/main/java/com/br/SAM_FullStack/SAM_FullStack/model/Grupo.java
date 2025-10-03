@@ -34,8 +34,15 @@ public class Grupo {
     @JoinColumn(name = "aluno_admin_id")
     private Aluno alunoAdmin;
 
-    @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL)
-    private List<Aluno> alunos;
+    @ManyToMany
+    @JsonIgnoreProperties("grupo")
+    @JoinTable(
+            name = "aluno_grupo",
+            joinColumns = @JoinColumn(name = "grupo_id"),
+            inverseJoinColumns = @JoinColumn(name = "aluno_id")
+    )
+    private List<Aluno> alunos = new ArrayList<>();
+
 
     @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reuniao> reunioes = new ArrayList<>();
