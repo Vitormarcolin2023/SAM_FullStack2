@@ -14,7 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -106,4 +108,13 @@ public class GrupoController {
         }
         return ResponseEntity.ok(grupoDTO);
     }
+
+    @PutMapping("/arquivar/{id}")
+    public ResponseEntity<Map<String, String>> arquivarGrupo(@PathVariable long id){
+        String result = grupoService.arquivarGrupo(id);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", result);
+        return ResponseEntity.ok(response);
+    }
+
 }
