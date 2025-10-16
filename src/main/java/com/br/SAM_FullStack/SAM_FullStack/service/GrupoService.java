@@ -31,7 +31,7 @@ public class GrupoService {
         );
     }
 
-    public Grupo findByAlunoId(Long alunoId) {
+    /*public Grupo findByAlunoId(Long alunoId) {
 
         Grupo grupo = grupoRepository.findByAlunosId(alunoId).orElseThrow(() ->
                 new IllegalArgumentException("Aluno não encontrado em nenhum grupo.")
@@ -42,7 +42,7 @@ public class GrupoService {
         }
 
         return grupo;
-    }
+    }*/
 
     public GrupoDTO save(GrupoDTO grupoDTO) {
         Aluno admin = alunoRepository.findById(grupoDTO.alunoAdminId())
@@ -103,10 +103,6 @@ public class GrupoService {
         Grupo grupo = grupoRepository.findById(groupId)
                 .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado."));
 
-        if (!grupo.getAlunoAdmin().getId().equals(adminId)) {
-            throw new IllegalStateException("Apenas o admin do grupo pode editar as informações.");
-        }
-
         if (grupoUpdateDTO.nome() != null && !grupoUpdateDTO.nome().isBlank()) {
             grupo.setNome(grupoUpdateDTO.nome());
         }
@@ -119,9 +115,10 @@ public class GrupoService {
         Grupo grupo = grupoRepository.findById(idGrupo)
                 .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado"));
 
-        if (!grupo.getAlunoAdmin().getId().equals(idAdmin)) {
+
+       /* if (!grupo.getAlunoAdmin().getId().equals(idAdmin)) {
             throw new IllegalStateException("Apenas o admin do grupo pode adicionar alunos");
-        }
+        }*/
 
         if (grupo.getAlunos().size() >= 6) {
             throw new IllegalStateException("O grupo já está no limite de alunos (6)");
@@ -151,9 +148,9 @@ public class GrupoService {
         Grupo grupo = grupoRepository.findById(idGrupo)
                 .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado."));
 
-        if (!grupo.getAlunoAdmin().getId().equals(idAdmin)) {
+        /*if (!grupo.getAlunoAdmin().getId().equals(idAdmin)) {
             throw new IllegalStateException("Apenas o administrador pode remover membros.");
-        }
+        }*/
 
         if (idAlunoRemover.equals(idAdmin)) {
             throw new IllegalStateException("O administrador não pode remover a si mesmo.");
@@ -165,7 +162,6 @@ public class GrupoService {
         if (!grupo.getAlunos().contains(aluno)) {
             throw new IllegalStateException("O aluno informado não pertence a este grupo.");
         }
-
         aluno.getGrupos().remove(grupo);
         grupo.getAlunos().remove(aluno);
         aluno.setStatusAlunoGrupo(null);
@@ -228,14 +224,24 @@ public class GrupoService {
         return "Grupo deletado com sucesso";
     }
 
-    public GrupoDTO findByAluno(Aluno aluno) {
-        if (!aluno.getGrupos().isEmpty()) {
-            Grupo grupo = grupoRepository.findByStatusGrupo(StatusGrupo.ATIVO)
-                    .orElseThrow( () -> new IllegalArgumentException("Aluno não possui nenhum grupo ativo"));
-            return new GrupoDTO(grupo.getId(), grupo.getNome(), grupo.getAlunoAdmin().getId(),
-                    grupo.getAlunos().stream().map(Aluno::getId).toList());
-        }
-        return null;
+    public Grupo findByAluno(Aluno aluno) {
+
+        System.out.println("ENTROU AQUI");
+            List<Grupo> grupos = grupoRepository.findByStatusGrupoAndAlunosId(StatusGrupo.ATIVO, aluno.getId());
+
+            if(grupos.isEmpty()){
+                 throw new RuntimeException("Aluno não possui nenhum grupo ativo");
+            }
+
+            // pega o primeiro grupo da lista pois o aluno só poderá ter 1 grupo ativo por projeto
+            Grupo grupo = grupos.get(0);
+
+            if(grupo == null){
+                throw new RuntimeException("Nenhum grupo ativo");
+            }
+
+            return grupo;
+
     }
 
     public String arquivarGrupo(long idGrupo){
@@ -246,5 +252,15 @@ public class GrupoService {
         grupoRepository.save(grupo);
 
         return "Grupo arquivado com sucesso!";
+    }
+
+    public List<Grupo> findByGruposArquivados(long id){
+        List<Grupo> grupos = grupoRepository.findByStatusGrupoAndAlunosId(StatusGrupo.ARQUIVADO, id);
+
+        if(grupos.isEmpty()){
+            throw new RuntimeException("Aluno não possui nenhum grupo arquivado");
+        }
+
+        return grupos;
     }
 }
