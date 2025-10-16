@@ -70,11 +70,6 @@ public class MentorService {
         if (mentorUpdate.getEndereco() != null) mentorExistente.setEndereco(mentorUpdate.getEndereco());
         if (mentorUpdate.getResumo() != null) mentorExistente.setResumo(mentorUpdate.getResumo());
 
-        if (mentorUpdate.getSenha() != null){
-            String senhaEncrip = passwordEncoder.encode(mentorUpdate.getSenha());
-            mentorExistente.setSenha(senhaEncrip);
-        }
-
         return mentorRepository.save(mentorExistente);
     }
 
