@@ -226,7 +226,6 @@ public class GrupoService {
 
     public Grupo findByAluno(Aluno aluno) {
 
-        System.out.println("ENTROU AQUI");
             List<Grupo> grupos = grupoRepository.findByStatusGrupoAndAlunosId(StatusGrupo.ATIVO, aluno.getId());
 
             if(grupos.isEmpty()){
