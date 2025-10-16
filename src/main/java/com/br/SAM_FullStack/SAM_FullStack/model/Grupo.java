@@ -16,7 +16,6 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "tb_grupo")
 public class Grupo {
 
@@ -53,5 +52,11 @@ public class Grupo {
     @JsonIgnoreProperties("grupo")
     private List<Projeto> projetos;
 
-
+    public Grupo(long id, String nome, StatusGrupo statusGrupo, Aluno alunoAdmin, List<Aluno> alunos) {
+        this.id = id;
+        this.nome = nome;
+        this.statusGrupo = statusGrupo;
+        this.alunoAdmin = alunoAdmin;
+        this.alunos = alunos;
+    }
 }
