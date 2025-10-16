@@ -30,9 +30,11 @@ public class Grupo {
     @Enumerated(EnumType.STRING)
     private StatusGrupo statusGrupo;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "aluno_admin_id")
+    @JsonIgnoreProperties("grupos")
     private Aluno alunoAdmin;
+
 
     @ManyToMany
     @JsonIgnoreProperties("grupo")
