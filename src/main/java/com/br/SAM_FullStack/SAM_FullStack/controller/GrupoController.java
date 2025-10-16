@@ -7,8 +7,10 @@ import com.br.SAM_FullStack.SAM_FullStack.dto.GrupoUpdateDTO; // DTO para a fun√
 import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.model.Grupo;
 import com.br.SAM_FullStack.SAM_FullStack.model.StatusAlunoGrupo;
+import com.br.SAM_FullStack.SAM_FullStack.service.AlunoService;
 import com.br.SAM_FullStack.SAM_FullStack.service.GrupoService;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.event.spi.SaveOrUpdateEvent;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,6 +27,7 @@ import java.util.Map;
 public class GrupoController {
 
     private final GrupoService grupoService;
+    private final AlunoService alunoService;
 
     @GetMapping("/findAll")
     public ResponseEntity<List<Grupo>> findAll() {
@@ -40,8 +43,13 @@ public class GrupoController {
 
     @GetMapping("/findByAluno/{alunoId}")
     public ResponseEntity<Grupo> findByAlunoId(@PathVariable Long alunoId) {
-        Grupo result = grupoService.findByAlunoId(alunoId);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        Aluno aluno = alunoService.findById(alunoId);
+        if (aluno != null) {
+            Grupo result = grupoService.findByAluno(aluno);
+            //System.out.println("GRUPO: " + result.getNome());
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
     @PostMapping("/save")
@@ -98,15 +106,15 @@ public class GrupoController {
     }
 
     @GetMapping("/por-aluno-logado")
-    public ResponseEntity<GrupoDTO> getGrupoDoAlunoLogado(@AuthenticationPrincipal Aluno alunoLogado) {
+    public ResponseEntity<Grupo> getGrupoDoAlunoLogado(@AuthenticationPrincipal Aluno alunoLogado) {
         if (alunoLogado == null) {
             return ResponseEntity.status(401).build();
         }
-        GrupoDTO grupoDTO = grupoService.findByAluno(alunoLogado);
-        if (grupoDTO == null) {
+        Grupo grupo = grupoService.findByAluno(alunoLogado);
+        if (grupo == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(grupoDTO);
+        return ResponseEntity.ok(grupo);
     }
 
     @PutMapping("/arquivar/{id}")
@@ -114,6 +122,12 @@ public class GrupoController {
         String result = grupoService.arquivarGrupo(id);
         Map<String, String> response = new HashMap<>();
         response.put("message", result);
+        return ResponseEntity.ok(response);
+    }
+
+        @GetMapping("/findByGruposArquivados/{id}")
+        public ResponseEntity<List<Grupo>> findByGruposArquivados(@PathVariable long id){
+        List<Grupo> response = grupoService.findByGruposArquivados(id);
         return ResponseEntity.ok(response);
     }
 
