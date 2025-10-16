@@ -41,4 +41,11 @@ public class AreaDeAtuacao {
     public int hashCode() {
         return Objects.hash(id);
     }
+
+    public AreaDeAtuacao(Long id, String nome) {
+        this.id = id;
+        this.nome = nome;
+    }
+
+    public AreaDeAtuacao() {}
 }
