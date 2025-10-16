@@ -17,7 +17,9 @@ public interface GrupoRepository extends JpaRepository<Grupo, Long> {
 
     List<Grupo> findByAlunosStatusAlunoGrupo(StatusAlunoGrupo statusAlunoGrupo);
 
-    Optional<Grupo> findByStatusGrupo (StatusGrupo statusGrupo);
+    List<Grupo> findByStatusGrupoAndAlunosId (StatusGrupo statusGrupo, long alunoId);
+
+
 
     @Query("SELECT g FROM Grupo g LEFT JOIN FETCH g.alunos a LEFT JOIN FETCH a.curso c LEFT JOIN FETCH c.areaDeAtuacao WHERE g.id = :id")
     Optional<Grupo> findByIdWithAlunos(@Param("id") Long id);
