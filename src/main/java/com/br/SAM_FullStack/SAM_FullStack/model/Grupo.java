@@ -1,5 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -15,7 +16,6 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "tb_grupo")
 public class Grupo {
 
@@ -24,14 +24,26 @@ public class Grupo {
     private long id;
 
     @NotBlank(message = "O campo 'nome' não pode ser nulo")
-    private String nome; // Definido conforme o ID do grupo
+    private String nome;
 
-    @OneToOne
+    @Enumerated(EnumType.STRING)
+    private StatusGrupo statusGrupo;
+
+    @ManyToOne
     @JoinColumn(name = "aluno_admin_id")
+    @JsonIgnoreProperties("grupos")
     private Aluno alunoAdmin;
 
-    @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL)
-    private List<Aluno> alunos;
+
+    @ManyToMany
+    @JsonIgnoreProperties("grupo")
+    @JoinTable(
+            name = "aluno_grupo",
+            joinColumns = @JoinColumn(name = "grupo_id"),
+            inverseJoinColumns = @JoinColumn(name = "aluno_id")
+    )
+    private List<Aluno> alunos = new ArrayList<>();
+
 
     @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reuniao> reunioes = new ArrayList<>();
@@ -40,5 +52,11 @@ public class Grupo {
     @JsonIgnoreProperties("grupo")
     private List<Projeto> projetos;
 
-
+    public Grupo(long id, String nome, StatusGrupo statusGrupo, Aluno alunoAdmin, List<Aluno> alunos) {
+        this.id = id;
+        this.nome = nome;
+        this.statusGrupo = statusGrupo;
+        this.alunoAdmin = alunoAdmin;
+        this.alunos = alunos;
+    }
 }

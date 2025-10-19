@@ -1,9 +1,13 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
 import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
+import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
 import com.br.SAM_FullStack.SAM_FullStack.model.StatusMentor;
 import com.br.SAM_FullStack.SAM_FullStack.repository.MentorRepository;
+import com.br.SAM_FullStack.SAM_FullStack.repository.ProjetoRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +21,8 @@ public class MentorService {
 
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public MentorService(MentorRepository mentorRepository){
         this.mentorRepository = mentorRepository;
@@ -38,6 +44,9 @@ public class MentorService {
         // Status inicial até a coordenação aprovar
         mentor.setStatusMentor(StatusMentor.PENDENTE);
 
+        String senhaEncript = passwordEncoder.encode(mentor.getSenha());
+        mentor.setSenha(senhaEncript);
+
         //Envio de email
         String destinatario = mentor.getEmail();
         String assunto = "Bem-vindo(a) ao SAM - Cadastro em Análise";
@@ -48,20 +57,22 @@ public class MentorService {
         return mentorRepository.save(mentor);
     }
 
-    //atualizar
-    public Mentor update(Long id, Mentor mentorUpdate){
+    public Mentor update(Long id, Mentor mentorUpdate) {
         Mentor mentorExistente = findById(id);
-        mentorExistente.setNome(mentorUpdate.getNome());
-        mentorExistente.setCpf(mentorUpdate.getCpf());
-        mentorExistente.setEmail(mentorUpdate.getEmail());
-        mentorExistente.setSenha(mentorUpdate.getSenha());
-        mentorExistente.setTipoDeVinculo(mentorUpdate.getTipoDeVinculo());
-        mentorExistente.setTempoDeExperiencia(mentorUpdate.getTempoDeExperiencia());
-        mentorExistente.setAreaDeAtuacao(mentorUpdate.getAreaDeAtuacao());
-        mentorExistente.setEndereco(mentorExistente.getEndereco());
+
+        // Atualiza campos apenas se vierem preenchidos
+        if (mentorUpdate.getNome() != null) mentorExistente.setNome(mentorUpdate.getNome());
+        if (mentorUpdate.getCpf() != null) mentorExistente.setCpf(mentorUpdate.getCpf());
+        if (mentorUpdate.getEmail() != null) mentorExistente.setEmail(mentorUpdate.getEmail());
+        if (mentorUpdate.getTipoDeVinculo() != null) mentorExistente.setTipoDeVinculo(mentorUpdate.getTipoDeVinculo());
+        if (mentorUpdate.getTempoDeExperiencia() != null) mentorExistente.setTempoDeExperiencia(mentorUpdate.getTempoDeExperiencia());
+        if (mentorUpdate.getAreaDeAtuacao() != null) mentorExistente.setAreaDeAtuacao(mentorUpdate.getAreaDeAtuacao());
+        if (mentorUpdate.getEndereco() != null) mentorExistente.setEndereco(mentorUpdate.getEndereco());
+        if (mentorUpdate.getResumo() != null) mentorExistente.setResumo(mentorUpdate.getResumo());
 
         return mentorRepository.save(mentorExistente);
     }
+
 
     //deletar
     public void delete(Long id){
@@ -84,5 +95,9 @@ public class MentorService {
         // Usa o repositório para buscar o mentor por e-mail e retorna o objeto ou null
         Optional<Mentor> mentor = mentorRepository.findByEmail(email);
         return mentor.orElse(null);
+    }
+
+    public List<Mentor> findByArea(Long idArea) {
+        return mentorRepository.findByAreaDeAtuacaoIdAndStatusMentor(idArea, StatusMentor.ATIVO);
     }
 }

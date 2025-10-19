@@ -1,22 +1,16 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
 import com.br.SAM_FullStack.SAM_FullStack.dto.GrupoDTO;
-import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
-import com.br.SAM_FullStack.SAM_FullStack.model.Grupo;
-import com.br.SAM_FullStack.SAM_FullStack.model.Professor;
-import com.br.SAM_FullStack.SAM_FullStack.model.StatusAlunoGrupo;
+import com.br.SAM_FullStack.SAM_FullStack.dto.GrupoUpdateDTO;
+import com.br.SAM_FullStack.SAM_FullStack.model.*;
 import com.br.SAM_FullStack.SAM_FullStack.repository.AlunoRepository;
 import com.br.SAM_FullStack.SAM_FullStack.repository.GrupoRepository;
 import com.br.SAM_FullStack.SAM_FullStack.repository.ProfessorRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.security.Guard;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,113 +20,162 @@ public class GrupoService {
     private final GrupoRepository grupoRepository;
     private final AlunoRepository alunoRepository;
     private final ProfessorRepository professorRepository;
-    private final EntityManager em;
 
-    public List<Grupo> findAll(){
+    public List<Grupo> findAll() {
         return grupoRepository.findAll();
     }
 
-    public Grupo findById(long id){
-        return grupoRepository.findById(id).
-                orElseThrow(()->
-                    new RuntimeException("Grupo não encontrado.")
-                );
+    public Grupo findById(long id) {
+        return grupoRepository.findById(id).orElseThrow(() ->
+                new RuntimeException("Grupo não encontrado.")
+        );
     }
 
-    public String save(GrupoDTO grupoDTO){
+    /*public Grupo findByAlunoId(Long alunoId) {
+
+        Grupo grupo = grupoRepository.findByAlunosId(alunoId).orElseThrow(() ->
+                new IllegalArgumentException("Aluno não encontrado em nenhum grupo.")
+        );
+
+        if(grupo.getStatusGrupo().equals(StatusGrupo.ARQUIVADO)){
+            throw new RuntimeException("Nenhum grupo ativo no momento");
+        }
+
+        return grupo;
+    }*/
+
+    public GrupoDTO save(GrupoDTO grupoDTO) {
+        Aluno admin = alunoRepository.findById(grupoDTO.alunoAdminId())
+                .orElseThrow(() -> new IllegalArgumentException("Aluno administrador não encontrado"));
+
+        // Valida se admin já está em grupo ativo
+        admin.getGrupos().forEach(grupo1 -> {
+            if (grupo1.getStatusGrupo() == StatusGrupo.ATIVO) {
+                throw new IllegalStateException("Operação não permitida. Admin já participa de outro grupo ativo");
+            }
+        });
+
+        List<Aluno> alunos = alunoRepository.findAllById(grupoDTO.alunosIds());
+        if (alunos.size() != grupoDTO.alunosIds().size()) {
+            throw new IllegalArgumentException("Um ou mais IDs de alunos não existem");
+        }
+
+        if (alunos.size() < 3 || alunos.size() > 6) {
+            throw new IllegalStateException("Grupo deve ter entre 3 e 6 participantes");
+        }
+
+        if (alunos.stream().noneMatch(a -> a.getId().equals(admin.getId()))) {
+            throw new IllegalStateException("Administrador informado não participa do grupo");
+        }
+
+        for (Aluno aluno : alunos) {
+            aluno.getGrupos().forEach(grupo1 -> {
+                if (grupo1.getStatusGrupo() == StatusGrupo.ATIVO) {
+                    throw new IllegalStateException("Aluno " + aluno.getNome() + " já participa de outro grupo ativo");
+                }
+            });
+        }
+
         Grupo grupo = new Grupo();
         grupo.setNome(grupoDTO.nome());
+        grupo.setAlunoAdmin(admin);
+        grupo.setStatusGrupo(StatusGrupo.ATIVO);
 
-        // Pega referencia de um aluno que já existe usando o id dele
-        Aluno admin = alunoRepository.getReferenceById(grupoDTO.alunoAdminId());
-
-        // verifica se esse aluno já não está em outro grupo
-        if(admin.getGrupo() != null) {
-            throw new IllegalStateException("Operação não permitida. Aluno já participa de outro grupo");
-        }
-
-        grupo.setAlunoAdmin(admin); // setta  o admin
-
-        grupo = grupoRepository.save(grupo); // salva para gerar id do grupo
-
-        // busca todos os alunos pelos ids passados
-        List<Aluno> alunos = alunoRepository.findAllById(grupoDTO.alunosIds());
-        // verifica se a qtd de alunos retornado é igual a qtd de ids passados
-        if(alunos.size() != grupoDTO.alunosIds().size()){
-            throw  new IllegalArgumentException("Um ou mais IDs de alunos não existem");
-        }
-
-        // verifica se a quantidade de participantes é permitida
-        if(alunos.size() < 3 || alunos.size() > 6){
-            throw new IllegalStateException("Operação não permitida. Grupo deve conter no mínimo 3 e no máximo 6 participantes!");
-        }
-
-        // verifica se algum aluno já está em outro grupo e se o admin informado também participa do grupo
-        boolean adminInformado = false;
-        for (Aluno aluno : alunos){
-            if(aluno.getGrupo() != null && aluno.getGrupo().getId() != grupo.getId()){
-                throw new IllegalStateException("Aluno " + aluno.getNome() + " já participa de outro grupo");
-            }
-            if(aluno.getId().equals(admin.getId())){
-                adminInformado = true;
-            }
-        }
-
-        // faz a validação do admin no grupo
-        if(!adminInformado){
-            throw new IllegalStateException("Operação não permitida. Administrador informado não participa do grupo");
-        }
-
-        // setta o grupo no aluno, porque aluno é o dono da relação
-        for (Aluno aluno : alunos){
+        for (Aluno aluno : alunos) {
             aluno.setStatusAlunoGrupo(StatusAlunoGrupo.ATIVO);
-            aluno.setGrupo(grupo);
-        }
-        alunoRepository.saveAll(alunos); // atualiza as alterações feitas em alunos depois de adionar o id do grupo para cada
-
-        grupo.setAlunos(alunos); // atualiza a lista de alunos no grupo também
-
-        return "Novo grupo cadastrado com sucesso!";
-    }
-
-    // Apenas o professor pode deletar um grupo
-    public void delete(long idGrupo, long idSolicitante){
-
-    }
-
-    // O aluno admin do grupo solicita a exclusão de um integrante do grupo e o professor aceita ou declina
-    public String excluirAlunoGrupo(Long idSolicitante, Long idAlunoExcluir){
-        // localiza o grupo que o aluno solicitante faz parte
-        Grupo grupo = grupoRepository.findByAlunosId(idSolicitante).orElseThrow(()->
-                new IllegalArgumentException("Nenhum Grupo encontrado para o aluno solicitante"));
-
-        // verifica se o solicitante é o admin do grupo
-        if(!idSolicitante.equals(grupo.getAlunoAdmin().getId())){
-            throw new IllegalStateException("Operação apenas atourizada para o Administrador do grupo!");
+            aluno.getGrupos().add(grupo);
         }
 
-        // localiza o aluno pelo id informado
-        Aluno alunoExc = alunoRepository.findById(idAlunoExcluir).orElseThrow(()->
-                new IllegalStateException("Aluno com id " + idAlunoExcluir + " não encontrado"));
+        grupo.setAlunos(alunos);
 
-        // verifica se o aluno informado pertence ao grupo do solicitante
-        if(alunoExc.getGrupo() == null || alunoExc.getGrupo().getId() != grupo.getId()){
-            throw new IllegalStateException("Aluno informado não pertence ao grupo do solicitante");
-        }
+        alunoRepository.saveAll(alunos);
+        Grupo salvo = grupoRepository.save(grupo);
 
-        // troca o status para AGUARDANDO para que seja feita uma filtragem pelo professor
-        alunoExc.setStatusAlunoGrupo(StatusAlunoGrupo.AGUARDANDO);
-        alunoRepository.save(alunoExc);
-
-        return "Solicitação enviada pera o professor responsável para análise";
+        return new GrupoDTO(
+                salvo.getId(),
+                salvo.getNome(),
+                admin.getId(),
+                alunos.stream().map(Aluno::getId).toList()
+        );
     }
 
-    // visualização de lista de grupos que solicitaram exclusão de algum aluno
-    public List<Grupo> findByAlunosStatusAlunoGrupo(StatusAlunoGrupo statusAlunoGrupo){
+    public String updateGrupoInfo(Long groupId, Long adminId, GrupoUpdateDTO grupoUpdateDTO) {
+        Grupo grupo = grupoRepository.findById(groupId)
+                .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado."));
+
+        if (grupoUpdateDTO.nome() != null && !grupoUpdateDTO.nome().isBlank()) {
+            grupo.setNome(grupoUpdateDTO.nome());
+        }
+
+        grupoRepository.save(grupo);
+        return "Informações do grupo atualizadas com sucesso.";
+    }
+
+    public String adicionarAlunoAoGrupo(Long idAdmin, long idGrupo, Long idAluno) {
+        Grupo grupo = grupoRepository.findById(idGrupo)
+                .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado"));
+
+
+       /* if (!grupo.getAlunoAdmin().getId().equals(idAdmin)) {
+            throw new IllegalStateException("Apenas o admin do grupo pode adicionar alunos");
+        }*/
+
+        if (grupo.getAlunos().size() >= 6) {
+            throw new IllegalStateException("O grupo já está no limite de alunos (6)");
+        }
+
+        Aluno aluno = alunoRepository.findById(idAluno).orElseThrow(() ->
+                new IllegalStateException("Aluno não encontrado"));
+
+        // Valida se aluno já participa de grupo ativo
+        aluno.getGrupos().forEach(g -> {
+            if (g.getStatusGrupo() == StatusGrupo.ATIVO) {
+                throw new IllegalStateException("Aluno " + aluno.getNome() + " já participa de outro grupo ativo");
+            }
+        });
+
+        aluno.setStatusAlunoGrupo(StatusAlunoGrupo.ATIVO);
+        aluno.getGrupos().add(grupo);
+        grupo.getAlunos().add(aluno);
+
+        alunoRepository.save(aluno);
+        grupoRepository.save(grupo);
+
+        return "Aluno adicionado com sucesso ao grupo";
+    }
+
+    public String removerAlunoDiretamente(Long idGrupo, Long idAlunoRemover, Long idAdmin) {
+        Grupo grupo = grupoRepository.findById(idGrupo)
+                .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado."));
+
+        /*if (!grupo.getAlunoAdmin().getId().equals(idAdmin)) {
+            throw new IllegalStateException("Apenas o administrador pode remover membros.");
+        }*/
+
+        if (idAlunoRemover.equals(idAdmin)) {
+            throw new IllegalStateException("O administrador não pode remover a si mesmo.");
+        }
+
+        Aluno aluno = alunoRepository.findById(idAlunoRemover)
+                .orElseThrow(() -> new IllegalArgumentException("Aluno não encontrado."));
+
+        if (!grupo.getAlunos().contains(aluno)) {
+            throw new IllegalStateException("O aluno informado não pertence a este grupo.");
+        }
+        aluno.getGrupos().remove(grupo);
+        grupo.getAlunos().remove(aluno);
+        aluno.setStatusAlunoGrupo(null);
+
+        alunoRepository.save(aluno);
+        grupoRepository.save(grupo);
+
+        return "Aluno " + aluno.getNome() + " foi removido do grupo";
+    }
+
+    public List<Grupo> findByAlunosStatusAlunoGrupo(StatusAlunoGrupo statusAlunoGrupo) {
         return grupoRepository.findByAlunosStatusAlunoGrupo(statusAlunoGrupo);
     }
 
-    // validação de exclusão de aluno pelo professor
     public String analizarExclusaoAluno(String senhaProf, long idGrupo, long idAluno, boolean resposta) {
         Grupo grupo = grupoRepository.findById(idGrupo)
                 .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado"));
@@ -140,77 +183,83 @@ public class GrupoService {
         Professor professor = professorRepository.findBySenha(senhaProf)
                 .orElseThrow(() -> new IllegalArgumentException("Professor não encontrado"));
 
-        Aluno aluno = alunoRepository
-                .findByIdAndGrupoAndStatusAlunoGrupo(idAluno, grupo, StatusAlunoGrupo.AGUARDANDO)
-                .orElseThrow(() -> new IllegalStateException("Esse aluno não está aguardando exclusão nesse grupo."));
+        Aluno aluno = alunoRepository.findById(idAluno)
+                .orElseThrow(() -> new IllegalArgumentException("Aluno não encontrado"));
+
+        if (!grupo.getAlunos().contains(aluno) || aluno.getStatusAlunoGrupo() != StatusAlunoGrupo.AGUARDANDO) {
+            throw new IllegalStateException("Esse aluno não está aguardando exclusão nesse grupo.");
+        }
 
         if (resposta) {
+            aluno.getGrupos().remove(grupo);
             grupo.getAlunos().remove(aluno);
-            aluno.setGrupo(null);
             aluno.setStatusAlunoGrupo(null);
-            alunoRepository.save(aluno);
-            grupoRepository.save(grupo);
-
-            return "Aluno " + aluno.getNome() + " foi removido do grupo";
         } else {
-            return "Solicitação de exclusão recusada. O aluno permanece no grupo";
+            aluno.setStatusAlunoGrupo(StatusAlunoGrupo.ATIVO);
         }
+
+        alunoRepository.save(aluno);
+        grupoRepository.save(grupo);
+
+        return resposta ?
+                "Aluno " + aluno.getNome() + " foi removido do grupo" :
+                "Solicitação de exclusão recusada. O aluno permanece no grupo";
     }
 
-
-
-    public String deletarGrupo(long idProfessor, long idGrupo) {
-        // Verifica se o grupo existe
+    public String deletarGrupo(long idGrupo, long idProfessor) {
         Grupo grupo = grupoRepository.findById(idGrupo)
                 .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado"));
 
         Professor professor = professorRepository.findById(idProfessor)
                 .orElseThrow(() -> new IllegalArgumentException("Professor não encontrado"));
 
-        // Remove o grupo
+        for (Aluno aluno : grupo.getAlunos()) {
+            aluno.getGrupos().remove(grupo);
+            aluno.setStatusAlunoGrupo(null);
+            alunoRepository.save(aluno);
+        }
+
         grupoRepository.delete(grupo);
 
         return "Grupo deletado com sucesso";
     }
 
-    public String adicionarAlunoAoGrupo(Long idAdmin, long idGrupo, Long idAluno) {
-        //verifica se o grupo existe
+    public Grupo findByAluno(Aluno aluno) {
+
+            List<Grupo> grupos = grupoRepository.findByStatusGrupoAndAlunosId(StatusGrupo.ATIVO, aluno.getId());
+
+            if(grupos.isEmpty()){
+                 throw new RuntimeException("Aluno não possui nenhum grupo ativo");
+            }
+
+            // pega o primeiro grupo da lista pois o aluno só poderá ter 1 grupo ativo por projeto
+            Grupo grupo = grupos.get(0);
+
+            if(grupo == null){
+                throw new RuntimeException("Nenhum grupo ativo");
+            }
+
+            return grupo;
+
+    }
+
+    public String arquivarGrupo(long idGrupo){
         Grupo grupo = grupoRepository.findById(idGrupo)
                 .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado"));
 
-        //verifica se quem está adicionando é o admin do grupo
-        if(!grupo.getAlunoAdmin().getId().equals(idAdmin)) {
-            throw new IllegalStateException("Apenas o admin do grupo pode adicionar alunos");
-        }
-
-        // localiza o aluno pelo id informado
-        Aluno aluno = alunoRepository.findById(idAluno).orElseThrow(()->
-                new IllegalStateException("Aluno com id " + idAluno + " não encontrado"));
-
-        //verifica se o aluno já está no grupo
-        if(aluno.getGrupo().getId() == grupo.getId()){
-            throw new IllegalStateException("Operação não permitida. Aluno já faz parte do grupo");
-        }
-
-        // verifica se o aluno não está em outro grupo
-        if(aluno.getGrupo() != null && aluno.getGrupo().getId() != grupo.getId()){
-            throw new IllegalStateException("Aluno " + aluno.getNome() + " já participa de outro grupo");
-        }
-
-        if(grupo.getAlunos().size() >= 6){
-            throw new IllegalStateException("Operação não permitida. O grupo já está com a capacidade máxima de alunos");
-        }
-
-        aluno.setStatusAlunoGrupo(StatusAlunoGrupo.ATIVO);
-        aluno.setGrupo(grupo);
-        alunoRepository.save(aluno);
-
-        grupo.getAlunos().add(aluno);
-        // Salva o grupo atualizado
+        grupo.setStatusGrupo(StatusGrupo.ARQUIVADO);
         grupoRepository.save(grupo);
 
-        return "Aluno adicionado com sucesso ao grupo";
+        return "Grupo arquivado com sucesso!";
     }
 
+    public List<Grupo> findByGruposArquivados(long id){
+        List<Grupo> grupos = grupoRepository.findByStatusGrupoAndAlunosId(StatusGrupo.ARQUIVADO, id);
 
+        if(grupos.isEmpty()){
+            throw new RuntimeException("Aluno não possui nenhum grupo arquivado");
+        }
+
+        return grupos;
+    }
 }

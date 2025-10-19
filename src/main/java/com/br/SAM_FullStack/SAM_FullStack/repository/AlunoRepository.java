@@ -18,11 +18,13 @@ public interface AlunoRepository extends JpaRepository<Aluno, Long> {
 
     Optional<Aluno> findByRa(Integer ra);
 
-    Optional<Aluno> findByIdAndGrupoAndStatusAlunoGrupo(Long idAluno, Grupo grupo, StatusAlunoGrupo status);
+    //Optional<Aluno> findByIdAndGrupoAndStatusAlunoGrupo(Long idAluno, Grupo grupo, StatusAlunoGrupo status);
 
-    List<Aluno> findAllByGrupoId(long id);
+    @Query("SELECT a FROM Aluno a JOIN a.grupos g WHERE g.id = :grupoId")
+    List<Aluno> findAllByGrupoId(@Param("grupoId") Long grupoId);
 
-    Optional<Aluno> findByEmailAndSenha(String email, String senha);
+
+    Optional<Aluno> findByEmail(String email);
 
     @Query(
             "Select a from Aluno a where a.nome = :nome"
@@ -38,4 +40,7 @@ public interface AlunoRepository extends JpaRepository<Aluno, Long> {
     List<Aluno> findByNomeContainingIgnoreCase(String nome);
 
     List<Aluno> findAllByOrderByNomeAsc();
+
+    List<Aluno> findByCursoId(Long id);
+
 }

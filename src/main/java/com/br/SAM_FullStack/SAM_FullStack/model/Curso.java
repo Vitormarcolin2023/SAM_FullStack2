@@ -1,11 +1,9 @@
 package com.br.SAM_FullStack.SAM_FullStack.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.ToString;
+
 import java.util.List;
 
 @Data
@@ -40,4 +38,13 @@ public class Curso {
     @JsonIgnoreProperties("cursos")
     private List<Professor> professores;
 
+    public Curso(Long id, String nome, AreaDeAtuacao areaDeAtuacao) {
+        this.id = id;
+        this.nome = nome;
+        this.areaDeAtuacao = areaDeAtuacao;
+    }
+
+    public Curso() {
+
+    }
 }

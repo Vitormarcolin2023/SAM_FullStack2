@@ -16,5 +16,7 @@ public class RespostaLoginDTO {
     public RespostaLoginDTO(String token){this.token = token;}
 
     private String role;
+    private String email;
     private String status;
+
 }

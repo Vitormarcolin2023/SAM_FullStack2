@@ -1,12 +1,13 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
-import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
-import com.br.SAM_FullStack.SAM_FullStack.model.AreaDeAtuacao;
-import com.br.SAM_FullStack.SAM_FullStack.model.Grupo;
-import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
+import com.br.SAM_FullStack.SAM_FullStack.model.*;
 import com.br.SAM_FullStack.SAM_FullStack.repository.GrupoRepository;
+import com.br.SAM_FullStack.SAM_FullStack.repository.MentorRepository;
 import com.br.SAM_FullStack.SAM_FullStack.repository.ProjetoRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.annotation.AccessType;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -16,6 +17,9 @@ import java.util.List;
 public class ProjetoService {
     private final ProjetoRepository projetoRepository;
     private final GrupoRepository grupoRepository;
+
+    @Autowired
+    private MentorRepository mentorRepository;
 
     public ProjetoService(ProjetoRepository projetoRepository, GrupoRepository grupoRepository) {
         this.projetoRepository = projetoRepository;
@@ -97,4 +101,28 @@ public class ProjetoService {
              Projeto projeto = findById(id);
              projetoRepository.delete(projeto);
     }
+
+    @Transactional
+    public void desvincularMentor(Long mentorId) {
+        List<Projeto> projetos = projetoRepository.findByMentorId(mentorId);
+        for (Projeto p : projetos) {
+            p.setMentor(null);
+            projetoRepository.save(p);
+        }
+    }
+
+    public List<Projeto> findByMentor(Long mentorId) {
+        List<Projeto> projetos = projetoRepository.findByMentorId(mentorId);
+
+        if (projetos.isEmpty()) {
+            throw new RuntimeException("Nenhum projeto encontrado para este mentor.");
+        }
+
+        return projetos;
+    }
+
+    public List<Projeto> buscarProjetosPorProfessor(Long professorId) {
+        return projetoRepository.findAllByProfessoresId(professorId);
+    }
+
 }
