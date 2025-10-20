@@ -31,19 +31,6 @@ public class GrupoService {
         );
     }
 
-    /*public Grupo findByAlunoId(Long alunoId) {
-
-        Grupo grupo = grupoRepository.findByAlunosId(alunoId).orElseThrow(() ->
-                new IllegalArgumentException("Aluno não encontrado em nenhum grupo.")
-        );
-
-        if(grupo.getStatusGrupo().equals(StatusGrupo.ARQUIVADO)){
-            throw new RuntimeException("Nenhum grupo ativo no momento");
-        }
-
-        return grupo;
-    }*/
-
     public GrupoDTO save(GrupoDTO grupoDTO) {
         Aluno admin = alunoRepository.findById(grupoDTO.alunoAdminId())
                 .orElseThrow(() -> new IllegalArgumentException("Aluno administrador não encontrado"));
