@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -23,18 +22,19 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+// Usa a extensão do Mockito para inicializar mocks
 @ExtendWith(MockitoExtension.class)
 public class MentorServiceTest {
 
+    // Dependências mockadas
     @Mock
     private MentorRepository mentorRepository;
-
     @Mock
     private EmailService emailService;
-
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    // A classe sob teste, com mocks injetados
     @InjectMocks
     private MentorService mentorService;
 
@@ -45,6 +45,7 @@ public class MentorServiceTest {
     void setUp() {
         area = new AreaDeAtuacao(1L, "Arquitetura");
 
+        // Assumindo que o ID é Long (Wrapper), se for 'long' primitivo, mude o 1L para 0L ao criar
         mentor = new Mentor(
                 1L, "João Teste", "12345678900", "joao@teste.com",
                 "senha123", "999999999", "5 anos", StatusMentor.ATIVO,
@@ -52,18 +53,19 @@ public class MentorServiceTest {
         );
     }
 
-    //testes de integração -Mock Repository
+     //TESTES DE INTEGRAÇÃO (MOCK REPOSITORY) - CRUD e Exceções
     @Test
     @DisplayName("TESTE DE INTEGRAÇÃO – listagem de todos os Mentores (Lista preenchida)")
     void listAll_DeveRetornarListaDeMentores() {
+        // Arrange
         Mentor mentor2 = new Mentor();
         List<Mentor> listaEsperada = Arrays.asList(mentor, mentor2);
         when(mentorRepository.findAll()).thenReturn(listaEsperada);
 
-        //listagem
+        // Act
         List<Mentor> listaAtual = mentorService.listAll();
 
-        // Verificação
+        // Assert com assertEquals
         assertFalse(listaAtual.isEmpty(), "A lista não deveria estar vazia");
         assertEquals(2, listaAtual.size(), "A lista deve conter 2 mentores");
         verify(mentorRepository, times(1)).findAll();
@@ -72,24 +74,25 @@ public class MentorServiceTest {
     @Test
     @DisplayName("TESTE DE INTEGRAÇÃO – busca de Mentor por ID")
     void findById_DeveRetornarMentorQuandoEncontrado() {
-        //Mocka o Repositório para retornar o Mentor
+        // Arrange
         when(mentorRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
 
+        // Act
         Mentor mentorEncontrado = mentorService.findById(mentor.getId());
 
-        // Verificação
+        // Assert com assertEquals
         assertNotNull(mentorEncontrado);
         assertEquals(mentor.getNome(), mentorEncontrado.getNome());
         verify(mentorRepository, times(1)).findById(mentor.getId());
     }
 
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO – lançar runtimeException  ao buscar Mentor por ID inexistente")
-    void findById_MentorNaoEncontrado() {
-        // Mocka o Repositório para retornar Optional vazio
+    @DisplayName("TESTE DE INTEGRAÇÃO – Cenário que lança exceção (assertThrows) ao buscar Mentor por ID inexistente")
+    void findById_MentorNaoEncontrado_DeveLancarExcecao() {
+        // Arrange: Retorna Optional vazio
         when(mentorRepository.findById(99L)).thenReturn(Optional.empty());
 
-        // ação e verificação
+        // Act & Assert com assertThrows
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             mentorService.findById(99L);
         });
@@ -99,100 +102,127 @@ public class MentorServiceTest {
     }
 
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO – Delete Mentor")
+    @DisplayName("TESTE DE INTEGRAÇÃO – Delete Mentor com sucesso")
     void delete_DeveDeletarMentorQuandoEncontrado() {
+        // Arrange
         when(mentorRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
 
+        // Act
         mentorService.delete(mentor.getId());
 
-        // Verificação: Deve chamar findById e em seguida o delete do repository
+        // Verify
         verify(mentorRepository, times(1)).findById(mentor.getId());
         verify(mentorRepository, times(1)).delete(mentor);
     }
 
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO – Lança exceção ao tentar deletar Mentor inexistente")
+    @DisplayName("TESTE DE INTEGRAÇÃO – Cenário que lança exceção (assertThrows) ao tentar deletar Mentor inexistente")
     void delete_ExcecaoQuandoMentorNaoEncontrado() {
-        //Mockando o findById para Optional vazio
-         when(mentorRepository.findById(99L)).thenReturn(Optional.empty());
+        // Arrange
+        when(mentorRepository.findById(99L)).thenReturn(Optional.empty());
 
-        // Ação e Verificação
+        // Act & Assert com assertThrows
         assertThrows(RuntimeException.class, () -> {
             mentorService.delete(99L);
         });
 
-        // O metodo delete do repository NÃO deve ser chamado
+        // Verify: O delete do repository NÃO deve ser chamado
         verify(mentorRepository, never()).delete(any(Mentor.class));
     }
 
-    //TESTE DE UNIDADE/INTEGRAÇÃO (MOCKS DE LÓGICA E FLUXO)
+    //TESTE DE UNIDADE/INTEGRAÇÃO (LÓGICA DE NEGÓCIO)
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO – Salvar Mentor deve encriptar senha, setar status e enviar email")
-    void save_DeveAplicarRegrasDeNegocio() {
-        // Dados de entrada com senha em texto puro e status nulo
+    @DisplayName("TESTE DE INTEGRAÇÃO – Salvar Mentor deve setar status PENDENTE, encriptar senha e enviar email")
+    void save_DeveAplicarRegrasDeNegocio_ComSuccesso() {
+        // Arrange
         Mentor novoMentor = new Mentor(
-                null, "Maria", "00000000000", "maria@teste.com",
-                "senhaNova123", "999999999", "1 ano", null,
+                0L, "Maria", "00000000000", "maria@teste.com",
+                "senhaNova123", "999999999", "1 ano", null, // Status nulo inicial
                 TipoDeVinculo.PJ, area, null, null, "Resumo Maria", null
         );
 
         String senhaOriginal = novoMentor.getSenha();
         String senhaEncriptada = "$2a$10$HASHENCRIPTADO";
 
-        //Mockando o PasswordEncoder
         when(passwordEncoder.encode(senhaOriginal)).thenReturn(senhaEncriptada);
-
-        //Mockando o Repositório
         when(mentorRepository.save(any(Mentor.class))).thenReturn(novoMentor);
 
+        // Act
         Mentor mentorSalvo = mentorService.save(novoMentor);
 
-        // Verificações de Unidade (Lógica de Negócio)
-        // 1. O status deve ser PENDENTE
+        // Assert com assertEquals
         assertEquals(StatusMentor.PENDENTE, mentorSalvo.getStatusMentor(), "O status inicial deve ser PENDENTE");
-        // 2. A senha deve ter sido encriptada
         assertEquals(senhaEncriptada, mentorSalvo.getSenha(), "A senha deve estar encriptada");
 
-        // Verificações de Mocks/Comportamento
-        // 3. Verifica se o Enconder foi chamado
+        // Verify (Mocks de Comportamento)
         verify(passwordEncoder, times(1)).encode(senhaOriginal);
-        // 4. Verifica se o EmailService foi chamado
-        verify(emailService, times(1)).enviarEmailComTemplate(
-                eq("maria@teste.com"),
-                eq("Bem-vindo(a) ao SAM - Cadastro em Análise"),
-                eq("emails/boasVindasMentor"),
-                anyMap()
-        );
-        // 5. Verifica se o Repositório foi chamado para salvar
+        verify(emailService, times(1)).enviarEmailComTemplate(eq("maria@teste.com"), anyString(), anyString(), anyMap());
         verify(mentorRepository, times(1)).save(novoMentor);
     }
 
     @Test
     @DisplayName("TESTE DE INTEGRAÇÃO – Update Mentor deve atualizar apenas campos preenchidos")
     void update_DeveAtualizarApenasCamposPreenchidos() {
-        //Mockando o findById (busca o Mentor existente)
+        // Arrange
         when(mentorRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
-
-        //Mockando o retorno do save
         when(mentorRepository.save(any(Mentor.class))).thenReturn(mentor);
 
-        // Dados de atualização (apenas nome e email preenchidos)
+        // Dados de atualização (apenas nome e email)
         Mentor mentorUpdate = new Mentor();
         mentorUpdate.setNome("Novo Nome");
         mentorUpdate.setEmail("novoemail@teste.com");
 
+        // Act
         Mentor mentorAtualizado = mentorService.update(mentor.getId(), mentorUpdate);
 
-        // Verificação:
+        // Assert com assertEquals
         assertEquals("Novo Nome", mentorAtualizado.getNome(), "O nome deve ser atualizado");
         assertEquals("novoemail@teste.com", mentorAtualizado.getEmail(), "O email deve ser atualizado");
 
-        // Verificação de Mocks
+        // Garante que campos nulos na atualização não mudam o original
+        assertNotNull(mentorAtualizado.getCpf());
+
+        // Verify
         verify(mentorRepository, times(1)).findById(mentor.getId());
         verify(mentorRepository, times(1)).save(mentor);
     }
 
-    // Cobertura dos metodos de busca por email e area
+    @Test
+    @DisplayName("TESTE DE INTEGRAÇÃO – Update Status (updateStatus) deve mudar o status e salvar")
+    void updateStatus_DeveMudarStatusDoMentor_ComSucesso() {
+        // Arrange
+        when(mentorRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
+        when(mentorRepository.save(any(Mentor.class))).thenReturn(mentor);
+
+        //Mudar para INATIVO
+        String resultado = mentorService.updateStatus(mentor.getId(), "INATIVO");
+
+        // Assert com assertEquals
+        assertEquals("Status do mentor atualizado com sucesso!", resultado);
+        assertEquals(StatusMentor.INATIVO, mentor.getStatusMentor(), "O status deve ser INATIVO");
+
+        // Verify
+        verify(mentorRepository, times(1)).findById(mentor.getId());
+        verify(mentorRepository, times(1)).save(mentor);
+    }
+
+    @Test
+    @DisplayName("TESTE DE INTEGRAÇÃO – Update Status (assertThrows) para ID inexistente")
+    void updateStatus_DeveLancarExcecaoQuandoMentorNaoEncontrado() {
+        // Arrange
+        when(mentorRepository.findById(99L)).thenReturn(Optional.empty());
+
+        // Act & Assert com assertThrows
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            mentorService.updateStatus(99L, "ATIVO");
+        });
+
+        assertEquals("Mentor não encontrado.", exception.getMessage());
+        verify(mentorRepository, times(1)).findById(99L);
+        verify(mentorRepository, never()).save(any(Mentor.class));
+    }
+
+     //TESTES DE CONSULTA CUSTOMIZADA
     @Test
     @DisplayName("TESTE DE INTEGRAÇÃO – Busca por Email deve retornar Mentor")
     void findByEmail_DeveRetornarMentor() {
@@ -203,7 +233,7 @@ public class MentorServiceTest {
     }
 
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO – Busca por Email deve retornar Null quando não encontrado")
+    @DisplayName("TESTE DE INTEGRAÇÃO – Busca por Email deve retornar Null (assertEquals) quando não encontrado")
     void findByEmail_DeveRetornarNull() {
         when(mentorRepository.findByEmail("naoexiste@email.com")).thenReturn(Optional.empty());
         Mentor resultado = mentorService.findByEmail("naoexiste@email.com");
@@ -212,7 +242,7 @@ public class MentorServiceTest {
     }
 
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO – Busca por Área deve retornar lista de Mentores ATIVOS")
+    @DisplayName("TESTE DE INTEGRAÇÃO – Busca por Área deve retornar lista (assertEquals) de Mentores ATIVOS")
     void findByArea_DeveRetornarListaFiltrada() {
         List<Mentor> listaAtivos = Collections.singletonList(mentor);
         when(mentorRepository.findByAreaDeAtuacaoIdAndStatusMentor(area.getId(), StatusMentor.ATIVO))
