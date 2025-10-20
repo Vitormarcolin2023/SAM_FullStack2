@@ -99,7 +99,21 @@ public class ProjetoService {
 
         public void delete(Long id){
              Projeto projeto = findById(id);
+             if(projeto == null){
+                 throw new RuntimeException("Projeto não encontrado");
+             }
+             this.desvincularMentor(projeto.getMentor().getId());
+             this.desvincularGrupo(projeto.getGrupo().getId());
              projetoRepository.delete(projeto);
+    }
+
+    @Transactional
+    public void desvincularGrupo(Long grupoId){
+        List<Projeto> projetos = projetoRepository.findAllByGrupoId(grupoId);
+        for (Projeto p: projetos) {
+            p.setGrupo(null);
+            projetoRepository.save(p);
+        }
     }
 
     @Transactional
