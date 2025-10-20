@@ -6,10 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,6 +22,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@NoArgsConstructor
 public class Aluno implements UserDetails {
 
     @Id
@@ -56,6 +54,15 @@ public class Aluno implements UserDetails {
     @JsonIgnore
     private List<Grupo> grupos = new ArrayList<>();
 
+    public Aluno(Long id, String nome, Integer ra, String senha, String email, Curso curso, StatusAlunoGrupo statusAlunoGrupo) {
+        this.id = id;
+        this.nome = nome;
+        this.ra = ra;
+        this.senha = senha;
+        this.email = email;
+        this.curso = curso;
+        this.statusAlunoGrupo = statusAlunoGrupo;
+    }
 
     // Metodos obrigatórios do Spring Security
 
