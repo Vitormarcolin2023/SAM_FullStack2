@@ -1,6 +1,7 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
 import com.br.SAM_FullStack.SAM_FullStack.dto.GrupoDTO;
+import com.br.SAM_FullStack.SAM_FullStack.dto.GrupoUpdateDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.*;
 import com.br.SAM_FullStack.SAM_FullStack.repository.AlunoRepository;
 import com.br.SAM_FullStack.SAM_FullStack.repository.GrupoRepository;
@@ -189,4 +190,14 @@ public class GrupoServiceTest {
         GrupoDTO response = grupoService.save(grupoSalvarSucesso);
         assertEquals(10L, response.id());
     }
+
+    @Test
+    @DisplayName("Deve retornar erro ao tentar buscar grupo por Id que não existe")
+    void updateGrupo_quandoIdErrado_deveRetornarErro(){
+        assertThrows(IllegalArgumentException.class, () -> {
+           this.grupoService.updateGrupoInfo(-1L, 1L, new GrupoUpdateDTO("Grupo Novo Nome"));
+        });
+    }
+
+
 }
