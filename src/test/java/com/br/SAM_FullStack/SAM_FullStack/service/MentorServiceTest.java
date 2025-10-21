@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -45,12 +46,25 @@ public class MentorServiceTest {
     void setUp() {
         area = new AreaDeAtuacao(1L, "Arquitetura");
 
-        // Objeto de teste base
+        //Inicialize o objeto mentor COM A SENHA PLANA (não encriptada)
         mentor = new Mentor(
                 1L, "João Teste", "12345678900", "joao@teste.com",
-                "senha123", "999999999", "5 anos", StatusMentor.ATIVO,
+                "senha123", //Senha PLANA para que o service a encripte no teste
+                "999999999", "5 anos", StatusMentor.ATIVO,
                 TipoDeVinculo.CLT, area, null, null, "Resumo Teste", null
         );
+
+        //INJEÇÃO FORÇADA DE TODAS AS DEPENDÊNCIAS NO SERVIÇO (@InjectMocks)
+
+        // A linha que corrige o NullPointerException no PasswordEncoder
+        ReflectionTestUtils.setField(mentorService, "passwordEncoder", passwordEncoder);
+
+        // Injeção do Repository
+        ReflectionTestUtils.setField(mentorService, "mentorRepository", mentorRepository);
+
+        ReflectionTestUtils.setField(mentorService, "emailService", emailService);
+
+
     }
 
      //TESTES DE INTEGRAÇÃO (MOCK REPOSITORY) - CRUD e Exceções (assertThrows)
