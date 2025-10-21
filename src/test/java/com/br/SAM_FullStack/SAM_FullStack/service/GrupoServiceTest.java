@@ -34,6 +34,7 @@ public class GrupoServiceTest {
 
     private Aluno aluno1;
     private Aluno aluno5;
+    private Aluno aluno11;
     private Grupo grupo1;
     private Grupo grupo2;
     private Grupo grupo3;
@@ -51,15 +52,19 @@ public class GrupoServiceTest {
         Aluno aluno2 = new Aluno(2L, "Bruno Costa", 1002, "senha123", "bruno.costa@email.com", curso1, StatusAlunoGrupo.ATIVO);
         Aluno aluno3 = new Aluno(3L, "Carla Mendes", 1003, "senha123", "carla.mendes@email.com", curso1, StatusAlunoGrupo.ATIVO);
         Aluno aluno4 = new Aluno(4L, "Diego Oliveira", 1004, "senha123", "diego.oliveira@email.com", curso1, StatusAlunoGrupo.ATIVO);
+        aluno11 = new Aluno(11L, "Artemis", 1011, "senha123", "artemis.gmail.com", curso1, StatusAlunoGrupo.ATIVO);
 
         aluno5 = new Aluno(5L, "Elisa Fernandes", 1005, "senha123", "elisa.fernandes@email.com", curso2, StatusAlunoGrupo.ATIVO);
         Aluno aluno6 = new Aluno(6L, "Fábio Santos", 1006, "senha123", "fabio.santos@email.com", curso2, StatusAlunoGrupo.ATIVO);
         Aluno aluno7 = new Aluno(7L, "Gabriela Lima", 1007, "senha123", "gabriela.lima@email.com", curso2, StatusAlunoGrupo.AGUARDANDO);
         Aluno aluno8 = new Aluno(8L, "Regina Lima", 1008, "senha123", "regina.lima@email.com", curso2, StatusAlunoGrupo.AGUARDANDO);
+        Aluno aluno9 = new Aluno(9L, "Guilherme Lima", 1009, "senha123", "gruilherme@gmail.com", curso2, StatusAlunoGrupo.ATIVO);
+        Aluno aluno10 = new Aluno(10L, "Lauriane Lisiane", 1010, "senha123", "lauriane@gmail.com", curso2, StatusAlunoGrupo.ATIVO);
 
-        grupo1 = new Grupo(1L, "Grupo Eng. Soft.", StatusGrupo.ATIVO, aluno1, List.of(aluno1, aluno2, aluno3, aluno4));
+        grupo1 = new Grupo(1L, "Grupo Eng. Soft.", StatusGrupo.ATIVO, aluno1, new ArrayList<>(List.of(aluno1, aluno2, aluno3, aluno4)));
         grupo3 = new Grupo(3L, "Grupo Eng. Soft Arquivado", StatusGrupo.ARQUIVADO, aluno1, List.of(aluno1, aluno2, aluno3, aluno4));
         grupo2 = new Grupo(2L, "Grupo Veterinária", StatusGrupo.ARQUIVADO, aluno5, List.of(aluno5, aluno6, aluno7));
+        Grupo grupo4 = new Grupo(4L, "Grupo 4", StatusGrupo.ATIVO, aluno6, List.of(aluno5, aluno6, aluno7, aluno8, aluno9, aluno10));
 
         aluno1.setGrupos(List.of(grupo1, grupo3));
         aluno2.setGrupos(List.of(grupo1, grupo3));
@@ -70,6 +75,7 @@ public class GrupoServiceTest {
         aluno6.setGrupos(new ArrayList<>(List.of(grupo2)));
         aluno7.setGrupos(new ArrayList<>(List.of(grupo2)));
         aluno8.setGrupos(List.of(grupo1));
+        aluno10.setGrupos(new ArrayList<>(List.of(grupo4)));
 
         grupoSalvarSucesso = new GrupoDTO(10L, "Grupo salvo com sucesso", 5L, List.of(5L, 6L, 7L));
 
@@ -93,6 +99,17 @@ public class GrupoServiceTest {
             Grupo grupo = invocation.getArgument(0);
             grupo.setId(10L);
             return grupo;
+        });
+        when(grupoRepository.findById(4L)).thenReturn(Optional.of(grupo4));
+        when(alunoRepository.findById(10L)).thenReturn(Optional.of(aluno10));
+        when(alunoRepository.findById(11L)).thenReturn(Optional.of(aluno11));
+        when(alunoRepository.save(aluno11)).thenAnswer(invocation -> {
+           aluno11.setStatusAlunoGrupo(StatusAlunoGrupo.ATIVO);
+           return aluno11;
+        });
+        when(grupoRepository.save(grupo1)).thenAnswer(invocation -> {
+           grupo1.getAlunos().add(aluno11);
+           return grupo1;
         });
     }
 
@@ -191,6 +208,7 @@ public class GrupoServiceTest {
         assertEquals(10L, response.id());
     }
 
+    // -- testes de update
     @Test
     @DisplayName("Deve retornar erro ao tentar buscar grupo por Id que não existe")
     void updateGrupo_quandoIdErrado_deveRetornarErro(){
@@ -199,5 +217,65 @@ public class GrupoServiceTest {
         });
     }
 
+    @Test
+    @DisplayName("Deve salvar novo nome do grupo")
+    void updateGrupo_quandoinformacoesCorretas_atualizaNome(){
+        String retorno = this.grupoService.updateGrupoInfo(1L, 1L, new GrupoUpdateDTO("Novo nome do grupo"));
+        assertEquals("Informações do grupo atualizadas com sucesso.", retorno);
+    }
+
+    // -- testes de put - adicionar novo aluno no grupo
+
+    @Test
+    @DisplayName("Deve retornar erro ao tentar buscar grupo com Id que não existe")
+    void putAluno_quandoIdErrado_deveRetornarErro(){
+        assertThrows(IllegalArgumentException.class, () ->{
+           this.grupoService.adicionarAlunoAoGrupo(1L, -1L, 8L);
+        });
+    }
+
+    @Test
+    @DisplayName("Deve retornar erro quando o Id do aluno passado for diferente do id do admin do grupo")
+    void putAluno_quandoAlunoNaoAdmin_deveRetornarErro(){
+        assertThrows(IllegalStateException.class, () ->{
+           this.grupoService.adicionarAlunoAoGrupo(2L, 1L, 8L);
+        });
+    }
+
+    @Test
+    @DisplayName("Deve retornar erro ao adicionar aluno se o grupo já tiver mais alunos do que o permitido")
+    void putAluno_quandoQtdMaiorDoQuePermitida_deveRetornarErro(){
+        assertThrows(IllegalStateException.class, () -> {
+            this.grupoService.adicionarAlunoAoGrupo(6L, 10L, 1L);
+        });
+    }
+
+    @Test
+    @DisplayName("Deve retornar erro ao adicionar aluno com Id incorreto")
+    void putAluno_quandoIdDoAlunoNovoErrado_deveRetornarErro(){
+        assertThrows(IllegalStateException.class, () ->{
+            this.grupoService.adicionarAlunoAoGrupo(1L,1L, -7L);
+        });
+    }
+
+    @Test
+    @DisplayName("Deve retornar erro se novo aluno informado já partici[a de outro grupo ativo")
+    void putAluno_quandoAlunoAtivoEmOutroGrupo_deveRetornarErro(){
+        assertThrows(IllegalStateException.class, () ->{
+           this.grupoService.adicionarAlunoAoGrupo(1L, 1L, 10L);
+        });
+    }
+
+    @Test
+    @DisplayName("Deve retornar mensagem de sucesso ao salvar grupo")
+    void putAluno_quandoInformacoesCorretas_deveSalvar(){
+        String response = this.grupoService.adicionarAlunoAoGrupo(1L, 1L, 11L);
+        assertEquals("Aluno adicionado com sucesso ao grupo", response);
+    }
+
+    // -- testa remover aluno diretamente
+
+
+    
 
 }

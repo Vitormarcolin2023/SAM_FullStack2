@@ -103,9 +103,9 @@ public class GrupoService {
                 .orElseThrow(() -> new IllegalArgumentException("Grupo não encontrado"));
 
 
-       /* if (!grupo.getAlunoAdmin().getId().equals(idAdmin)) {
+        if (!grupo.getAlunoAdmin().getId().equals(idAdmin)) {
             throw new IllegalStateException("Apenas o admin do grupo pode adicionar alunos");
-        }*/
+        }
 
         if (grupo.getAlunos().size() >= 6) {
             throw new IllegalStateException("O grupo já está no limite de alunos (6)");
