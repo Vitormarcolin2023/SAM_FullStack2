@@ -33,6 +33,7 @@ public class GrupoServiceTest {
     private AlunoRepository alunoRepository;
 
     private Aluno aluno1;
+    private Aluno aluno2;
     private Aluno aluno5;
     private Aluno aluno11;
     private Grupo grupo1;
@@ -49,7 +50,7 @@ public class GrupoServiceTest {
         Curso curso2 = new Curso(2L, "Veterinária", area2);
 
         aluno1 = new Aluno(1L, "Ana Silva", 1001, "senha123", "ana.silva@email.com", curso1, StatusAlunoGrupo.ATIVO);
-        Aluno aluno2 = new Aluno(2L, "Bruno Costa", 1002, "senha123", "bruno.costa@email.com", curso1, StatusAlunoGrupo.ATIVO);
+        aluno2 = new Aluno(2L, "Bruno Costa", 1002, "senha123", "bruno.costa@email.com", curso1, StatusAlunoGrupo.ATIVO);
         Aluno aluno3 = new Aluno(3L, "Carla Mendes", 1003, "senha123", "carla.mendes@email.com", curso1, StatusAlunoGrupo.ATIVO);
         Aluno aluno4 = new Aluno(4L, "Diego Oliveira", 1004, "senha123", "diego.oliveira@email.com", curso1, StatusAlunoGrupo.ATIVO);
         aluno11 = new Aluno(11L, "Artemis", 1011, "senha123", "artemis.gmail.com", curso1, StatusAlunoGrupo.ATIVO);
@@ -67,7 +68,7 @@ public class GrupoServiceTest {
         Grupo grupo4 = new Grupo(4L, "Grupo 4", StatusGrupo.ATIVO, aluno6, List.of(aluno5, aluno6, aluno7, aluno8, aluno9, aluno10));
 
         aluno1.setGrupos(List.of(grupo1, grupo3));
-        aluno2.setGrupos(List.of(grupo1, grupo3));
+        aluno2.setGrupos(new ArrayList<>(List.of(grupo1, grupo3)));
         aluno3.setGrupos(List.of(grupo1, grupo3));
         aluno4.setGrupos(List.of(grupo1, grupo3));
 
@@ -103,14 +104,6 @@ public class GrupoServiceTest {
         when(grupoRepository.findById(4L)).thenReturn(Optional.of(grupo4));
         when(alunoRepository.findById(10L)).thenReturn(Optional.of(aluno10));
         when(alunoRepository.findById(11L)).thenReturn(Optional.of(aluno11));
-        when(alunoRepository.save(aluno11)).thenAnswer(invocation -> {
-           aluno11.setStatusAlunoGrupo(StatusAlunoGrupo.ATIVO);
-           return aluno11;
-        });
-        when(grupoRepository.save(grupo1)).thenAnswer(invocation -> {
-           grupo1.getAlunos().add(aluno11);
-           return grupo1;
-        });
     }
 
     @Test
@@ -269,11 +262,65 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve retornar mensagem de sucesso ao salvar grupo")
     void putAluno_quandoInformacoesCorretas_deveSalvar(){
+        when(alunoRepository.save(aluno11)).thenAnswer(invocation -> {
+            aluno11.setStatusAlunoGrupo(StatusAlunoGrupo.ATIVO);
+            return aluno11;
+        });
         String response = this.grupoService.adicionarAlunoAoGrupo(1L, 1L, 11L);
         assertEquals("Aluno adicionado com sucesso ao grupo", response);
     }
 
     // -- testa remover aluno diretamente
+
+    @Test
+    @DisplayName("Testa se o Id do grupo existe se não retorna erro")
+    void excluiAluno_quandoGrupoIdInexistente_deveRetornarErro(){
+        assertThrows(IllegalArgumentException.class, () ->{
+            this.grupoService.removerAlunoDiretamente(-1L, 2L, 1L);
+        });
+    }
+
+    @Test
+    @DisplayName("Testa se o id do aluno que será removido é igual ao id do admin do grupo")
+    void excluiAluno_quandoIdDoAlunoExcForIgualDoAdmin_deveRetornarErro(){
+        assertThrows(IllegalStateException.class, () ->{
+           this.grupoService.removerAlunoDiretamente(1L, 1L, 1L);
+        });
+    }
+
+    @Test
+    @DisplayName("Testa se o id do aluno que será removido existe")
+    void excluiAluno_quandoIdAlunoExcInexistente_deveRetornarErro(){
+        assertThrows(IllegalArgumentException.class, () ->{
+           this.grupoService.removerAlunoDiretamente(1L, -1L, 1L);
+        });
+    }
+
+    @Test
+    @DisplayName("Testa se o aluno que será excluido faz parte do grupo")
+    void excluiAluno_quandoAlunoNaoParticipaDoGrupo_deveRetornarErro(){
+        when(grupoRepository.save(grupo1)).thenAnswer(invocation -> {
+            grupo1.getAlunos().add(aluno11);
+            return grupo1;
+        });
+        assertThrows(IllegalStateException.class, () ->{
+           this.grupoService.removerAlunoDiretamente(1L, 5L, 1L);
+        });
+    }
+
+    @Test
+    @DisplayName("Deve retornar mensagem de sucesso quando o aluno for excluido")
+    void excluiAluno_quandoInformacoesCorretas_deveRetornarSucesso(){
+        when(alunoRepository.findById(2L)).thenReturn(Optional.of(aluno2));
+        when(grupoRepository.save(grupo1)).thenAnswer(invocation -> {
+            grupo1.getAlunos().remove(aluno2);
+            return grupo1;
+        });
+        String retorno = this.grupoService.removerAlunoDiretamente(1L,  2L, 1L);
+        assertEquals("Aluno Bruno Costafoi removido do grupo", retorno);
+    }
+
+    // -- Testa buscar alunos por status no grupo
 
 
     
