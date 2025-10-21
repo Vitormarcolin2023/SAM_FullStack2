@@ -69,7 +69,7 @@ public class MentorServiceTest {
 
      //TESTES DE INTEGRAÇÃO (MOCK REPOSITORY) - CRUD e Exceções (assertThrows)
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO – listagem de todos os Mentores (Lista preenchida)")
+    @DisplayName("Listagem de todos os Mentores (Lista preenchida)")
     void listAll_DeveRetornarListaDeMentores() {
         // Arrange
         Mentor mentor2 = new Mentor();
@@ -86,7 +86,7 @@ public class MentorServiceTest {
     }
 
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO – busca de Mentor por ID deve retornar sucesso")
+    @DisplayName("Busca de Mentor por ID deve retornar sucesso")
     void findById_DeveRetornarMentorQuandoEncontrado() {
         // Arrange
         when(mentorRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
@@ -101,7 +101,7 @@ public class MentorServiceTest {
     }
 
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO – Cenário que lança exceção (assertThrows) ao buscar Mentor por ID inexistente")
+    @DisplayName("Lança exceção (assertThrows) ao buscar Mentor por ID inexistente")
     void findById_MentorNaoEncontrado_DeveLancarExcecao() {
         // Arrange: Retorna Optional vazio
         when(mentorRepository.findById(99L)).thenReturn(Optional.empty());
@@ -116,7 +116,7 @@ public class MentorServiceTest {
     }
 
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO – Delete Mentor com sucesso")
+    @DisplayName("Delete Mentor com sucesso")
     void delete_DeveDeletarMentorQuandoEncontrado() {
         // Arrange
         when(mentorRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
@@ -130,7 +130,7 @@ public class MentorServiceTest {
     }
 
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO – Cenário que lança exceção (assertThrows) ao tentar deletar Mentor inexistente")
+    @DisplayName("Cenário que lança exceção (assertThrows) ao tentar deletar Mentor inexistente")
     void delete_ExcecaoQuandoMentorNaoEncontrado() {
         // Arrange
         when(mentorRepository.findById(99L)).thenReturn(Optional.empty());
@@ -147,7 +147,7 @@ public class MentorServiceTest {
 
      //TESTE DE UNIDADE/INTEGRAÇÃO (LÓGICA DE NEGÓCIO)
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO – Salvar Mentor deve setar status PENDENTE, encriptar senha e enviar email")
+    @DisplayName("Salvar Mentor deve setar status PENDENTE, encriptar senha e enviar email")
     void save_DeveAplicarRegrasDeNegocio_ComSuccesso() {
         // Arrange: Novo mentor sem ID e status nulo
         Mentor novoMentor = new Mentor(
@@ -177,7 +177,7 @@ public class MentorServiceTest {
     }
 
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO – Update Mentor deve atualizar apenas campos não nulos")
+    @DisplayName("Update Mentor deve atualizar apenas campos não nulos")
     void update_DeveAtualizarApenasCamposPreenchidos() {
         // Arrange
         when(mentorRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
@@ -201,7 +201,7 @@ public class MentorServiceTest {
     }
 
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO – Update Status (updateStatus) deve mudar o status e salvar")
+    @DisplayName("Update Status (updateStatus) deve mudar o status e salvar")
     void updateStatus_DeveMudarStatusDoMentor_ComSucesso() {
         // Arrange
         when(mentorRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
@@ -220,7 +220,7 @@ public class MentorServiceTest {
     }
 
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO – Update Status (assertThrows) para ID inexistente")
+    @DisplayName("Update Status (assertThrows) para ID inexistente")
     void updateStatus_DeveLancarExcecaoQuandoMentorNaoEncontrado() {
         // Arrange
         when(mentorRepository.findById(99L)).thenReturn(Optional.empty());
@@ -237,7 +237,7 @@ public class MentorServiceTest {
 
     //TESTES DE CONSULTA CUSTOMIZADA
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO – Busca por Email deve retornar Mentor")
+    @DisplayName("Busca por Email deve retornar Mentor")
     void findByEmail_DeveRetornarMentor() {
         when(mentorRepository.findByEmail(mentor.getEmail())).thenReturn(Optional.of(mentor));
         Mentor resultado = mentorService.findByEmail(mentor.getEmail());
@@ -246,7 +246,7 @@ public class MentorServiceTest {
     }
 
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO – Busca por Email deve retornar Null (assertEquals) quando não encontrado")
+    @DisplayName("Busca por Email deve retornar Null (assertEquals) quando não encontrado")
     void findByEmail_DeveRetornarNull() {
         when(mentorRepository.findByEmail("naoexiste@email.com")).thenReturn(Optional.empty());
         Mentor resultado = mentorService.findByEmail("naoexiste@email.com");
@@ -255,7 +255,7 @@ public class MentorServiceTest {
     }
 
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO – Busca por Área deve retornar lista (assertEquals) de Mentores ATIVOS")
+    @DisplayName("Busca por Área deve retornar lista (assertEquals) de Mentores ATIVOS")
     void findByArea_DeveRetornarListaFiltrada() {
         List<Mentor> listaAtivos = Collections.singletonList(mentor);
         when(mentorRepository.findByAreaDeAtuacaoIdAndStatusMentor(area.getId(), StatusMentor.ATIVO))
