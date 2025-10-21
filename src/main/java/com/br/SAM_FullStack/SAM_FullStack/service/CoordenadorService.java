@@ -9,7 +9,6 @@ import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
 import com.br.SAM_FullStack.SAM_FullStack.repository.CoordenadorRepository;
 import com.br.SAM_FullStack.SAM_FullStack.repository.CursoRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
@@ -26,9 +25,7 @@ public class CoordenadorService {
     private final CursoRepository cursoRepository;
     private final MentorService mentorService;
     private final ProjetoService projetoService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public Coordenador save(CoordenadorDTO coordenadorDTO) {
