@@ -25,7 +25,7 @@ public class Mentor implements UserDetails {
 
     @Id // Anotação correta do JPA
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotBlank(message = "O campo nome é obrigatório")
     private String nome;
