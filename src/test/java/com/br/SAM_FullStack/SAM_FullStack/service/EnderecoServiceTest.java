@@ -51,7 +51,7 @@ public class EnderecoServiceTest {
     @Test
     @DisplayName("Deve buscar endereço por ID com sucesso")
     void findById_quandoExistente_deveRetornarEndereco() {
-        // 🌟 CORRIGIDO: 8 argumentos: String para numero e null para Mentor
+
         Endereco enderecoParaTeste = new Endereco(1L, "Rua Teste", "100", "Bairro X", "Cidade Y", "Estado Z", "12345678", null);
 
         when(enderecoRepository.findById(1L)).thenReturn(Optional.of(enderecoParaTeste));
@@ -78,7 +78,7 @@ public class EnderecoServiceTest {
     @Test
     @DisplayName("Deve salvar endereço preenchendo campos nulos pela API")
     void save_quandoCamposNulos_devePreencherPelaApiESalvar() {
-        // 🌟 CORRIGIDO: 8 argumentos: String para numero e null para Mentor
+
         // Endereço de entrada com CEP, mas campos vazios (numero como String)
         Endereco novoEndereco = new Endereco(null, null, "200", null, null, null, "12345678", null);
 
@@ -96,7 +96,7 @@ public class EnderecoServiceTest {
         assertNotNull(enderecoSalvo);
         assertEquals("Rua da API", enderecoSalvo.getRua());
         assertEquals("Bairro da API", enderecoSalvo.getBairro());
-        // 🌟 Asserção ajustada para String
+
         assertEquals("200", enderecoSalvo.getNumero());
 
         verify(restTemplate).getForObject(eq(urlEsperada), eq(Endereco.class));
@@ -106,7 +106,7 @@ public class EnderecoServiceTest {
     @Test
     @DisplayName("Deve salvar endereço sem chamar a API se o CEP for nulo")
     void save_quandoCepNulo_naoDeveChamarApi() {
-        // 🌟 CORRIGIDO: 8 argumentos: String para numero e null para Mentor
+
         Endereco novoEndereco = new Endereco(null, "Rua A", "1", "Bairro B", "Cidade C", "Estado D", null, null);
 
         when(enderecoRepository.save(any(Endereco.class))).thenAnswer(i -> i.getArgument(0));
@@ -123,7 +123,6 @@ public class EnderecoServiceTest {
     @DisplayName("Deve retornar todos os endereços")
     void listAll_deveRetornarListaDeEnderecos() {
         // PREPARAÇÃO
-        // 🌟 CORRIGIDO: 8 argumentos: String para numero e null para Mentor
         Endereco endereco1 = new Endereco(1L, "Rua A", "10", "Bairro X", "Cidade Y", "Estado Z", "12345678", null);
         Endereco endereco2 = new Endereco(2L, "Rua B", "20", "Bairro W", "Cidade V", "Estado U", "87654321", null);
         List<Endereco> listaMocks = Arrays.asList(endereco1, endereco2);
@@ -146,7 +145,7 @@ public class EnderecoServiceTest {
     void update_deveAtualizarEPreencherDadosPelaApi() {
         // PREPARAÇÃO
         Long idExistente = 1L;
-        // 🌟 CORRIGIDO: 8 argumentos para o Endereço Existente
+
         Endereco enderecoExistente = new Endereco(1L, "Rua Antiga", "100", "Bairro Antigo", "Cidade Velha", "Estado Velho", "12345678", null);
 
         // Dados de entrada para atualização (apenas CEP e Novo Número)
@@ -205,7 +204,6 @@ public class EnderecoServiceTest {
     @DisplayName("Deve deletar endereço por ID com sucesso")
     void delete_quandoExistente_deveChamarDelete() {
         Long idExistente = 1L;
-        // 🌟 CORRIGIDO: 8 argumentos para o Endereço Existente
         Endereco enderecoExistente = new Endereco(1L, "Rua a deletar", "10", "Bairro X", "Cidade Y", "Estado Z", "12345678", null);
 
         // PREPARAÇÃO
