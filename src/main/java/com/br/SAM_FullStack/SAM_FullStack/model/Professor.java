@@ -48,6 +48,13 @@ public class Professor implements UserDetails {
     @JsonIgnoreProperties("professores")
     private List<Projeto> projetos;
 
+    public Professor(Long id, String nome, String email, String senha, List<Curso> cursos) {
+        this.id = id;
+        this.nome = nome;
+        this.email = email;
+        this.senha = senha;
+        this.cursos = cursos;
+    }
 
     // Metodos obrigatórios do Spring Security
 
