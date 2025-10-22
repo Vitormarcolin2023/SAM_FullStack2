@@ -222,10 +222,6 @@ public class GrupoService {
             // pega o primeiro grupo da lista pois o aluno só poderá ter 1 grupo ativo por projeto
             Grupo grupo = grupos.get(0);
 
-            if(grupo == null){
-                throw new RuntimeException("Nenhum grupo ativo");
-            }
-
             return grupo;
 
     }

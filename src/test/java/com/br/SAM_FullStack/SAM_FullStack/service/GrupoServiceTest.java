@@ -5,6 +5,7 @@ import com.br.SAM_FullStack.SAM_FullStack.dto.GrupoUpdateDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.*;
 import com.br.SAM_FullStack.SAM_FullStack.repository.AlunoRepository;
 import com.br.SAM_FullStack.SAM_FullStack.repository.GrupoRepository;
+import com.br.SAM_FullStack.SAM_FullStack.repository.ProfessorRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,10 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 public class GrupoServiceTest {
@@ -31,15 +31,22 @@ public class GrupoServiceTest {
     private GrupoRepository grupoRepository;
     @MockitoBean
     private AlunoRepository alunoRepository;
+    @MockitoBean
+    private ProfessorRepository professorRepository;
 
     private Aluno aluno1;
     private Aluno aluno2;
+    private Aluno aluno3;
+    private Aluno aluno4;
     private Aluno aluno5;
+    private Aluno aluno10;
     private Aluno aluno11;
     private Grupo grupo1;
     private Grupo grupo2;
     private Grupo grupo3;
+    private Grupo grupo4;
     private GrupoDTO grupoSalvarSucesso;
+    private Professor professor;
 
     @BeforeEach
     void setup() {
@@ -51,8 +58,8 @@ public class GrupoServiceTest {
 
         aluno1 = new Aluno(1L, "Ana Silva", 1001, "senha123", "ana.silva@email.com", curso1, StatusAlunoGrupo.ATIVO);
         aluno2 = new Aluno(2L, "Bruno Costa", 1002, "senha123", "bruno.costa@email.com", curso1, StatusAlunoGrupo.ATIVO);
-        Aluno aluno3 = new Aluno(3L, "Carla Mendes", 1003, "senha123", "carla.mendes@email.com", curso1, StatusAlunoGrupo.ATIVO);
-        Aluno aluno4 = new Aluno(4L, "Diego Oliveira", 1004, "senha123", "diego.oliveira@email.com", curso1, StatusAlunoGrupo.ATIVO);
+        aluno3 = new Aluno(3L, "Carla Mendes", 1003, "senha123", "carla.mendes@email.com", curso1, StatusAlunoGrupo.AGUARDANDO);
+        aluno4 = new Aluno(4L, "Diego Oliveira", 1004, "senha123", "diego.oliveira@email.com", curso1, StatusAlunoGrupo.ATIVO);
         aluno11 = new Aluno(11L, "Artemis", 1011, "senha123", "artemis.gmail.com", curso1, StatusAlunoGrupo.ATIVO);
 
         aluno5 = new Aluno(5L, "Elisa Fernandes", 1005, "senha123", "elisa.fernandes@email.com", curso2, StatusAlunoGrupo.ATIVO);
@@ -60,28 +67,30 @@ public class GrupoServiceTest {
         Aluno aluno7 = new Aluno(7L, "Gabriela Lima", 1007, "senha123", "gabriela.lima@email.com", curso2, StatusAlunoGrupo.AGUARDANDO);
         Aluno aluno8 = new Aluno(8L, "Regina Lima", 1008, "senha123", "regina.lima@email.com", curso2, StatusAlunoGrupo.AGUARDANDO);
         Aluno aluno9 = new Aluno(9L, "Guilherme Lima", 1009, "senha123", "gruilherme@gmail.com", curso2, StatusAlunoGrupo.ATIVO);
-        Aluno aluno10 = new Aluno(10L, "Lauriane Lisiane", 1010, "senha123", "lauriane@gmail.com", curso2, StatusAlunoGrupo.ATIVO);
+        aluno10 = new Aluno(10L, "Lauriane Lisiane", 1010, "senha123", "lauriane@gmail.com", curso2, StatusAlunoGrupo.ATIVO);
 
-        grupo1 = new Grupo(1L, "Grupo Eng. Soft.", StatusGrupo.ATIVO, aluno1, new ArrayList<>(List.of(aluno1, aluno2, aluno3, aluno4)));
+        grupo1 = new Grupo(1L, "Grupo Eng. Soft.", StatusGrupo.ATIVO, aluno1, new ArrayList<>(List.of(aluno1, aluno2, aluno3)));
         grupo3 = new Grupo(3L, "Grupo Eng. Soft Arquivado", StatusGrupo.ARQUIVADO, aluno1, List.of(aluno1, aluno2, aluno3, aluno4));
         grupo2 = new Grupo(2L, "Grupo Veterinária", StatusGrupo.ARQUIVADO, aluno5, List.of(aluno5, aluno6, aluno7));
-        Grupo grupo4 = new Grupo(4L, "Grupo 4", StatusGrupo.ATIVO, aluno6, List.of(aluno5, aluno6, aluno7, aluno8, aluno9, aluno10));
+        grupo4 = new Grupo(4L, "Grupo 4", StatusGrupo.ATIVO, aluno6, List.of(aluno5, aluno6, aluno7, aluno8, aluno9, aluno10));
 
-        aluno1.setGrupos(List.of(grupo1, grupo3));
+        aluno1.setGrupos(new ArrayList<>(List.of(grupo1, grupo3)));
         aluno2.setGrupos(new ArrayList<>(List.of(grupo1, grupo3)));
-        aluno3.setGrupos(List.of(grupo1, grupo3));
-        aluno4.setGrupos(List.of(grupo1, grupo3));
+        aluno3.setGrupos(new ArrayList<>(List.of(grupo1, grupo3)));
+        aluno4.setGrupos(new ArrayList<>(List.of(grupo3)));
 
         aluno5.setGrupos(new ArrayList<>(List.of(grupo2)));
         aluno6.setGrupos(new ArrayList<>(List.of(grupo2)));
         aluno7.setGrupos(new ArrayList<>(List.of(grupo2)));
-        aluno8.setGrupos(List.of(grupo1));
+        aluno8.setGrupos(new ArrayList<>(List.of(grupo1)));
         aluno10.setGrupos(new ArrayList<>(List.of(grupo4)));
 
         grupoSalvarSucesso = new GrupoDTO(10L, "Grupo salvo com sucesso", 5L, List.of(5L, 6L, 7L));
 
         List<Grupo> todosGrupos = List.of(grupo1, grupo2, grupo3);
         List<Grupo> gruposAluno1 = List.of(grupo1);
+
+        professor = new Professor(1L, "Alexandra", "alexandra@uniamerica.br", "senha123", List.of(curso1, curso2));
 
         when(grupoRepository.findAll()).thenReturn(todosGrupos);
         when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
@@ -96,14 +105,10 @@ public class GrupoServiceTest {
         when(alunoRepository.findAllById(List.of(5L, 6L))).thenReturn(List.of(aluno5, aluno6));
         when(alunoRepository.findAllById(List.of(6L, 7L, 8L))).thenReturn(List.of(aluno6, aluno7, aluno8));
         when(alunoRepository.findAllById(List.of(5L, 6L, 7L))).thenReturn(List.of(aluno5, aluno6, aluno7));
-        when(grupoRepository.save(any(Grupo.class))).thenAnswer(invocation -> {
-            Grupo grupo = invocation.getArgument(0);
-            grupo.setId(10L);
-            return grupo;
-        });
         when(grupoRepository.findById(4L)).thenReturn(Optional.of(grupo4));
         when(alunoRepository.findById(10L)).thenReturn(Optional.of(aluno10));
         when(alunoRepository.findById(11L)).thenReturn(Optional.of(aluno11));
+        when(professorRepository.findBySenha("senha123")).thenReturn(Optional.of(professor));
     }
 
     @Test
@@ -118,7 +123,7 @@ public class GrupoServiceTest {
     void buscarPorId_quandoExiste_deveRetornarGrupo() {
         Grupo response = grupoService.findById(1L);
         assertEquals(1L, response.getId());
-        assertEquals(4, response.getAlunos().size());
+        assertEquals(3, response.getAlunos().size());
     }
 
     @Test
@@ -197,6 +202,11 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve salvar novo grupo quando não há erros")
     void salvarGrupo_quandoInformacoesCorretas_deveSalvar(){
+        when(grupoRepository.save(any(Grupo.class))).thenAnswer(invocation -> {
+            Grupo grupo = invocation.getArgument(0);
+            grupo.setId(10L);
+            return grupo;
+        });
         GrupoDTO response = grupoService.save(grupoSalvarSucesso);
         assertEquals(10L, response.id());
     }
@@ -239,7 +249,7 @@ public class GrupoServiceTest {
     @DisplayName("Deve retornar erro ao adicionar aluno se o grupo já tiver mais alunos do que o permitido")
     void putAluno_quandoQtdMaiorDoQuePermitida_deveRetornarErro(){
         assertThrows(IllegalStateException.class, () -> {
-            this.grupoService.adicionarAlunoAoGrupo(6L, 10L, 1L);
+            this.grupoService.adicionarAlunoAoGrupo(6L, 4L, 1L);
         });
     }
 
@@ -313,16 +323,187 @@ public class GrupoServiceTest {
     void excluiAluno_quandoInformacoesCorretas_deveRetornarSucesso(){
         when(alunoRepository.findById(2L)).thenReturn(Optional.of(aluno2));
         when(grupoRepository.save(grupo1)).thenAnswer(invocation -> {
+            aluno2.setStatusAlunoGrupo(StatusAlunoGrupo.AGUARDANDO);
             grupo1.getAlunos().remove(aluno2);
             return grupo1;
         });
         String retorno = this.grupoService.removerAlunoDiretamente(1L,  2L, 1L);
-        assertEquals("Aluno Bruno Costafoi removido do grupo", retorno);
+        assertEquals("Aluno Bruno Costa foi removido do grupo", retorno);
     }
 
     // -- Testa buscar alunos por status no grupo
 
+    @Test
+    @DisplayName("Deve retornar lista com alunos que estão com status AGUARDANDO")
+    void buscarAlunosPorStatus_deveRetornarAlunosComStatusAguardando(){
+        when(grupoRepository.findByAlunosStatusAlunoGrupo(StatusAlunoGrupo.AGUARDANDO)).thenReturn(List.of(grupo1, grupo2, grupo4));
+        List<Grupo> retorno = this.grupoService.findByAlunosStatusAlunoGrupo(StatusAlunoGrupo.AGUARDANDO);
+        assertEquals(3, retorno.size());
+    }
 
-    
+    // -- testes analizar exclusão de alunos no grupo
+
+    @Test
+    @DisplayName("Deve retornar erro quando o id do grupo for inexistente")
+    void buscarGrupos_quandoIdInexistente_deveRetornarErro(){
+        assertThrows(IllegalArgumentException.class, () ->{
+           this.grupoService.analizarExclusaoAluno("senha123", -1L, 3L, true);
+        });
+    }
+
+    @Test
+    @DisplayName("Deve retornar erro quando o professor não for encontrado")
+    void buscarGrupos_quandoProfessorNaoEncontrado_deveRetornarErro(){
+        assertThrows(IllegalArgumentException.class, () -> {
+           this.grupoService.analizarExclusaoAluno("senha1", 1L, 3L, true);
+        });
+    }
+
+    @Test
+    @DisplayName("Deve retornar erro quando aluno não for encontrado")
+    void buscarGrupos_quandoAlunoNaoEncontrado_deveRetornarErro(){
+        assertThrows(IllegalArgumentException.class, () -> {
+           this.grupoService.analizarExclusaoAluno("senha1", 1L, -1L, true);
+        });
+    }
+
+    @Test
+    @DisplayName("Deve retornar erro caso não tenha sido solicitado exclusão do aluno informado")
+    void buscarGrupos_quandoStatusAlunoAtivo_deveRetornarErro(){
+        assertThrows(IllegalStateException.class, () -> {
+            this.grupoService.analizarExclusaoAluno("senha123", 1L, 1L, true);
+        });
+    }
+
+    @Test
+    @DisplayName("Quando a solicitação de exclusão for aceita, o aluno deve ser removido do grupo")
+    void buscarGrupos_quandoSolicitacaoAceita_deveRemoverAlunoDoGrupo(){
+        when(alunoRepository.findById(3L)).thenReturn(Optional.of(aluno3));
+        when(grupoRepository.save(grupo1)).thenAnswer(invocation -> {
+           grupo1.getAlunos().remove(aluno3);
+           aluno3.getGrupos().remove(grupo1);
+           aluno3.setStatusAlunoGrupo(null);
+
+           return grupo1;
+        });
+        String retorno = this.grupoService.analizarExclusaoAluno("senha123", 1L, 3L, true);
+        assertEquals("Aluno Carla Mendes foi removido do grupo", retorno);
+    }
+
+    @Test
+    @DisplayName("Quando a solicitação de exclusão for negada, o aluno deve permanecer no grupo")
+    void buscarGrupos_quandoSolicitacaoNegada_deveManterALuno(){
+        when(alunoRepository.findById(3L)).thenReturn(Optional.of(aluno3));
+        when(grupoRepository.save(grupo1)).thenAnswer(invocation -> {
+            aluno3.setStatusAlunoGrupo(StatusAlunoGrupo.ATIVO);
+            return grupo1;
+        });
+        String retorno = this.grupoService.analizarExclusaoAluno("senha123", 1L, 3L, false);
+        assertEquals("Solicitação de exclusão recusada. O aluno permanece no grupo", retorno);
+    }
+
+    // -- teste deletar grupo
+
+    @Test
+    @DisplayName("Deve retornar erro ao não encontrar o grupo")
+    void deletarGrupo_quandoIdGrupoIncorreto_deveRetornarErro(){
+        when(professorRepository.findById(1L)).thenReturn(Optional.of(professor));
+        assertThrows(IllegalArgumentException.class, () -> {
+            this.grupoService.deletarGrupo(-1L, 1L);
+        });
+    }
+
+   @Test
+   @DisplayName("Deve retornar erro ao não encontrar Id do professor")
+   void deletarGrupo_quandoIdProfessorIncorreto_deveRetornarErro(){
+        assertThrows(IllegalArgumentException.class, () ->{
+           this.grupoService.deletarGrupo(1L, -1L);
+        });
+   }
+
+   @Test
+   @DisplayName("Deve deletar grupo quando informações corretas")
+    void deletarGrupo_quandoInfoCorretas_deveDeletarGrupo(){
+       when(professorRepository.findById(1L)).thenReturn(Optional.of(professor));
+       doAnswer(invocation -> {
+          for (Aluno aluno : grupo1.getAlunos()){
+              aluno.getGrupos().remove(grupo1);
+              aluno.setStatusAlunoGrupo(null);
+          }
+          return null;
+       }).when(grupoRepository).delete(grupo1);
+
+       String retorno = this.grupoService.deletarGrupo(1L, 1L);
+       assertEquals("Grupo deletado com sucesso", retorno);
+   }
+
+   // -- testa buscar grupos por aluno
+
+    @Test
+    @DisplayName("Deve retornar erro caso o grupo do aluno estiver arquivado")
+    void buscarGrupoAtivo_quandoAlunoNaoPossuiGrupoAtivo_deveRetornarErro(){
+        when(grupoRepository.findByStatusGrupoAndAlunosId(StatusGrupo.ATIVO, aluno4.getId())).thenReturn(List.of());
+
+        RuntimeException runtimeException =  assertThrows(RuntimeException.class, () ->{
+            this.grupoService.findByAluno(aluno4);
+        });
+
+        assertEquals("Aluno não possui nenhum grupo ativo", runtimeException.getMessage());
+    }
+
+    @Test
+    @DisplayName("Deve retornar o grupo ativo do aluno")
+    void buscarGrupoAtivo_quandoAlunoPossuiGrupoAtivo_deveRetornarGrupo(){
+        when(grupoRepository.findByStatusGrupoAndAlunosId(StatusGrupo.ATIVO, aluno1.getId())).thenReturn(List.of(grupo1));
+
+        Grupo retorno = this.grupoService.findByAluno(aluno1);
+        assertEquals(grupo1, retorno);
+    }
+
+    // -- testes arquivar grupos
+
+    @Test
+    @DisplayName("Deve retornar erro ao passar um id de grupo inexistente")
+    void arquivarGrupo_quandoIdInexistente_deveRetornarErro(){
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->{
+           this.grupoService.arquivarGrupo(-1L);
+        });
+
+        assertEquals("Grupo não encontrado", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Deve retornar mensagem de sucesso quando o grupo for arquivado")
+    void arquivarGrupo_quandoInfoCorretas_deveRetornarMsgDeSucesso(){
+        when(grupoRepository.save(grupo1)).thenAnswer(invocation -> {
+           grupo1.setStatusGrupo(StatusGrupo.ARQUIVADO);
+           return grupo1;
+        });
+
+        String retorno = this.grupoService.arquivarGrupo(1L);
+        assertEquals("Grupo arquivado com sucesso!", retorno);
+    }
+
+    // -- testes para buscar grupos arquivados
+
+    @Test
+    @DisplayName("Deve retornar erro quando não encontrar nenhum grupo arquivado")
+    void buscarGrupos_quandoAlunoNaoPossuiGruposArquivados_DeveRetornarErro(){
+        when(grupoRepository.findByStatusGrupoAndAlunosId(StatusGrupo.ARQUIVADO, aluno10.getId())).thenReturn(List.of());
+
+        RuntimeException runtimeException = assertThrows(RuntimeException.class, () ->{
+            this.grupoService.findByGruposArquivados(10L);
+        });
+
+        assertEquals("Aluno não possui nenhum grupo arquivado", runtimeException.getMessage());
+    }
+
+    @Test
+    @DisplayName("Deve retornar uma lista com os grupos do arquivados do aluno ao encontrar grupo arquivado")
+    void buscarGrupos_quandoExisteGrupoArquivado_deveRetornarGrupos(){
+        when(grupoRepository.findByStatusGrupoAndAlunosId(StatusGrupo.ARQUIVADO, 10L)).thenReturn(List.of(grupo3));
+        List<Grupo> retorno = this.grupoService.findByGruposArquivados(10L);
+        assertEquals(1, retorno.size());
+    }
 
 }
