@@ -86,4 +86,44 @@ public class GrupoRepositoryTest {
         assertTrue(retorno.isPresent(), "Grupo não deve estar vazio");
         assertEquals("Grupo Ativo", retorno.get().getNome());
     }
+
+    @Test
+    @DisplayName("Deve retornar lista vazia quando não houver alunos aguardando")
+    void findByAlunosStatusAlunoGrupo_quandoNaoHouverAlunosAguardando_deveRetornarListaVazia() {
+        aluno3.setStatusAlunoGrupo(StatusAlunoGrupo.ATIVO);
+        List<Grupo> retorno = grupoRepository.findByAlunosStatusAlunoGrupo(StatusAlunoGrupo.AGUARDANDO);
+
+        assertTrue(retorno.isEmpty(), "A lista deveria estar vazia pois nenhum aluno tem status PENDENTE");
+    }
+
+    @Test
+    @DisplayName("Deve retornar lista vazia quando o aluno não fizer parte de grupos arquivados")
+    void findByStatusGrupoAndAlunosId_quandoAlunoNaoTemGrupoArquivado_deveRetornarListaVazia() {
+        Aluno alunoSemGrupoArquivado = new Aluno(null, "Laura Silva", 2001, "senha123", "laura@gmail.com", aluno1.getCurso(), StatusAlunoGrupo.ATIVO);
+        entityManager.persistAndFlush(alunoSemGrupoArquivado);
+
+        List<Grupo> retorno = grupoRepository.findByStatusGrupoAndAlunosId(StatusGrupo.ARQUIVADO, alunoSemGrupoArquivado.getId());
+        assertTrue(retorno.isEmpty(), "A lista deveria estar vazia pois o aluno não tem grupo arquivado");
+    }
+
+    @Test
+    @DisplayName("Deve retornar Optional vazio quando o grupo não existir")
+    void findByIdWithAlunos_quandoGrupoNaoExiste_deveRetornarOptionalVazio() {
+        Optional<Grupo> retorno = grupoRepository.findByIdWithAlunos(-99L);
+
+        assertTrue(retorno.isEmpty(), "Era esperado Optional vazio pois o ID do grupo não existe");
+    }
+
+    @Test
+    @DisplayName("Deve retornar lista vazia quando o aluno não estiver em grupos ativos")
+    void findByStatusGrupoAndAlunosId_quandoAlunoNaoTemGrupoAtivo_deveRetornarListaVazia() {
+        Aluno alunoSemGrupoAtivo = new Aluno(null, "Ricardo Alves", 2002, "senha123", "ricardo@gmail.com", aluno1.getCurso(), StatusAlunoGrupo.ATIVO);
+        entityManager.persistAndFlush(alunoSemGrupoAtivo);
+
+        List<Grupo> retorno = grupoRepository.findByStatusGrupoAndAlunosId(StatusGrupo.ATIVO, alunoSemGrupoAtivo.getId());
+        assertTrue(retorno.isEmpty(), "A lista deveria estar vazia pois o aluno não tem grupo ativo");
+    }
+
+
+
 }
