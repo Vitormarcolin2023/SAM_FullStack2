@@ -26,7 +26,10 @@ public class Coordenador implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
+
+    @Column(unique = true, nullable = false)
     private String email;
+
     private String senha;
 
     @OneToMany(mappedBy = "coordenador", cascade = CascadeType.ALL)
