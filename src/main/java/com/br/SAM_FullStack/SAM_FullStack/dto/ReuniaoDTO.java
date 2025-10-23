@@ -3,7 +3,9 @@ package com.br.SAM_FullStack.SAM_FullStack.dto;
 import com.br.SAM_FullStack.SAM_FullStack.model.FormatoReuniao;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Time;
@@ -11,6 +13,8 @@ import java.util.Date;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ReuniaoDTO {
 
     @NotBlank(message = "O campo 'assunto' não pode ser nulo")

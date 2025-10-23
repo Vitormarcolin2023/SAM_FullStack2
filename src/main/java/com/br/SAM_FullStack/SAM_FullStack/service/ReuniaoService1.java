@@ -104,21 +104,17 @@
                     .orElseThrow(() -> new IllegalStateException("Reunião não encontrada"));
 
             reuniaoExiste.setStatusReuniao(novoStatus);
-            try {
-                reuniaoRepository.save(reuniaoExiste);
-                return "Status reunião: " + novoStatus.toString().toLowerCase();
-            } catch (Exception e) {
-                System.err.println("Erro ao salvar a reunião: " + e.getMessage());
-                throw new RuntimeException("Erro ao atualizar o status da reunião", e);
-            }
+
+            reuniaoRepository.save(reuniaoExiste);
+            return "Status reunião: " + novoStatus.toString().toLowerCase();
         }
 
         // Deletar reunião
         public String delete(long id) {
-            Reuniao reuniao = this.findById(id);
-            if (reuniao == null){
-                throw new IllegalStateException("Reunião não encontrada");
-            }
+            Reuniao reuniao = reuniaoRepository.findById(id).orElseThrow(
+                    () -> new IllegalStateException("Reunião não encontrada")
+            );
+
             reuniaoRepository.delete(reuniao);
             return ("Reunião deletada com sucesso");
         }
