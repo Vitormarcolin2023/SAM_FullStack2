@@ -73,7 +73,7 @@ class CoordenadorServiceTest {
     }
 
     @Test
-    @DisplayName("Salva coordenador com curso vinculado")
+    @DisplayName("Salvar: coordenador com curso vinculado")
     void save_comCursosValidos_deveSalvarCoordenadorComCursosVinculados() {
         when(passwordEncoder.encode(anyString())).thenReturn("senha_criptografada");
 
@@ -94,7 +94,7 @@ class CoordenadorServiceTest {
     }
 
     @Test
-    @DisplayName("Atualizar coordenador com novos cursos - salvo com sucesso")
+    @DisplayName("Atualizar: coordenador com novos cursos, mensagem de salvo com sucesso")
     void update_CoordenadorEncontradoComNovosCursos_deveAtualizarComSucesso() {
         coordenadorMock.setCursos(new ArrayList<>(Arrays.asList(cursoMock)));
 
@@ -119,7 +119,7 @@ class CoordenadorServiceTest {
     }
 
     @Test
-    @DisplayName("Atualizar coordenador - lançar exceção")
+    @DisplayName("Atualizar: exceção de coordenador não encontrado")
     void update_CoordenadorNaoEncontrado_deveLancarRuntimeException() {
         when(coordenadorRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -132,7 +132,7 @@ class CoordenadorServiceTest {
     }
 
     @Test
-    @DisplayName("Atualizar - lançar exceção para curso não encontrado")
+    @DisplayName("Atualizar: lançar exceção para curso não encontrado")
     void update_CursoNaoEncontrado_deveLancarRuntimeException() {
         when(coordenadorRepository.findById(1L)).thenReturn(Optional.of(coordenadorMock));
         coordenadorUpdateDTOMock.setCursosIds(Arrays.asList(99L));
@@ -147,7 +147,7 @@ class CoordenadorServiceTest {
     }
 
     @Test
-    @DisplayName("Deletar - encontrar coordenador, desvincular curso e deletar")
+    @DisplayName("Deletar: encontra coordenador, desvincula curso e deleta")
     void delete_CoordenadorEncontrado_deveDesvincularCursosESerDeletado() {
         coordenadorMock.setCursos(new ArrayList<>(Arrays.asList(cursoMock)));
         when(coordenadorRepository.findById(1L)).thenReturn(Optional.of(coordenadorMock));
@@ -162,7 +162,7 @@ class CoordenadorServiceTest {
     }
 
     @Test
-    @DisplayName("Deletar - lançar exceção de coordenador não encontrado")
+    @DisplayName("Deletar: lançar exceção de coordenador não encontrado")
     void delete_CoordenadorNaoEncontrado_deveLancarRuntimeException() {
         when(coordenadorRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -183,7 +183,7 @@ class CoordenadorServiceTest {
     }
 
     @Test
-    @DisplayName("Ativar mentor - chamada com erro")
+    @DisplayName("Ativar mentor: chamada com erro")
     void ativarMentor_chamadaComErro_deveRetornarMensagemDeErro() throws Exception {
         doThrow(new RuntimeException()).when(mentorService).updateStatus(1L, "ATIVO");
 
@@ -194,7 +194,7 @@ class CoordenadorServiceTest {
     }
 
     @Test
-    @DisplayName("Inativar mentor - sucesso")
+    @DisplayName("Inativar mentor: mensagem de sucesso")
     void inativarMentor_chamadaBemSucedida_deveRetornarSucesso() throws Exception {
         when(mentorService.updateStatus(1L, "INATIVO")).thenReturn("Status atualizado");
 
@@ -205,7 +205,7 @@ class CoordenadorServiceTest {
     }
 
     @Test
-    @DisplayName("Inativar mentor - retornar mensagem de erro")
+    @DisplayName("Inativar mentor: retornar mensagem de erro")
     void inativarMentor_chamadaComErro_deveRetornarMensagemDeErro() throws Exception {
         doThrow(new RuntimeException()).when(mentorService).updateStatus(1L, "INATIVO");
 
@@ -216,7 +216,7 @@ class CoordenadorServiceTest {
     }
 
     @Test
-    @DisplayName("Encontrar mentores e retornar lista de mentores")
+    @DisplayName("Encontrar mentores: retorna lista de mentores")
     void findAllMentores_deveRetornarListaDeMentores() {
         List<Mentor> mentores = Arrays.asList(new Mentor(), new Mentor());
         when(mentorService.listAll()).thenReturn(mentores);
@@ -229,7 +229,7 @@ class CoordenadorServiceTest {
     }
 
     @Test
-    @DisplayName("Encontrar projetos e retortar lista de projetos")
+    @DisplayName("Encontrar projetos: retorna lista de projetos")
     void findAllProjetos_deveRetornarListaDeProjetos() {
         List<Projeto> projetos = Arrays.asList(new Projeto());
         when(projetoService.listAll()).thenReturn(projetos);
@@ -242,7 +242,7 @@ class CoordenadorServiceTest {
     }
 
     @Test
-    @DisplayName("Buscar por email - retornar coordenador")
+    @DisplayName("Buscar por email: retorna coordenador")
     void buscarPorEmail_quandoEncontrado_deveRetornarCoordenador() {
         when(coordenadorRepository.findByEmail("teste@email.com")).thenReturn(Optional.of(coordenadorMock));
 
@@ -253,7 +253,7 @@ class CoordenadorServiceTest {
     }
 
     @Test
-    @DisplayName("Buscar por email - retornar null se não encontrar")
+    @DisplayName("Buscar por email: retorna null se não encontrar")
     void buscarPorEmail_quandoNaoEncontrado_deveRetornarNull() {
         when(coordenadorRepository.findByEmail("email_nao_existe@email.com")).thenReturn(Optional.empty());
 
@@ -263,7 +263,7 @@ class CoordenadorServiceTest {
     }
 
     @Test
-    @DisplayName("Encontrar por Id - retornar coordenador")
+    @DisplayName("Encontrar por Id: retorna coordenador")
     void findById_CoordenadorEncontrado_deveRetornarCoordenador() {
         when(coordenadorRepository.findById(1L)).thenReturn(Optional.of(coordenadorMock));
 
@@ -274,7 +274,7 @@ class CoordenadorServiceTest {
     }
 
     @Test
-    @DisplayName("Encontrar por Id - lançar exception")
+    @DisplayName("Encontrar por Id: lança exception")
     void findById_CoordenadorNaoEncontrado_deveLancarNoSuchElementException() {
         when(coordenadorRepository.findById(2L)).thenReturn(Optional.empty());
 
