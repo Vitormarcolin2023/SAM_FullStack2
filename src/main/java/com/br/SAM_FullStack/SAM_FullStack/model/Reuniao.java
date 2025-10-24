@@ -23,7 +23,7 @@ public class Reuniao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotBlank(message = "O campo 'assunto' não pode ser nulo")
     private String assunto;
