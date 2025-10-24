@@ -41,19 +41,17 @@ public class AuthService {
             nome = ((Aluno) user).getNome();
         } else if(user instanceof Mentor) {
             nome = ((Mentor) user).getNome();
-            // ALTERADO: Converte o Enum para String usando .name()
             status = ((Mentor) user).getStatusMentor().name();
         } else if(user instanceof Professor) {
             nome = ((Professor) user).getNome();
         } else if(user instanceof Coordenador) {
             nome = ((Coordenador) user).getNome();
         } else {
-            nome = user.getUsername(); // fallback
+            throw  new RuntimeException("Usuário não detectado");
         }
 
         String token = tokenService.generateToken(email, role, nome);
 
-        // ALTERADO: Usa o novo construtor com todos os 4 campos
         return new RespostaLoginDTO(token, role, email, status);
     }
 }
