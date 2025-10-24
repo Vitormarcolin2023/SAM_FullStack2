@@ -1,40 +1,49 @@
 package com.br.SAM_FullStack.SAM_FullStack.controller;
 
+import com.br.SAM_FullStack.SAM_FullStack.autenticacao.TokenService;
 import com.br.SAM_FullStack.SAM_FullStack.dto.CoordenadorDTO;
 import com.br.SAM_FullStack.SAM_FullStack.dto.CoordenadorUpdateDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.Coordenador;
 import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
 import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
 import com.br.SAM_FullStack.SAM_FullStack.service.CoordenadorService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(CoordenadorController.class)
+@WithMockUser
 class CoordenadorControllerTest {
 
-    @Mock
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockBean
     private CoordenadorService coordenadorService;
 
-    @InjectMocks
-    private CoordenadorController coordenadorController;
+    @MockBean
+    private TokenService tokenService;
 
     private CoordenadorDTO coordenadorDTO;
     private CoordenadorUpdateDTO coordenadorUpdateDTO;
@@ -66,140 +75,161 @@ class CoordenadorControllerTest {
 
     @Test
     @DisplayName("Salvar: deve retornar HTTP 201 CREATED e o objeto Coordenador salvo")
-    void save_deveRetornarCreatedCoordenador() {
+    void save_deveRetornarCreatedCoordenador() throws Exception {
         when(coordenadorService.save(any(CoordenadorDTO.class))).thenReturn(coordenador);
 
-        ResponseEntity<Coordenador> response = coordenadorController.save(coordenadorDTO);
+        mockMvc.perform(post("/api/coordenador/save")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(coordenadorDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.email").value(coordenador.getEmail()));
 
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(coordenador.getEmail(), response.getBody().getEmail());
+        verify(coordenadorService, times(1)).save(any(CoordenadorDTO.class));
     }
 
     @Test
     @DisplayName("Atualizar: deve retornar HTTP 200 OK com mensagem de sucesso")
-    void update_deveRetornarOkComMensagem() {
+    void update_deveRetornarOkComMensagem() throws Exception {
         String successMessage = "Coordenador atualizado com sucesso.";
         when(coordenadorService.update(any(CoordenadorUpdateDTO.class), eq(coordenadorId))).thenReturn(successMessage);
 
-        ResponseEntity<String> response = coordenadorController.update(coordenadorUpdateDTO, coordenadorId);
+        mockMvc.perform(put("/api/coordenador/update/{id}", coordenadorId)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(coordenadorUpdateDTO)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(successMessage));
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(successMessage, response.getBody());
+        verify(coordenadorService, times(1)).update(any(CoordenadorUpdateDTO.class), eq(coordenadorId));
     }
 
     @Test
     @DisplayName("Deletar: deve retornar HTTP 200 OK com mensagem de sucesso")
-    void delete_deveRetornarOkComMensagem() {
+    void delete_deveRetornarOkComMensagem() throws Exception {
+        // O Service real não retorna String, mas o Controller retorna 200 OK com mensagem
         doNothing().when(coordenadorService).delete(coordenadorId);
 
-        ResponseEntity<String> response = coordenadorController.delete(coordenadorId);
+        mockMvc.perform(delete("/api/coordenador/delete/{id}", coordenadorId)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Coordenador excluído com sucesso"));
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Coordenador excluído com sucesso", response.getBody());
+        verify(coordenadorService, times(1)).delete(coordenadorId);
     }
 
     @Test
     @DisplayName("Ativar Mentor: deve retornar HTTP 200 OK com mensagem de ativação")
-    void ativarMentor_deveRetornarOkComMensagem() {
+    void ativarMentor_deveRetornarOkComMensagem() throws Exception {
         String message = "Mentor ativado.";
         when(coordenadorService.ativarMentor(coordenadorId)).thenReturn(message);
 
-        ResponseEntity<String> response = coordenadorController.ativarMentor(coordenadorId);
+        mockMvc.perform(put("/api/coordenador/ativarMentor/{id}", coordenadorId)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(message));
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(message, response.getBody());
+        verify(coordenadorService, times(1)).ativarMentor(coordenadorId);
     }
 
     @Test
     @DisplayName("Inativar Mentor: deve retornar HTTP 200 OK com mensagem de inativação")
-    void inativarMentor_deveRetornarOkComMensagem() {
+    void inativarMentor_deveRetornarOkComMensagem() throws Exception {
         String message = "Mentor inativado.";
         when(coordenadorService.inativarMentor(coordenadorId)).thenReturn(message);
 
-        ResponseEntity<String> response = coordenadorController.inativarMentor(coordenadorId);
+        mockMvc.perform(put("/api/coordenador/inativarMentor/{id}", coordenadorId)
+                        .with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(content().string(message));
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(message, response.getBody());
+        verify(coordenadorService, times(1)).inativarMentor(coordenadorId);
     }
 
     @Test
     @DisplayName("Buscar todos os Mentores: deve retornar HTTP 200 OK com a lista de Mentores")
-    void findAllMentores_deveRetornarOkComLista() {
+    void findAllMentores_deveRetornarOkComLista() throws Exception {
         List<Mentor> mentores = Arrays.asList(new Mentor(), new Mentor());
         when(coordenadorService.findAllMentores()).thenReturn(mentores);
 
-        ResponseEntity<List<Mentor>> response = coordenadorController.findAllMentores();
+        mockMvc.perform(get("/api/coordenador/mentores"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(2));
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(2, response.getBody().size());
+        verify(coordenadorService, times(1)).findAllMentores();
     }
 
     @Test
     @DisplayName("Buscar todos os Projetos: deve retornar HTTP 200 OK com a lista de Projetos")
-    void findAllProjetos_deveRetornarOkComLista() {
+    void findAllProjetos_deveRetornarOkComLista() throws Exception {
         List<Projeto> projetos = Arrays.asList(new Projeto(), new Projeto());
         when(coordenadorService.findAllProjetos()).thenReturn(projetos);
 
-        ResponseEntity<List<Projeto>> response = coordenadorController.findAllProjetos();
+        mockMvc.perform(get("/api/coordenador/projetos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(2));
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(2, response.getBody().size());
+        verify(coordenadorService, times(1)).findAllProjetos();
     }
 
     @Test
     @DisplayName("Buscar todos os Projetos: quando vazia, deve retornar HTTP 200 OK com lista vazia")
-    void findAllProjetos_quandoVazia_deveRetornarOkComListaVazia() {
+    void findAllProjetos_quandoVazia_deveRetornarOkComListaVazia() throws Exception {
         List<Projeto> projetos = Collections.emptyList();
         when(coordenadorService.findAllProjetos()).thenReturn(projetos);
 
-        ResponseEntity<List<Projeto>> response = coordenadorController.findAllProjetos();
+        mockMvc.perform(get("/api/coordenador/projetos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(0));
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(0, response.getBody().size());
+        verify(coordenadorService, times(1)).findAllProjetos();
     }
 
     @Test
     @DisplayName("Buscar por Email: quando encontrado, deve retornar HTTP 200 OK e o objeto Coordenador")
-    void buscarPorEmail_quandoEncontrado_deveRetornarOkCoordenador() {
+    void buscarPorEmail_quandoEncontrado_deveRetornarOkCoordenador() throws Exception {
         when(coordenadorService.buscarPorEmail(email)).thenReturn(coordenador);
 
-        ResponseEntity<Coordenador> response = coordenadorController.buscarPorEmail(email);
+        mockMvc.perform(get("/api/coordenador/buscar-por-email").param("email", email))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value(email));
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(email, response.getBody().getEmail());
+        verify(coordenadorService, times(1)).buscarPorEmail(email);
     }
 
     @Test
     @DisplayName("Buscar por Email: quando não encontrado, deve retornar HTTP 404 NOT_FOUND")
-    void buscarPorEmail_quandoNaoEncontrado_deveRetornarNotFound() {
-        when(coordenadorService.buscarPorEmail(anyString())).thenReturn(null);
+    void buscarPorEmail_quandoNaoEncontrado_deveRetornarNotFound() throws Exception {
+        String emailInvalido = "naoexiste@example.com";
+        when(coordenadorService.buscarPorEmail(emailInvalido)).thenReturn(null);
 
-        ResponseEntity<Coordenador> response = coordenadorController.buscarPorEmail("naoexiste@example.com");
+        mockMvc.perform(get("/api/coordenador/buscar-por-email").param("email", emailInvalido))
+                .andExpect(status().isNotFound());
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        verify(coordenadorService, times(1)).buscarPorEmail(emailInvalido);
     }
 
     @Test
     @DisplayName("Buscar por ID: quando encontrado, deve retornar HTTP 200 OK e o objeto Coordenador")
-    void getCoordenadorPorId_quandoEncontrado_deveRetornarOkCoordenador() {
+    void getCoordenadorPorId_quandoEncontrado_deveRetornarOkCoordenador() throws Exception {
         when(coordenadorService.findById(coordenadorId)).thenReturn(coordenador);
 
-        ResponseEntity<Coordenador> response = coordenadorController.getCoordenadorPorId(coordenadorId);
+        mockMvc.perform(get("/api/coordenador/getById/{id}", coordenadorId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(coordenadorId));
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(coordenadorId, response.getBody().getId());
+        verify(coordenadorService, times(1)).findById(coordenadorId);
     }
 
     @Test
     @DisplayName("Buscar por ID: quando não encontrado (null), deve retornar HTTP 404 NOT_FOUND")
-    void getCoordenadorPorId_quandoNaoEncontrado_deveRetornarNotFound() {
-        when(coordenadorService.findById(coordenadorId)).thenReturn(null);
+    void getCoordenadorPorId_quandoNaoEncontrado_deveRetornarNotFound() throws Exception {
+        Long idInvalido = 99L;
+        when(coordenadorService.findById(idInvalido)).thenReturn(null);
 
-        ResponseEntity<Coordenador> response = coordenadorController.getCoordenadorPorId(coordenadorId);
+        mockMvc.perform(get("/api/coordenador/getById/{id}", idInvalido))
+                .andExpect(status().isNotFound());
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        verify(coordenadorService, times(1)).findById(idInvalido);
     }
 }

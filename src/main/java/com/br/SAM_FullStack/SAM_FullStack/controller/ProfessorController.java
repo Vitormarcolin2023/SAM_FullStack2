@@ -59,7 +59,10 @@ public class ProfessorController {
     @GetMapping("/buscar-por-email")
     public ResponseEntity<Professor> getProfessorPorEmail(@RequestParam String email) {
         Professor professor = this.professorService.findByEmail(email);
-        return new ResponseEntity<>(professor, HttpStatus.OK);
+
+        return Optional.ofNullable(professor)
+                .map(p -> new ResponseEntity<>(p, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("/getById/{id}")
