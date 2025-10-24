@@ -269,5 +269,33 @@ public class ReuniaoServiceTest {
         assertEquals("Reunião deletada com sucesso", retorno);
     }
 
-    
+    @Test
+    @DisplayName("Deve retornar erro quando a área de atuação de um aluno for nula")
+    void saveReuniao_quandoAreaAlunoNula_deveRetornarErro(){
+        Aluno alunoNulo = new Aluno(4L, "Teste Nulo", 1004, "senha", "teste@gmail.com", new Curso(2L, "Curso Nulo", null), StatusAlunoGrupo.ATIVO);
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo));
+        when(mentorRepository.findById(1L)).thenReturn(Optional.of(mentor));
+        when(alunoRepository.findAllByGrupoId(1L)).thenReturn(List.of(aluno1, aluno2, alunoNulo));
+
+        reuniaoDTO = new ReuniaoDTO("nova reunião", data, hora, FormatoReuniao.ONLINE, 1L, 1L);
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            reuniaoService.save(reuniaoDTO);
+        });
+        assertEquals("A área de atuação de pelo menos um aluno não corresponde à do mentor.", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Deve atualizar reunião mesmo quando campos forem nulos")
+    void update_quandoCamposNulos_deveAtualizarComSucesso(){
+        Reuniao reuniaoAtualizada = new Reuniao(); // todos campos nulos
+        when(reuniaoRepository.findById(2L)).thenReturn(Optional.of(reuniao2));
+        when(reuniaoRepository.save(any(Reuniao.class))).thenReturn(reuniao2);
+
+        String retorno = reuniaoService.update(2L, reuniaoAtualizada);
+        assertEquals("Reunião atualizada e reenviada para aprovação", retorno);
+    }
+
+
+
 }
