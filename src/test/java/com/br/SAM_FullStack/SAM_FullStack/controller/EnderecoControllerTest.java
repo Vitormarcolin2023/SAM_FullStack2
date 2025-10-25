@@ -7,11 +7,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
@@ -37,10 +39,10 @@ public class EnderecoControllerTest {
     private ObjectMapper objectMapper; // Converte objetos para/de JSON
 
     // Mock da dependência do Controller (Service)
-    @MockBean
+    @MockitoBean
     private EnderecoService enderecoService;
 
-    @MockBean
+    @MockitoBean
     private TokenService tokenService;
 
     private Endereco enderecoMock;

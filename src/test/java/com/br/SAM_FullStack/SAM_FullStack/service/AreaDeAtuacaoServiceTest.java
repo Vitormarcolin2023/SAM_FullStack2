@@ -1,6 +1,5 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
-
 import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.model.AreaDeAtuacao;
 import com.br.SAM_FullStack.SAM_FullStack.model.Curso;
@@ -8,15 +7,15 @@ import com.br.SAM_FullStack.SAM_FullStack.repository.AreaDeAtuacaoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import com.br.SAM_FullStack.SAM_FullStack.autenticacao.TokenService;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,18 +25,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 @DisplayName("Testes Unitários do AreaDeAtuacaoService")
 class AreaDeAtuacaoServiceTest {
 
-    /*MockitoBean
+    @Mock
     AreaDeAtuacaoRepository areaDeAtuacaoRepository;
 
-    @Autowired
+    @InjectMocks
     AreaDeAtuacaoService areaDeAtuacaoService;
-
-    @MockitoBean
-    TokenService tokenService;
 
     AreaDeAtuacao area;
     Aluno aluno;
@@ -92,6 +88,29 @@ class AreaDeAtuacaoServiceTest {
         assertNotNull(areaSalva);
         verify(areaDeAtuacaoRepository).save(area);
     }
+
+    @Test
+    @DisplayName("Deve salvar e retornar uma lista de áreas")
+    void saveAll_deveSalvarListaDeAreas() {
+        AreaDeAtuacao area1 = new AreaDeAtuacao();
+        area1.setNome("Saúde");
+
+        AreaDeAtuacao area2 = new AreaDeAtuacao();
+        area2.setNome("Educação");
+
+        List<AreaDeAtuacao> listaParaSalvar = Arrays.asList(area1, area2);
+
+        when(areaDeAtuacaoRepository.save(any(AreaDeAtuacao.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0)); // Retorna o mesmo objeto que recebeu
+
+        List<AreaDeAtuacao> resultado = areaDeAtuacaoService.saveAll(listaParaSalvar);
+
+        assertNotNull(resultado);
+        assertEquals(2, resultado.size());
+
+        verify(areaDeAtuacaoRepository, times(2)).save(any(AreaDeAtuacao.class));
+    }
+
 
     @Test
     @DisplayName("Deve atualizar e retornar área de atuação")
@@ -177,5 +196,5 @@ class AreaDeAtuacaoServiceTest {
             AreaDeAtuacao areaEncontrada = areaDeAtuacaoService.findByAlunoLogado();
             assertNull(areaEncontrada);
         }
-    }*/
+    }
 }
