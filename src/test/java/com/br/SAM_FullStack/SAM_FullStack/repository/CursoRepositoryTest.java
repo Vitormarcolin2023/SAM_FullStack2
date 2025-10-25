@@ -20,27 +20,25 @@ class CursoRepositoryTest {
 
     @Autowired
     private AreaDeAtuacaoRepository areaDeAtuacaoRepository;
-
     private AreaDeAtuacao area;
-    private Curso cursoJavaBasico;
-    private Curso cursoJavaAvancado;
-    private Curso cursoPython;
+
+    private Curso novoCurso(String nome, AreaDeAtuacao area) {
+        return new Curso(null, nome, area);
+    }
 
     @BeforeEach
     void setup () {
-        area = new AreaDeAtuacao(null, "Tecnologia");
-        area = areaDeAtuacaoRepository.save(area);
+        area = areaDeAtuacaoRepository.save(new AreaDeAtuacao(null, "Tecnologia"));
 
-        cursoJavaBasico = new Curso(null, "Java Básico", area);
-        cursoJavaAvancado = new Curso(null, "Java Avançado", area);
-        cursoPython = new Curso(null, "Python", area);
-
-        cursoRepository.saveAll(List.of(cursoJavaBasico, cursoJavaAvancado, cursoPython));
-
+        cursoRepository.saveAll(List.of(
+                novoCurso("Java Básico", area),
+                novoCurso("Java Avançado", area),
+                novoCurso("Python", area)
+        ));
     }
 
     @Test
-    @DisplayName("Deve retorna lista de cursos que contenham 'Java' no nome (ignorando maiúsculas/minúsculas)")
+    @DisplayName("Quando cursos contendo 'Java' existirem, deve retornar lista de cursos")
 
     void findByNomeContainingIgnoreCase_quandoCursoExiste_deveRetornarListaDeCursos() {
       List<Curso> retorno = cursoRepository.findByNomeContainingIgnoreCase("Java");
@@ -55,7 +53,7 @@ class CursoRepositoryTest {
     }
 
     @Test
-    @DisplayName("Deve retornar lista vazia quando nenhum curso encontrado para o nome pesquiso")
+    @DisplayName("Quando nenhum curso encontrado, deve retornar lista vazia")
 
     void findByNomeContainingIgnoreCase_quandoNenhumCursoEncontrado_deveRetornarListaVazia() {
         List<Curso> retorno = cursoRepository.findByNomeContainingIgnoreCase("HTML");
@@ -64,7 +62,7 @@ class CursoRepositoryTest {
         assertTrue(retorno.isEmpty(), "A lista deve estar vazia");
     }
     @Test
-    @DisplayName("Deve retornar lista de cursos da área Tecnoligia")
+    @DisplayName("Quando cursos da área 'Tecnologia' existirem, deve retornar lista de cursos")
     void findByAreaDeAtuacaoNomeContainingIgnoreCase_quandoAreaExiste_deveRetornarCursos() {
         List<Curso> retorno = cursoRepository.findByAreaDeAtuacaoNomeContainingIgnoreCase("tecnologia");
         assertNotNull(retorno, "O retorno não deve ser nulo");
@@ -72,6 +70,15 @@ class CursoRepositoryTest {
         assertEquals(3, retorno.size(), "Deve retornar exatamente 3 cursos da área Tecnologia");
         assertTrue(retorno.stream().allMatch(c -> c.getAreaDeAtuacao().getNome().equalsIgnoreCase("Tecnologia")),
                 "Todos os cursos retornados devem pertencer à área Tecnologia");
+    }
+
+    @Test
+    @DisplayName("Quando nenhuma área correspondente for encontrada, deve retornar lista vazia")
+    void findByAreaDeAtuacaoNomeContainingIgnoreCase_quandoAreaNaoExistir_deveRetornarListaVazia() {
+        List<Curso> retorno = cursoRepository.findByAreaDeAtuacaoNomeContainingIgnoreCase("Saúde");
+
+        assertNotNull(retorno, "O retorno não deve ser nulo");
+        assertTrue(retorno.isEmpty(), "A lista deve estar vazia");
     }
 
 }

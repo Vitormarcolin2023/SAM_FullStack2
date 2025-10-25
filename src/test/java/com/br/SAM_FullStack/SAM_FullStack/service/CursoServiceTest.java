@@ -44,7 +44,7 @@ public class CursoServiceTest {
     }
 
 
-    @DisplayName("findById_quandoCursoExiste_deveRetornarCurso")
+    @DisplayName("Deve retornar curdo quando existe")
     @Test
     void findById_quandoCursoExiste_deveRetornarCurso() {
         Curso curso = new Curso(1L, "Analise e desenvolveimento de sistema", area);
@@ -57,7 +57,7 @@ public class CursoServiceTest {
         assertEquals("Analise e desenvolveimento de sistema", retorno.getNome());
     }
 
-    @DisplayName("findById_quandoCursoNaoExiste_deveLancarException")
+    @DisplayName("Quando nao existe o curso, lanca exceçao")
     @Test
     void findById_quandoCursoNaoExiste_deveLancarException() {
         when(cursoRepository.findById(1L)).thenReturn(Optional.empty());
@@ -69,7 +69,7 @@ public class CursoServiceTest {
     }
 
     @Test
-    @DisplayName("findAll_deveRetornarListaDeCursos")
+    @DisplayName("Teste de retorno da lista de cursos")
     void findAll_deveRetornarListaDeCursos() {
 
         when(cursoRepository.findAll()).thenReturn(cursosMock);
@@ -82,7 +82,7 @@ public class CursoServiceTest {
     }
 
     @Test
-    @DisplayName("save_deveSalvarCursoComSucesso")
+    @DisplayName("Deve salvar curso com sucesso")
     void save_deveSalvarCursoComSucesso() {
         Curso curso = new Curso(null, "HTML", area);
         Curso cursoSalvo = new Curso(3L, "HTML", area);
@@ -97,7 +97,7 @@ public class CursoServiceTest {
     }
 
     @Test
-    @DisplayName("update_deveAtualizarCursoComSucesso")
+    @DisplayName("Autulizar curso com sucesso")
     void update_deveAtualizarCursoComSucesso() {
         Curso cursoExistente = cursosMock.get(0);
         Curso cursoUpdate = new Curso(null, "HTML e CSS", area);
@@ -117,7 +117,7 @@ public class CursoServiceTest {
     }
 
     @Test
-    @DisplayName("delete_deveRemoverCursoComSucesso")
+    @DisplayName("Deletar curso com sucesso")
     void delete_deveRemoverCursoComSucesso() {
         Curso cursoExistente = cursosMock.get(0);
         when(cursoRepository.findById(1L)).thenReturn(Optional.of(cursoExistente));
@@ -130,7 +130,7 @@ public class CursoServiceTest {
 
     }
     @Test
-    @DisplayName("delete_quandoCursoNaoExiste_deveLancarException")
+    @DisplayName("Quanado não deleta lancar excecao")
     void delete_quandoCursoNaoExiste_deveLancarException() {
         when(cursoRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -142,7 +142,7 @@ public class CursoServiceTest {
 
 
     @Test
-    @DisplayName("savaAll_deveSalvarTodosOsCursosComSucesso")
+    @DisplayName("Salvar listas de cursos")
     void savaAll_deveSalvarTodosOsCursosComSucesso() {
         when(cursoRepository.save(any(Curso.class))).thenAnswer(invocation -> {
             Curso curso = invocation.getArgument(0);
@@ -166,7 +166,7 @@ public class CursoServiceTest {
     }
 
     @Test
-    @DisplayName("buscarPorCurso_quandoCursoExisteExiste_deveRetornarListaDeCursos")
+    @DisplayName("bBuscar por curso e retorna lista com os cursos")
     void buscarPorCurso_quandoCursoExisteExiste_deveRetornarListaDeCursos() {
         String termoBusca = "Java";
         List<Curso> cursosEncontrados = cursosMock.stream()
@@ -187,7 +187,7 @@ public class CursoServiceTest {
     }
 
     @Test
-    @DisplayName("buscarPorCurso_quandoNenhumCusoEncontrado_deveRetornarListaVazia")
+    @DisplayName("Quando não encontra o curso  lanca lista vazia")
     void buscarPorCurso_quandoNenhumCusoEncontrado_deveRetornarListaVazia() {
         String termoBusca = "Python";
 
@@ -203,7 +203,7 @@ public class CursoServiceTest {
     }
 
     @Test
-    @DisplayName("buscarPorNomeDaArea_quandoCursosExistem_deveRetornarListaDeCursos")
+    @DisplayName("Pesquisa de curso por area de atuacao e retornar lista com o cursos  da area")
     void buscarPorNomeDaArea_quandoCursosExistem_deveRetornarListaDeCursos() {
 
         String termoBusca = "Tecnologia";
@@ -226,7 +226,7 @@ public class CursoServiceTest {
                 .findByAreaDeAtuacaoNomeContainingIgnoreCase(termoBusca);
     }
     @Test
-    @DisplayName("buscarPorNomeDaArea_quandoNenhumCursoEncontrado_deveRetornarListaVazia")
+    @DisplayName("Quando nao encintrado o curso na area retorna lista vazia")
     void buscarPorNomeDaArea_quandoNenhumCursoEncontrado_deveRetornarListaVazia() {
         String termoBusca = "Saúde";
 
