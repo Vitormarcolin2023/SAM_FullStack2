@@ -34,7 +34,7 @@ public class CursoService {
         Curso cursoExistente = findById(id);
         cursoExistente.setNome(cursoUpdate.getNome());
 
-        return cursoRepository.save(cursoUpdate);
+        return cursoRepository.save(cursoExistente);
     }
 
     public void delete(Long id){
