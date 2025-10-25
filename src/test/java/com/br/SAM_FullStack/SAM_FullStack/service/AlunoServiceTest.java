@@ -11,7 +11,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
@@ -27,27 +30,25 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 @DisplayName("Testes Unitários do AlunoService")
 class AlunoServiceTest {
 
-    @Mock
-    private AlunoRepository alunoRepository;
+    @Autowired
+    AlunoRepository alunoRepository;
 
-    @Mock
-    private EmailService emailService;
-
-    @Mock
-    private PasswordEncoder passwordEncoder;
-
-    @Mock
-    private TokenService tokenService;
+    @MockitoBean
+    EmailService emailService;
+    @MockitoBean
+    PasswordEncoder passwordEncoder;
+    @MockitoBean
+    TokenService tokenService;
 
     @InjectMocks
-    private AlunoService alunoService;
+    AlunoService alunoService;
 
-    private Aluno aluno;
-    private Curso mockCurso;
+    Aluno aluno;
+    Curso mockCurso;
 
     @BeforeEach
     void setUp() {
