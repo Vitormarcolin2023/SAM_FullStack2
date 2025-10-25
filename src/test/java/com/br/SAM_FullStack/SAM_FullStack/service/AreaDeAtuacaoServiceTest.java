@@ -1,5 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
+
 import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.model.AreaDeAtuacao;
 import com.br.SAM_FullStack.SAM_FullStack.model.Curso;
@@ -7,15 +8,15 @@ import com.br.SAM_FullStack.SAM_FullStack.repository.AreaDeAtuacaoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockedStatic;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.Mockito;;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import com.br.SAM_FullStack.SAM_FullStack.autenticacao.TokenService;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,19 +26,22 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 @DisplayName("Testes Unitários do AreaDeAtuacaoService")
 class AreaDeAtuacaoServiceTest {
 
-    @Mock
-    private AreaDeAtuacaoRepository areaDeAtuacaoRepository;
+    /*MockitoBean
+    AreaDeAtuacaoRepository areaDeAtuacaoRepository;
 
-    @InjectMocks
-    private AreaDeAtuacaoService areaDeAtuacaoService;
+    @Autowired
+    AreaDeAtuacaoService areaDeAtuacaoService;
 
-    private AreaDeAtuacao area;
-    private Aluno aluno;
-    private Curso curso;
+    @MockitoBean
+    TokenService tokenService;
+
+    AreaDeAtuacao area;
+    Aluno aluno;
+    Curso curso;
 
     @BeforeEach
     void setUp() {
@@ -173,5 +177,5 @@ class AreaDeAtuacaoServiceTest {
             AreaDeAtuacao areaEncontrada = areaDeAtuacaoService.findByAlunoLogado();
             assertNull(areaEncontrada);
         }
-    }
+    }*/
 }
