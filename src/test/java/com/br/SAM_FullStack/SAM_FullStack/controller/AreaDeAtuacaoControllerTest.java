@@ -1,10 +1,7 @@
 package com.br.SAM_FullStack.SAM_FullStack.controller;
 
-import com.br.SAM_FullStack.SAM_FullStack.autenticacao.CustomUserDetailsService; // Import concrete class
-import com.br.SAM_FullStack.SAM_FullStack.autenticacao.TokenService; // Import service
-import com.br.SAM_FullStack.SAM_FullStack.config.SecurityConfig;
-import com.br.SAM_FullStack.SAM_FullStack.config.JwtAuthenticationFilter;
-import com.br.SAM_FullStack.SAM_FullStack.config.GlobalExceptionHandler;
+import com.br.SAM_FullStack.SAM_FullStack.autenticacao.CustomUserDetailsService;
+import com.br.SAM_FullStack.SAM_FullStack.autenticacao.TokenService;
 import com.br.SAM_FullStack.SAM_FullStack.model.AreaDeAtuacao;
 import com.br.SAM_FullStack.SAM_FullStack.service.AreaDeAtuacaoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,15 +9,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.mockito.ArgumentMatchers.any;
@@ -31,27 +30,24 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@WebMvcTest(controllers = {AreaDeAtuacaoController.class, GlobalExceptionHandler.class})
-@Import({SecurityConfig.class, JwtAuthenticationFilter.class})
+@SpringBootTest
+@AutoConfigureMockMvc
 @DisplayName("Testes de Integração Web do AreaDeAtuacaoController")
 class AreaDeAtuacaoControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
-
+    MockMvc mockMvc;
     @Autowired
-    private ObjectMapper objectMapper;
+    ObjectMapper objectMapper;
 
-    @MockBean
-    private AreaDeAtuacaoService areaDeAtuacaoService;
+    @MockitoBean
+    AreaDeAtuacaoService areaDeAtuacaoService;
+    @MockitoBean
+    TokenService tokenService;
+    @MockitoBean
+    CustomUserDetailsService customUserDetailsService;
 
-    @MockBean
-    private TokenService tokenService;
-
-    @MockBean
-    private CustomUserDetailsService customUserDetailsService;
-
-    private AreaDeAtuacao area;
+    AreaDeAtuacao area;
 
     @BeforeEach
     void setUp() {
@@ -131,6 +127,29 @@ class AreaDeAtuacaoControllerTest {
         when(areaDeAtuacaoService.buscarPorInicioDoNome("X")).thenReturn(Collections.emptyList());
         mockMvc.perform(get("/areas/buscar-por-inicio").param("prefixo", "X"))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("Deve salvar lista de áreas e retornar status CREATED")
+    @WithMockUser
+    void saveAll_quandoAutenticadoEValido_deveRetornarCreatedELista() throws Exception {
+        AreaDeAtuacao area2 = new AreaDeAtuacao();
+        area2.setId(2L);
+        area2.setNome("Saúde");
+
+        List<AreaDeAtuacao> areasParaSalvar = Arrays.asList(area, area2);
+        List<AreaDeAtuacao> areasSalvas = Arrays.asList(area, area2); // Mock return
+
+        when(areaDeAtuacaoService.saveAll(any(List.class))).thenReturn(areasSalvas);
+        mockMvc.perform(post("/areas/batch")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(areasParaSalvar)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].nome").value("Tecnologia"))
+                .andExpect(jsonPath("$[1].id").value(2L))
+                .andExpect(jsonPath("$[1].nome").value("Saúde"));
     }
 
     @Test
