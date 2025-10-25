@@ -34,8 +34,10 @@ import static org.mockito.Mockito.*;
 @DisplayName("Testes Unitários do AlunoService")
 class AlunoServiceTest {
 
-    /*@Autowired
+    @MockitoBean
     AlunoRepository alunoRepository;
+    @Autowired
+    AlunoService alunoService;
 
     @MockitoBean
     EmailService emailService;
@@ -43,9 +45,6 @@ class AlunoServiceTest {
     PasswordEncoder passwordEncoder;
     @MockitoBean
     TokenService tokenService;
-
-    @InjectMocks
-    AlunoService alunoService;
 
     Aluno aluno;
     Curso mockCurso;
@@ -63,10 +62,6 @@ class AlunoServiceTest {
         aluno.setRa(12345);
         aluno.setSenha("senha123"); // Senha não encriptada para teste
         aluno.setCurso(mockCurso);
-
-        ReflectionTestUtils.setField(alunoService, "emailService", emailService);
-        ReflectionTestUtils.setField(alunoService, "passwordEncoder", passwordEncoder);
-        ReflectionTestUtils.setField(alunoService, "tokenService", tokenService);
     }
 
     @Test
@@ -378,5 +373,5 @@ class AlunoServiceTest {
         when(alunoRepository.findByCursoId(cursoId)).thenReturn(Collections.emptyList());
         RuntimeException exception = assertThrows(RuntimeException.class, () -> alunoService.findByCurso(cursoId));
         assertEquals("Nenhum aluno encontrado nesse curso", exception.getMessage());
-    }*/
+    }
 }
