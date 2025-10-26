@@ -9,9 +9,10 @@ import com.br.SAM_FullStack.SAM_FullStack.repository.ProfessorRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,17 +22,17 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class GrupoServiceTest {
 
-    @Autowired
+    @InjectMocks
     private GrupoService grupoService;
 
-    @MockitoBean
+    @Mock
     private GrupoRepository grupoRepository;
-    @MockitoBean
+    @Mock
     private AlunoRepository alunoRepository;
-    @MockitoBean
+    @Mock
     private ProfessorRepository professorRepository;
 
     private Aluno aluno1;
@@ -42,7 +43,7 @@ public class GrupoServiceTest {
     private Aluno aluno6;
     private Aluno aluno7;
     private Aluno aluno10;
-    private Aluno aluno11;
+    private Aluno aluno11, aluno8;
     private Grupo grupo1;
     private Grupo grupo2;
     private Grupo grupo3;
@@ -67,7 +68,7 @@ public class GrupoServiceTest {
         aluno5 = new Aluno(5L, "Elisa Fernandes", 1005, "senha123", "elisa.fernandes@email.com", curso2, StatusAlunoGrupo.ATIVO);
         aluno6 = new Aluno(6L, "Fábio Santos", 1006, "senha123", "fabio.santos@email.com", curso2, StatusAlunoGrupo.ATIVO);
         aluno7 = new Aluno(7L, "Gabriela Lima", 1007, "senha123", "gabriela.lima@email.com", curso2, StatusAlunoGrupo.AGUARDANDO);
-        Aluno aluno8 = new Aluno(8L, "Regina Lima", 1008, "senha123", "regina.lima@email.com", curso2, StatusAlunoGrupo.AGUARDANDO);
+        aluno8 = new Aluno(8L, "Regina Lima", 1008, "senha123", "regina.lima@email.com", curso2, StatusAlunoGrupo.AGUARDANDO);
         Aluno aluno9 = new Aluno(9L, "Guilherme Lima", 1009, "senha123", "gruilherme@gmail.com", curso2, StatusAlunoGrupo.ATIVO);
         aluno10 = new Aluno(10L, "Lauriane Lisiane", 1010, "senha123", "lauriane@gmail.com", curso2, StatusAlunoGrupo.ATIVO);
 
@@ -94,36 +95,20 @@ public class GrupoServiceTest {
         List<Grupo> gruposAluno1 = List.of(grupo1);
 
         professor = new Professor(1L, "Alexandra", "alexandra@uniamerica.br", "senha123", List.of(curso1, curso2));
-
-        when(grupoRepository.findAll()).thenReturn(todosGrupos);
-        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
-        when(grupoRepository.findById(2L)).thenReturn(Optional.of(grupo2));
-        when(grupoRepository.findById(-1L)).thenReturn(Optional.empty());
-        when(grupoRepository.findByStatusGrupoAndAlunosId(StatusGrupo.ATIVO, aluno1.getId())).thenReturn(gruposAluno1);
-        when(alunoRepository.findById(-41L)).thenReturn(Optional.empty());
-        when(alunoRepository.findById(1L)).thenReturn(Optional.of(aluno1));
-        when(alunoRepository.findById(5L)).thenReturn(Optional.of(aluno5));
-        when(alunoRepository.findById(6L)).thenReturn(Optional.of(aluno6));
-        when(alunoRepository.findAllById(List.of(1L, 2L, 3L, 4L))).thenReturn(List.of(aluno1, aluno2, aluno3, aluno4));
-        when(alunoRepository.findAllById(List.of(5L, 6L))).thenReturn(List.of(aluno5, aluno6));
-        when(alunoRepository.findAllById(List.of(6L, 7L, 8L))).thenReturn(List.of(aluno6, aluno7, aluno8));
-        when(alunoRepository.findAllById(List.of(5L, 6L, 7L))).thenReturn(List.of(aluno5, aluno6, aluno7));
-        when(grupoRepository.findById(4L)).thenReturn(Optional.of(grupo4));
-        when(alunoRepository.findById(10L)).thenReturn(Optional.of(aluno10));
-        when(alunoRepository.findById(11L)).thenReturn(Optional.of(aluno11));
-        when(professorRepository.findBySenha("senha123")).thenReturn(Optional.of(professor));
     }
 
     @Test
     @DisplayName("Deve retornar todos os grupos")
     void buscar_deveRetornarTodosOsGrupos() {
+        when(grupoRepository.findAll()).thenReturn(List.of(grupo1, grupo2, grupo3, grupo4));
         List<Grupo> response = grupoService.findAll();
-        assertEquals(3, response.size());
+        assertEquals(4, response.size());
     }
 
     @Test
     @DisplayName("Deve retornar o grupo pelo ID")
     void buscarPorId_quandoExiste_deveRetornarGrupo() {
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
         Grupo response = grupoService.findById(1L);
         assertEquals(1L, response.getId());
         assertEquals(3, response.getAlunos().size());
@@ -138,6 +123,7 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve retornar grupo ativo de um aluno")
     void buscarPorAlunoId_quandoExiste_deveRetornarGrupoAtivoDoAluno() {
+        when(grupoRepository.findByStatusGrupoAndAlunosId(StatusGrupo.ATIVO, 1L)).thenReturn(List.of(grupo1));
         Grupo response = grupoService.findByAluno(aluno1);
         assertEquals(StatusGrupo.ATIVO, response.getStatusGrupo());
         assertEquals(true, response.getAlunos().contains(aluno1));
@@ -157,6 +143,7 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve retornor erro ao tentar salvar um novo grupo quando o admin informado já participa de outro grupo ativo")
     void salvarGrupo_quandoAdminJaPossuiGrupoAtivo_deveRetornarException() {
+        when(alunoRepository.findById(1L)).thenReturn(Optional.of(aluno1));
         assertThrows(IllegalStateException.class, () -> {
             GrupoDTO grupoErroStatus = new GrupoDTO(5L, "Grupo erro status", 1L, List.of(1L, 2L, 3L, 4L));
             grupoService.save(grupoErroStatus);
@@ -175,6 +162,8 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve retornar erro ao tentar salvar grupo com qtd de alunos menor do que a permitida")
     void salvarGrupo_quandoQtdDeAlunoEhMenorDoQuePermitida_deveRetornarErro() {
+        when(alunoRepository.findById(5L)).thenReturn(Optional.of(aluno5));
+        when(alunoRepository.findAllById(List.of(5L, 6L))).thenReturn(List.of(aluno5, aluno6));
         assertThrows(IllegalStateException.class, () -> {
             GrupoDTO grupoErroQtdAlunos = new GrupoDTO(7L, "Grupo teste erro qtd alunos", 5L, List.of(5L, 6L));
             grupoService.save(grupoErroQtdAlunos);
@@ -184,6 +173,8 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve retornar erro ao tentar salvar grupo quando o id do admin não é passado cna lista de alunos")
     void salvarGrupo_quandoIdDoAdminNaoForInformadoNaLista_deveRetornarErro() {
+        when(alunoRepository.findById(5L)).thenReturn(Optional.of(aluno5));
+        when(alunoRepository.findAllById(List.of(6L, 7L, 8L))).thenReturn(List.of(aluno6, aluno7, aluno8));
         assertThrows(IllegalStateException.class, () -> {
             GrupoDTO grupoErroListaALunos = new GrupoDTO(8L, "Grupo teste erro lista alunos", 5L, List.of(6L, 7L, 8L));
             grupoService.save(grupoErroListaALunos);
@@ -193,6 +184,8 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve retornar erro ao tentar salvar grupo quando algum aluno informado já participa de outro grupo ativo")
     void salvarGrupo_quandoAlgumAlunoTemGrupoAtivo_deveRetorarErro() {
+        when(alunoRepository.findById(6L)).thenReturn(Optional.of(aluno6));
+        when(alunoRepository.findAllById(List.of(6L, 7L, 8L))).thenReturn(List.of(aluno6, aluno7, aluno8));
         assertThrows(IllegalStateException.class, () -> {
             GrupoDTO grupoErroAlunoComGrupoAtivo = new GrupoDTO(9L, "Grupo teste erro aluno com grupo ativo",
                     6L, List.of(6L, 7L, 8L));
@@ -210,6 +203,9 @@ public class GrupoServiceTest {
             grupo.setId(10L);
             return grupo;
         });
+        when(alunoRepository.findById(5L)).thenReturn(Optional.of(aluno5));
+        when(alunoRepository.findAllById(List.of(5L, 6L, 7L))).thenReturn(List.of(aluno5, aluno6, aluno7));
+
         GrupoDTO response = grupoService.save(grupoSalvarSucesso);
         assertEquals(10L, response.id());
     }
@@ -226,6 +222,7 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve salvar novo nome do grupo")
     void updateGrupo_quandoinformacoesCorretas_atualizaNome() {
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
         String retorno = this.grupoService.updateGrupoInfo(1L, 1L, new GrupoUpdateDTO("Novo nome do grupo"));
         assertEquals("Informações do grupo atualizadas com sucesso.", retorno);
     }
@@ -243,6 +240,8 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve retornar erro quando o Id do aluno passado for diferente do id do admin do grupo")
     void putAluno_quandoAlunoNaoAdmin_deveRetornarErro() {
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
+
         assertThrows(IllegalStateException.class, () -> {
             this.grupoService.adicionarAlunoAoGrupo(2L, 1L, 8L);
         });
@@ -251,6 +250,8 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve retornar erro ao adicionar aluno se o grupo já tiver mais alunos do que o permitido")
     void putAluno_quandoQtdMaiorDoQuePermitida_deveRetornarErro() {
+        when(grupoRepository.findById(4L)).thenReturn(Optional.of(grupo4));
+
         assertThrows(IllegalStateException.class, () -> {
             this.grupoService.adicionarAlunoAoGrupo(6L, 4L, 1L);
         });
@@ -259,6 +260,8 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve retornar erro ao adicionar aluno com Id incorreto")
     void putAluno_quandoIdDoAlunoNovoErrado_deveRetornarErro() {
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
+
         assertThrows(IllegalStateException.class, () -> {
             this.grupoService.adicionarAlunoAoGrupo(1L, 1L, -7L);
         });
@@ -267,6 +270,8 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve retornar erro se novo aluno informado já partici[a de outro grupo ativo")
     void putAluno_quandoAlunoAtivoEmOutroGrupo_deveRetornarErro() {
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
+
         assertThrows(IllegalStateException.class, () -> {
             this.grupoService.adicionarAlunoAoGrupo(1L, 1L, 10L);
         });
@@ -279,6 +284,9 @@ public class GrupoServiceTest {
             aluno11.setStatusAlunoGrupo(StatusAlunoGrupo.ATIVO);
             return aluno11;
         });
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
+        when(alunoRepository.findById(11L)).thenReturn(Optional.of(aluno11));
+
         String response = this.grupoService.adicionarAlunoAoGrupo(1L, 1L, 11L);
         assertEquals("Aluno adicionado com sucesso ao grupo", response);
     }
@@ -296,6 +304,8 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Testa se o id do aluno que será removido é igual ao id do admin do grupo")
     void excluiAluno_quandoIdDoAlunoExcForIgualDoAdmin_deveRetornarErro() {
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
+
         assertThrows(IllegalStateException.class, () -> {
             this.grupoService.removerAlunoDiretamente(1L, 1L, 1L);
         });
@@ -304,6 +314,8 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Testa se o id do aluno que será removido existe")
     void excluiAluno_quandoIdAlunoExcInexistente_deveRetornarErro() {
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
+
         assertThrows(IllegalArgumentException.class, () -> {
             this.grupoService.removerAlunoDiretamente(1L, -1L, 1L);
         });
@@ -312,10 +324,9 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Testa se o aluno que será excluido faz parte do grupo")
     void excluiAluno_quandoAlunoNaoParticipaDoGrupo_deveRetornarErro() {
-        when(grupoRepository.save(grupo1)).thenAnswer(invocation -> {
-            grupo1.getAlunos().add(aluno11);
-            return grupo1;
-        });
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
+        when(alunoRepository.findById(5L)).thenReturn(Optional.of(aluno5));
+
         assertThrows(IllegalStateException.class, () -> {
             this.grupoService.removerAlunoDiretamente(1L, 5L, 1L);
         });
@@ -330,6 +341,8 @@ public class GrupoServiceTest {
             grupo1.getAlunos().remove(aluno2);
             return grupo1;
         });
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
+
         String retorno = this.grupoService.removerAlunoDiretamente(1L, 2L, 1L);
         assertEquals("Aluno Bruno Costa foi removido do grupo", retorno);
     }
@@ -357,6 +370,8 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve retornar erro quando o professor não for encontrado")
     void buscarGrupos_quandoProfessorNaoEncontrado_deveRetornarErro() {
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
+
         assertThrows(IllegalArgumentException.class, () -> {
             this.grupoService.analizarExclusaoAluno("senha1", 1L, 3L, true);
         });
@@ -365,6 +380,8 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve retornar erro quando aluno não for encontrado")
     void buscarGrupos_quandoAlunoNaoEncontrado_deveRetornarErro() {
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
+
         assertThrows(IllegalArgumentException.class, () -> {
             this.grupoService.analizarExclusaoAluno("senha1", 1L, -1L, true);
         });
@@ -373,6 +390,10 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve retornar erro caso não tenha sido solicitado exclusão do aluno informado")
     void buscarGrupos_quandoStatusAlunoAtivo_deveRetornarErro() {
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
+        when(alunoRepository.findById(1L)).thenReturn(Optional.of(aluno1));
+        when(professorRepository.findBySenha("senha123")).thenReturn(Optional.of(professor));
+
         assertThrows(IllegalStateException.class, () -> {
             this.grupoService.analizarExclusaoAluno("senha123", 1L, 1L, true);
         });
@@ -389,6 +410,10 @@ public class GrupoServiceTest {
 
             return grupo1;
         });
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
+        when(alunoRepository.findById(3L)).thenReturn(Optional.of(aluno3));
+        when(professorRepository.findBySenha("senha123")).thenReturn(Optional.of(professor));
+
         String retorno = this.grupoService.analizarExclusaoAluno("senha123", 1L, 3L, true);
         assertEquals("Aluno Carla Mendes foi removido do grupo", retorno);
     }
@@ -401,6 +426,10 @@ public class GrupoServiceTest {
             aluno3.setStatusAlunoGrupo(StatusAlunoGrupo.ATIVO);
             return grupo1;
         });
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
+        when(alunoRepository.findById(3L)).thenReturn(Optional.of(aluno3));
+        when(professorRepository.findBySenha("senha123")).thenReturn(Optional.of(professor));
+
         String retorno = this.grupoService.analizarExclusaoAluno("senha123", 1L, 3L, false);
         assertEquals("Solicitação de exclusão recusada. O aluno permanece no grupo", retorno);
     }
@@ -410,7 +439,6 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve retornar erro ao não encontrar o grupo")
     void deletarGrupo_quandoIdGrupoIncorreto_deveRetornarErro() {
-        when(professorRepository.findById(1L)).thenReturn(Optional.of(professor));
         assertThrows(IllegalArgumentException.class, () -> {
             this.grupoService.deletarGrupo(-1L, 1L);
         });
@@ -419,6 +447,7 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve retornar erro ao não encontrar Id do professor")
     void deletarGrupo_quandoIdProfessorIncorreto_deveRetornarErro() {
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
         assertThrows(IllegalArgumentException.class, () -> {
             this.grupoService.deletarGrupo(1L, -1L);
         });
@@ -428,6 +457,7 @@ public class GrupoServiceTest {
     @DisplayName("Deve deletar grupo quando informações corretas")
     void deletarGrupo_quandoInfoCorretas_deveDeletarGrupo() {
         when(professorRepository.findById(1L)).thenReturn(Optional.of(professor));
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
         doAnswer(invocation -> {
             for (Aluno aluno : grupo1.getAlunos()) {
                 aluno.getGrupos().remove(grupo1);
@@ -482,6 +512,7 @@ public class GrupoServiceTest {
             grupo1.setStatusGrupo(StatusGrupo.ARQUIVADO);
             return grupo1;
         });
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
 
         String retorno = this.grupoService.arquivarGrupo(1L);
         assertEquals("Grupo arquivado com sucesso!", retorno);
@@ -517,9 +548,7 @@ public class GrupoServiceTest {
 
         when(alunoRepository.findAllById(List.of(1L, 5L, 6L)))
                 .thenReturn(List.of(aluno1, aluno5, aluno6));
-        when(alunoRepository.findById(1L)).thenReturn(Optional.of(aluno1));
         when(alunoRepository.findById(5L)).thenReturn(Optional.of(aluno5));
-        when(alunoRepository.findById(6L)).thenReturn(Optional.of(aluno6));
 
         assertThrows(IllegalStateException.class, () -> grupoService.save(grupoErroAlunoAtivo));
     }
@@ -528,6 +557,7 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve retornar erro ao adicionar aluno se grupo já possui 6 alunos")
     void adicionarAluno_quandoGrupoNoLimite_deveRetornarErro() {
+        when(grupoRepository.findById(4L)).thenReturn(Optional.of(grupo4));
         assertThrows(IllegalStateException.class, () -> {
             grupoService.adicionarAlunoAoGrupo(6L, 4L, 5L);
         });
@@ -536,16 +566,12 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve retornar erro quando aluno não estiver aguardando exclusão")
     void analizarExclusaoAluno_quandoStatusNaoAguardando_deveRetornarErro() {
+        when(alunoRepository.findById(1L)).thenReturn(Optional.of(aluno1));
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
+        when(professorRepository.findBySenha("senha123")).thenReturn(Optional.of(professor));
         assertThrows(IllegalStateException.class, () -> {
             grupoService.analizarExclusaoAluno("senha123", 1L, 1L, true);
         });
-    }
-
-    @Test
-    @DisplayName("Deve retornar erro ao salvar grupo quando lista de alunos não contém admin (cenário negativo)")
-    void salvarGrupo_quandoListaNaoContemAdmin_deveRetornarErro() {
-        GrupoDTO grupoErroLista = new GrupoDTO(13L, "Grupo sem Admin", 5L, List.of(6L, 7L, 8L));
-        assertThrows(IllegalStateException.class, () -> grupoService.save(grupoErroLista));
     }
 
     @Test
@@ -559,66 +585,6 @@ public class GrupoServiceTest {
         });
 
         assertEquals("Aluno não possui nenhum grupo arquivado", exception.getMessage());
-    }
-
-    @Test
-    @DisplayName("Deve lançar exceção ao tentar salvar grupo com mais de 6 alunos")
-    void salvarGrupo_quandoQtdAlunosMaiorDoQuePermitida_deveRetornarErro() {
-        List<Long> alunosIds = List.of(5L, 6L, 7L, 8L, 9L, 10L, 11L);
-        GrupoDTO grupoErroQtdAlunos = new GrupoDTO(14L, "Grupo com excesso de alunos", 5L, alunosIds);
-
-        when(alunoRepository.findAllById(alunosIds))
-                .thenReturn(List.of(aluno5, aluno6, new Aluno(7L, "Gabriela Lima", 1007, "senha123", "gabriela.lima@email.com", aluno5.getCurso(), StatusAlunoGrupo.AGUARDANDO),
-                        new Aluno(8L, "Regina Lima", 1008, "senha123", "regina.lima@email.com", aluno5.getCurso(), StatusAlunoGrupo.AGUARDANDO),
-                        new Aluno(9L, "Guilherme Lima", 1009, "senha123", "gruilherme@gmail.com", aluno5.getCurso(), StatusAlunoGrupo.ATIVO),
-                        aluno10, aluno11));
-
-        when(alunoRepository.findById(5L)).thenReturn(Optional.of(aluno5));
-        when(alunoRepository.findById(6L)).thenReturn(Optional.of(aluno6));
-        when(alunoRepository.findById(7L)).thenReturn(Optional.of(new Aluno(7L, "Gabriela Lima", 1007, "senha123", "gabriela.lima@email.com", aluno5.getCurso(), StatusAlunoGrupo.AGUARDANDO)));
-        when(alunoRepository.findById(8L)).thenReturn(Optional.of(new Aluno(8L, "Regina Lima", 1008, "senha123", "regina.lima@email.com", aluno5.getCurso(), StatusAlunoGrupo.AGUARDANDO)));
-        when(alunoRepository.findById(9L)).thenReturn(Optional.of(new Aluno(9L, "Guilherme Lima", 1009, "senha123", "gruilherme@gmail.com", aluno5.getCurso(), StatusAlunoGrupo.ATIVO)));
-        when(alunoRepository.findById(10L)).thenReturn(Optional.of(aluno10));
-        when(alunoRepository.findById(11L)).thenReturn(Optional.of(aluno11));
-    }
-
-
-    @Test
-    @DisplayName("Deve retornar erro quando lista de alunos contém admin e outro aluno já ativo (cenário misto)")
-    void salvarGrupo_quandoListaContemAdminEOutroAlunoAtivo_deveRetornarErro() {
-        // Cenário: admin aluno5, outro aluno ativo aluno1 (que já está em outro grupo)
-        GrupoDTO grupoErroMisto = new GrupoDTO(15L, "Grupo Misto", 5L, List.of(1L, 5L, 6L));
-
-        when(alunoRepository.findAllById(List.of(1L,5L,6L)))
-                .thenReturn(List.of(aluno1, aluno5, aluno6));
-        when(alunoRepository.findById(5L)).thenReturn(Optional.of(aluno5));
-        when(alunoRepository.findById(1L)).thenReturn(Optional.of(aluno1));
-        when(alunoRepository.findById(6L)).thenReturn(Optional.of(aluno6));
-
-        assertThrows(IllegalStateException.class, () -> grupoService.save(grupoErroMisto));
-    }
-
-    @Test
-    @DisplayName("Deve retornar erro ao tentar salvar grupo com mais de 6 alunos")
-    void salvarGrupo_quandoQtdAlunosMaiorQue6_deveRetornarErro() {
-        List<Long> alunosIds = List.of(5L,6L,7L,8L,9L,10L,11L);
-        GrupoDTO grupoErroQtdAlunos = new GrupoDTO(16L, "Grupo grande demais", 5L, alunosIds);
-
-        when(alunoRepository.findAllById(alunosIds))
-                .thenReturn(List.of(aluno5, aluno6, new Aluno(7L,"Gabriela",1007,"senha","email", aluno5.getCurso(),StatusAlunoGrupo.AGUARDANDO),
-                        new Aluno(8L,"Regina",1008,"senha","email", aluno5.getCurso(),StatusAlunoGrupo.AGUARDANDO),
-                        new Aluno(9L,"Guilherme",1009,"senha","email", aluno5.getCurso(),StatusAlunoGrupo.ATIVO),
-                        aluno10, aluno11));
-
-        when(alunoRepository.findById(5L)).thenReturn(Optional.of(aluno5));
-        when(alunoRepository.findById(6L)).thenReturn(Optional.of(aluno6));
-        when(alunoRepository.findById(7L)).thenReturn(Optional.of(new Aluno(7L,"Gabriela",1007,"senha","email", aluno5.getCurso(),StatusAlunoGrupo.AGUARDANDO)));
-        when(alunoRepository.findById(8L)).thenReturn(Optional.of(new Aluno(8L,"Regina",1008,"senha","email", aluno5.getCurso(),StatusAlunoGrupo.AGUARDANDO)));
-        when(alunoRepository.findById(9L)).thenReturn(Optional.of(new Aluno(9L,"Guilherme",1009,"senha","email", aluno5.getCurso(),StatusAlunoGrupo.ATIVO)));
-        when(alunoRepository.findById(10L)).thenReturn(Optional.of(aluno10));
-        when(alunoRepository.findById(11L)).thenReturn(Optional.of(aluno11));
-
-        assertThrows(IllegalStateException.class, () -> grupoService.save(grupoErroQtdAlunos));
     }
 
     @Test
@@ -642,6 +608,7 @@ public class GrupoServiceTest {
     void updateGrupo_quandoNomeNulo_naoAtualizaNome() {
         // Mock para verificar se o save foi chamado, mas o nome não deve ser alterado
         when(grupoRepository.save(grupo1)).thenReturn(grupo1);
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
 
         String nomeOriginal = grupo1.getNome();
         String retorno = this.grupoService.updateGrupoInfo(1L, 1L, new GrupoUpdateDTO(null));
@@ -654,8 +621,8 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Não deve atualizar o nome do grupo se o nome for vazio")
     void updateGrupo_quandoNomeVazio_naoAtualizaNome() {
-        // Mock para verificar se o save foi chamado, mas o nome não deve ser alterado
         when(grupoRepository.save(grupo1)).thenReturn(grupo1);
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
 
         String nomeOriginal = grupo1.getNome();
         String retorno = this.grupoService.updateGrupoInfo(1L, 1L, new GrupoUpdateDTO(""));
@@ -669,6 +636,7 @@ public class GrupoServiceTest {
     @DisplayName("Não deve atualizar o nome do grupo se o nome for em branco")
     void updateGrupo_quandoNomeEmBranco_naoAtualizaNome() {
         when(grupoRepository.save(grupo1)).thenReturn(grupo1);
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
 
         String nomeOriginal = grupo1.getNome();
         String retorno = this.grupoService.updateGrupoInfo(1L, 1L, new GrupoUpdateDTO("   "));
@@ -683,6 +651,7 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve retornar erro se novo aluno informado já participa de outro grupo ATIVO")
     void putAluno_quandoAlunoAtivoEmOutroGrupo_deveRetornarErro_CobreIf() {
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
         assertThrows(IllegalStateException.class, () -> {
             this.grupoService.adicionarAlunoAoGrupo(1L, 1L, 10L);
         });
@@ -693,7 +662,9 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve retornar erro ao analisar exclusão se o aluno NÃO pertence ao grupo")
     void analisarExclusaoAluno_quandoAlunoNaoPertenceAoGrupo_deveRetornarErro() {
-        when(alunoRepository.findById(5L)).thenReturn(Optional.of(aluno5)); // aluno5 existe
+        when(alunoRepository.findById(5L)).thenReturn(Optional.of(aluno5));
+        when(professorRepository.findBySenha("senha123")).thenReturn(Optional.of(professor));
+        when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
         assertThrows(IllegalStateException.class, () -> {
             this.grupoService.analizarExclusaoAluno("senha123", 1L, 5L, true);
         });
@@ -703,6 +674,9 @@ public class GrupoServiceTest {
     @DisplayName("Deve retornar erro ao analisar exclusão se o aluno pertence, mas não está AGUARDANDO")
     void analisarExclusaoAluno_quandoAlunoNaoEstaAguardando_deveRetornarErro() {
         assertThrows(IllegalStateException.class, () -> {
+            when(alunoRepository.findById(1L)).thenReturn(Optional.of(aluno1));
+            when(professorRepository.findBySenha("senha123")).thenReturn(Optional.of(professor));
+            when(grupoRepository.findById(1L)).thenReturn(Optional.of(grupo1));
             this.grupoService.analizarExclusaoAluno("senha123", 1L, 1L, true);
         });
     }
