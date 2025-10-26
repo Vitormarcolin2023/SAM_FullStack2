@@ -57,32 +57,27 @@ public class ProjetoService {
 
          // SALVAR
          public Projeto save(Projeto projeto) {
-             // Se o projeto tiver grupo associado
-             if (projeto.getGrupo() != null && projeto.getGrupo().getId() != null) {
-
+             if (projeto.getGrupo() != null && projeto.getGrupo().getId() != 0) {
+                 // Use a nova query para buscar o grupo com os alunos já carregados
                  Grupo grupoGerenciado = grupoRepository.findByIdWithAlunos(projeto.getGrupo().getId())
-                         .orElse(projeto.getGrupo());
+                         .orElseThrow(() -> new RuntimeException("Grupo não encontrado"));
 
                  projeto.setGrupo(grupoGerenciado);
 
+                 if (grupoGerenciado.getAlunos() != null && !grupoGerenciado.getAlunos().isEmpty()) {
 
-                 if (grupoGerenciado.getAlunos() != null) {
+                     AreaDeAtuacao areaDoProjeto = projeto.getAreaDeAtuacao();
                      for (Aluno aluno : grupoGerenciado.getAlunos()) {
-                         if (aluno.getCurso() != null
-                                 && aluno.getCurso().getAreaDeAtuacao() != null
-                                 && projeto.getAreaDeAtuacao() != null
-                                 && !aluno.getCurso().getAreaDeAtuacao().getId()
-                                 .equals(projeto.getAreaDeAtuacao().getId())) {
-                             throw new IllegalArgumentException(
-                                     "A área de atuação do projeto deve ser a mesma de todos os alunos do grupo."
-                             );
+                         if (!aluno.getCurso().getAreaDeAtuacao().getId().equals(areaDoProjeto.getId())) {
+                             throw new IllegalArgumentException("A área de atuação do projeto deve ser a mesma de todos os alunos do grupo.");
                          }
                      }
+                 } else {
+                     throw new IllegalArgumentException("O grupo associado ao projeto não possui alunos.");
                  }
              }
 
              atualizarStatusProjeto(projeto);
-
              return projetoRepository.save(projeto);
          }
 
