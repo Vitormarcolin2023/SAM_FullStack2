@@ -27,21 +27,19 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Testes Unitários do EmailService")
 class EmailServiceTest {
 
     @Mock
-    private JavaMailSender javaMailSender;
-
+    JavaMailSender javaMailSender;
     @Mock
-    private SpringTemplateEngine templateEngine;
+    SpringTemplateEngine templateEngine;
 
     @InjectMocks
-    private EmailService emailService;
+    EmailService emailService;
 
-    private final String remetente = "sam@email.com";
-    private final String destinatario = "aluno@email.com";
-    private final String assunto = "Teste";
+    final String remetente = "sam@email.com";
+    final String destinatario = "mentor@email.com";
+    final String assunto = "Teste";
 
     @BeforeEach
     void setUp() {
@@ -105,6 +103,7 @@ class EmailServiceTest {
     @Test
     @DisplayName("Deve lançar RuntimeException original se falhar ao processar template")
     void enviarEmailComTemplate_quandoFalhaNoTemplate_deveLancarRuntimeExceptionOriginal() {
+        // (Teste OK)
         String templatePath = "path/invalido";
         Map<String, Object> variaveis = Collections.emptyMap();
         String errorMsg = "Erro de Template Simulado";
@@ -119,6 +118,34 @@ class EmailServiceTest {
         assertEquals(errorMsg, exception.getMessage());
 
         verify(javaMailSender, never()).createMimeMessage();
+        verify(javaMailSender, never()).send(any(MimeMessage.class));
+    }
+
+    @Test
+    @DisplayName("Deve lançar RuntimeException ao falhar ao configurar o helper")
+    void enviarEmailComTemplate_quandoFalhaNaConfiguracaoDoHelper_deveLancarRuntimeException() throws MessagingException {
+        String templatePath = "email/template";
+        Map<String, Object> variaveis = Collections.singletonMap("nome", "Mentor");
+        String corpoHtml = "<html><body>Olá Mentor</body></html>";
+        String errorMsg = "Erro simulado no helper.setFrom()";
+
+        MimeMessage mimeMessage = mock(MimeMessage.class);
+
+        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
+        when(templateEngine.process(eq(templatePath), any(Context.class))).thenReturn(corpoHtml);
+
+        doThrow(new MessagingException(errorMsg))
+                .when(mimeMessage)
+                .setFrom(any(jakarta.mail.Address.class));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            emailService.enviarEmailComTemplate(destinatario, assunto, templatePath, variaveis);
+        });
+
+        assertEquals("Erro ao enviar e-mail com template: " + errorMsg, exception.getMessage());
+        assertNotNull(exception.getCause());
+        assertTrue(exception.getCause() instanceof MessagingException);
+
         verify(javaMailSender, never()).send(any(MimeMessage.class));
     }
 }
