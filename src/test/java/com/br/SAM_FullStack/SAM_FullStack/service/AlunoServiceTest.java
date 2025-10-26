@@ -11,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
-// IMPORTANTE: Adicione este import!
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
@@ -27,41 +26,33 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class) // Correto: Usa o runner do Mockito
+@ExtendWith(MockitoExtension.class)
 @DisplayName("Testes Unitários do AlunoService")
 class AlunoServiceTest {
 
-    @Mock // Correto
+    @Mock
     AlunoRepository alunoRepository;
 
-    // REMOVIDO @InjectMocks - Vamos injetar manualmente
     AlunoService alunoService;
 
-    @Mock // Correto
+    @Mock
     EmailService emailService;
-
-    @Mock // Correto
+    @Mock
     PasswordEncoder passwordEncoder;
-
-    @Mock // Correto
+    @Mock
     TokenService tokenService;
 
     Aluno aluno;
     Curso mockCurso;
 
-    // ***** AQUI ESTÁ A CORREÇÃO *****
     @BeforeEach
     void setUp() {
-        // 1. Cria o service usando o construtor que ele exige (do @RequiredArgsConstructor)
         alunoService = new AlunoService(alunoRepository);
 
-        // 2. Usa ReflectionTestUtils para "forçar" a injeção dos campos @Autowired
-        // Isso resolve 100% dos seus NullPointerExceptions
         ReflectionTestUtils.setField(alunoService, "emailService", emailService);
         ReflectionTestUtils.setField(alunoService, "passwordEncoder", passwordEncoder);
         ReflectionTestUtils.setField(alunoService, "tokenService", tokenService);
 
-        // 3. O resto do seu setup continua igual
         mockCurso = new Curso();
         mockCurso.setId(1L);
         mockCurso.setNome("Eng Teste");
@@ -74,7 +65,6 @@ class AlunoServiceTest {
         aluno.setSenha("senha123"); // Senha não encriptada para teste
         aluno.setCurso(mockCurso);
     }
-    // ***** FIM DA CORREÇÃO *****
 
 
     @Test
@@ -126,26 +116,18 @@ class AlunoServiceTest {
     @Test
     @DisplayName("Deve salvar aluno com RA não existente e enviar email")
     void save_quandoRaNaoExistente_deveSalvarEEnviarEmail() {
-        // Mock do repositório
         when(alunoRepository.findByRa(aluno.getRa())).thenReturn(Optional.empty());
-
-        // Mock do PasswordEncoder (ESSENCIAL)
         when(passwordEncoder.encode(aluno.getSenha())).thenReturn("senhaEncriptada");
-
         when(alunoRepository.save(any(Aluno.class))).thenAnswer(invocation -> {
             Aluno a = invocation.getArgument(0);
             a.setId(1L);
             return a;
         });
-
-        // Mock do EmailService (ESSENCIAL)
         when(emailService.enviarEmailTexto(anyString(), anyString(), anyString()))
                 .thenReturn("Email Enviado - Mock");
 
-        // Execução
         Aluno alunoSalvo = alunoService.save(aluno);
 
-        // Verificação
         assertNotNull(alunoSalvo);
         assertEquals("senhaEncriptada", alunoSalvo.getSenha());
         verify(alunoRepository).findByRa(aluno.getRa());
@@ -164,18 +146,12 @@ class AlunoServiceTest {
     void save_quandoRaExistente_deveLancarRuntimeException() {
         Aluno alunoExistente = new Aluno();
         when(alunoRepository.findByRa(aluno.getRa())).thenReturn(Optional.of(alunoExistente));
-
-        // Mock do EmailService (ESSENCIAL)
         when(emailService.enviarEmailTexto(anyString(), anyString(), anyString()))
                 .thenReturn("Email Enviado - Mock Falha");
-
-        // Execução e Verificação da Exceção
         RuntimeException exception = assertThrows(RuntimeException.class, () -> alunoService.save(aluno));
 
-        // Verificação dos resultados
         assertEquals("Aluno com RA 12345 já está cadastrado!", exception.getMessage());
 
-        // Verifica se o email de falha foi enviado
         verify(emailService).enviarEmailTexto(
                 eq(aluno.getEmail()),
                 eq("Falha no Cadastro: RA já existente"),
@@ -190,9 +166,9 @@ class AlunoServiceTest {
     void update_quandoSucessoSemAlterarEmailESenha_deveRetornarAlunoAtualizado() {
         Aluno alunoUpdate = new Aluno();
         alunoUpdate.setNome("Novo Nome");
-        alunoUpdate.setEmail("teste@email.com"); // Mesmo email
+        alunoUpdate.setEmail("teste@email.com");
         alunoUpdate.setRa(54321);
-        alunoUpdate.setSenha(null); // Senha nula ou vazia
+        alunoUpdate.setSenha(null);
 
         String originalEncodedPassword = "encodedOriginalPassword";
         aluno.setSenha(originalEncodedPassword);
