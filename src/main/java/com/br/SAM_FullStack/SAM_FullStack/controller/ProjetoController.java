@@ -37,8 +37,10 @@ public class ProjetoController {
     }
 
     @GetMapping("/buscar-por-atuacao")
-    public List<Projeto> buscarPorAtuacao(@RequestParam AreaDeAtuacao areaDeAtuacao) {
-        return projetoService.buscarPorAreaAtuacao(areaDeAtuacao);
+    public List<Projeto> buscarPorAtuacao(@RequestParam String areaNome) {
+        AreaDeAtuacao areaA = new AreaDeAtuacao();
+        areaA.setNome(areaNome);
+        return projetoService.buscarPorAreaAtuacao(areaA);
     }
 
     @PostMapping("/save")

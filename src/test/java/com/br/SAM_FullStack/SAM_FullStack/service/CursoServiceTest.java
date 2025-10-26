@@ -9,13 +9,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-
 
 import java.util.*;
-import java.util.concurrent.Callable;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -166,7 +161,7 @@ public class CursoServiceTest {
     }
 
     @Test
-    @DisplayName("bBuscar por curso e retorna lista com os cursos")
+    @DisplayName("Buscar por curso e retorna lista com os cursos")
     void buscarPorCurso_quandoCursoExisteExiste_deveRetornarListaDeCursos() {
         String termoBusca = "Java";
         List<Curso> cursosEncontrados = cursosMock.stream()
@@ -240,5 +235,34 @@ public class CursoServiceTest {
 
         verify(cursoRepository, times(1)).findByAreaDeAtuacaoNomeContainingIgnoreCase(termoBusca);
     }
+    @Test
+    @DisplayName("Deve retornar cursos vinculados ao coordenador")
+    void findByCoordenadorId_deveRetornarCursosDoCoordenador() {
+        Long coordenadorId = 1L;
 
+        List<Curso> cursosDoCoordenador = cursosMock.subList(0, 2);
+        when(cursoRepository.findByCoordenadorId(coordenadorId)).thenReturn(cursosDoCoordenador);
+
+        List<Curso> resultado = cursoService.findByCoordenadorId(coordenadorId);
+
+        assertEquals(2, resultado.size());
+        assertEquals("Banco de dados", resultado.get(0).getNome());
+        assertEquals("Java", resultado.get(1).getNome());
+
+        verify(cursoRepository, times(1)).findByCoordenadorId(coordenadorId);
+    }
+    @Test
+    @DisplayName("Quando coordenador não possui cursos retorna lista vazia")
+    void findByCoordenadorId_quandoNaoExistemCursos_deveRetornarListaVazia() {
+        Long coordenadorId = 7L;
+
+        when(cursoRepository.findByCoordenadorId(coordenadorId)).thenReturn(Collections.emptyList());
+
+        List<Curso> resultado = cursoService.findByCoordenadorId(coordenadorId);
+
+        assertNotNull(resultado);
+        assertTrue(resultado.isEmpty());
+
+        verify(cursoRepository, times(1)).findByCoordenadorId(coordenadorId);
+    }
 }
