@@ -177,25 +177,32 @@ public class MentorServiceTest {
     }
 
     @Test
-    @DisplayName("Update Mentor deve atualizar apenas campos não nulos")
+    @DisplayName("Update Mentor deve atualizar todos os campos não nulos")
     void update_DeveAtualizarApenasCamposPreenchidos() {
-        // Arrange
         when(mentorRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
         when(mentorRepository.save(any(Mentor.class))).thenReturn(mentor);
 
-        // Dados de atualização (apenas nome e email)
+        AreaDeAtuacao novaArea = new AreaDeAtuacao(2L, "Backend");
+
         Mentor mentorUpdate = new Mentor();
         mentorUpdate.setNome("Novo Nome");
         mentorUpdate.setEmail("novoemail@teste.com");
+        mentorUpdate.setCpf("111.222.333-44");
+        mentorUpdate.setTipoDeVinculo(TipoDeVinculo.PJ);
+        mentorUpdate.setTempoDeExperiencia("10 anos");
+        mentorUpdate.setAreaDeAtuacao(novaArea);
+        mentorUpdate.setResumo("Novo Resumo Profissional");
 
-        // Act
         Mentor mentorAtualizado = mentorService.update(mentor.getId(), mentorUpdate);
 
-        // Assert com assertEquals
-        assertEquals("Novo Nome", mentorAtualizado.getNome(), "O nome deve ser atualizado");
-        assertEquals("novoemail@teste.com", mentorAtualizado.getEmail(), "O email deve ser atualizado");
+        assertEquals("Novo Nome", mentorAtualizado.getNome());
+        assertEquals("novoemail@teste.com", mentorAtualizado.getEmail());
+        assertEquals("111.222.333-44", mentorAtualizado.getCpf());
+        assertEquals(TipoDeVinculo.PJ, mentorAtualizado.getTipoDeVinculo());
+        assertEquals("10 anos", mentorAtualizado.getTempoDeExperiencia());
+        assertEquals(novaArea, mentorAtualizado.getAreaDeAtuacao());
+        assertEquals("Novo Resumo Profissional", mentorAtualizado.getResumo());
 
-        // Verify
         verify(mentorRepository, times(1)).findById(mentor.getId());
         verify(mentorRepository, times(1)).save(mentor);
     }
