@@ -1,5 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -37,10 +38,12 @@ public class Projeto {
 
     @NotNull(message = "A data de inicio é obrigatória")
     @Column(name = "data_inicio_projeto", nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataInicioProjeto;
 
     @NotNull(message = "A data para conclusão do projeto é obrigatório")
     @Column(name = "data_final_projeto", nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataFinalProjeto;
 
     @NotBlank(message = "É obrigatório adicionar o periodo da faculdade")

@@ -25,61 +25,62 @@ public class ProjetoService {
         this.projetoRepository = projetoRepository;
         this.grupoRepository = grupoRepository;
     }
-        //LISTAR PROJETO
-        public List<Projeto> listAll () {
-            return projetoRepository.findAll();
-        }
-        //BUSCAR POR ID
-        public Projeto findById ( long id){
-            return projetoRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Projeto não encontrado"));
-        }
 
-        public List<Projeto>buscarPorNome(String nomeDoProjeto){
+    //LISTAR PROJETO
+    public List<Projeto> listAll() {
+        return projetoRepository.findAll();
+    }
+
+    //BUSCAR POR ID
+    public Projeto findById(long id) {
+        return projetoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Projeto não encontrado"));
+    }
+
+    public List<Projeto> buscarPorNome(String nomeDoProjeto) {
         return projetoRepository.findByNomeDoProjetoIgnoreCaseContaining(nomeDoProjeto);
-        }
+    }
 
-        public List<Projeto>buscarPorAreaAtuacao(AreaDeAtuacao areaDeAtuacao){
+    public List<Projeto> buscarPorAreaAtuacao(AreaDeAtuacao areaDeAtuacao) {
         return projetoRepository.findByAreaDeAtuacao(areaDeAtuacao);
+    }
+
+    private void atualizarStatusProjeto(Projeto projeto) {
+        LocalDate hoje = LocalDate.now();
+
+        if (projeto.getDataFinalProjeto().isBefore(hoje)) {
+            projeto.setStatusProjeto("ENCERRADO");
+        } else if (projeto.getDataInicioProjeto().isAfter(hoje)) {
+            projeto.setStatusProjeto("NAO_INICIADO");
+        } else {
+            projeto.setStatusProjeto("EM_ANDAMENTO");
         }
+    }
 
-        private void atualizarStatusProjeto(Projeto projeto){
-            LocalDate hoje = LocalDate.now();
+    // SALVAR
+    public Projeto save(Projeto projeto) {
+        if (projeto.getGrupo() != null && projeto.getGrupo().getId() != null) {
+            Grupo grupoGerenciado = grupoRepository.findByIdWithAlunos(projeto.getGrupo().getId())
+                    .orElse(projeto.getGrupo());
+            projeto.setGrupo(grupoGerenciado);
+            if (grupoGerenciado.getAlunos() != null) {
+                for (Aluno aluno : grupoGerenciado.getAlunos()) {
+                    if (aluno.getCurso() != null
+                            && aluno.getCurso().getAreaDeAtuacao() != null
+                            && projeto.getAreaDeAtuacao() != null
+                            && !aluno.getCurso().getAreaDeAtuacao().getId()
+                            .equals(projeto.getAreaDeAtuacao().getId())) {
+                        throw new IllegalArgumentException(
+                                "A área de atuação do projeto deve ser a mesma de todos os alunos do grupo."
+                        );
+                    }
+                }
 
-            if (projeto.getDataFinalProjeto().isBefore(hoje)){
-                projeto.setStatusProjeto("ENCERRADO");
-            }else if(projeto.getDataInicioProjeto().isAfter(hoje)){
-                projeto.setStatusProjeto("NAO_INICIADO");
-            }else {
-                projeto.setStatusProjeto("EM_ANDAMENTO");
             }
         }
-
-         // SALVAR
-         public Projeto save(Projeto projeto) {
-             if (projeto.getGrupo() != null && projeto.getGrupo().getId() != 0) {
-                 // Use a nova query para buscar o grupo com os alunos já carregados
-                 Grupo grupoGerenciado = grupoRepository.findByIdWithAlunos(projeto.getGrupo().getId())
-                         .orElseThrow(() -> new RuntimeException("Grupo não encontrado"));
-
-                 projeto.setGrupo(grupoGerenciado);
-
-                 if (grupoGerenciado.getAlunos() != null && !grupoGerenciado.getAlunos().isEmpty()) {
-
-                     AreaDeAtuacao areaDoProjeto = projeto.getAreaDeAtuacao();
-                     for (Aluno aluno : grupoGerenciado.getAlunos()) {
-                         if (!aluno.getCurso().getAreaDeAtuacao().getId().equals(areaDoProjeto.getId())) {
-                             throw new IllegalArgumentException("A área de atuação do projeto deve ser a mesma de todos os alunos do grupo.");
-                         }
-                     }
-                 } else {
-                     throw new IllegalArgumentException("O grupo associado ao projeto não possui alunos.");
-                 }
-             }
-
-             atualizarStatusProjeto(projeto);
-             return projetoRepository.save(projeto);
-         }
+        atualizarStatusProjeto(projeto);
+        return projetoRepository.save(projeto);
+    }
 
 
     //atualizar

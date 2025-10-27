@@ -241,4 +241,35 @@ public class CursoServiceTest {
         verify(cursoRepository, times(1)).findByAreaDeAtuacaoNomeContainingIgnoreCase(termoBusca);
     }
 
+    @Test
+    @DisplayName("Deve retornar cursos vinculados ao coordenador")
+    void findByCoordenadorId_deveRetornarCursosDoCoordenador() {
+        Long coordenadorId = 1L;
+
+        List<Curso> cursosDoCoordenador = cursosMock.subList(0, 2);
+        when(cursoRepository.findByCoordenadorId(coordenadorId)).thenReturn(cursosDoCoordenador);
+
+        List<Curso> resultado = cursoService.findByCoordenadorId(coordenadorId);
+
+        assertEquals(2, resultado.size());
+        assertEquals("Banco de dados", resultado.get(0).getNome());
+        assertEquals("Java", resultado.get(1).getNome());
+
+        verify(cursoRepository, times(1)).findByCoordenadorId(coordenadorId);
+    }
+    @Test
+    @DisplayName("Quando coordenador não possui cursos retorna lista vazia")
+    void findByCoordenadorId_quandoNaoExistemCursos_deveRetornarListaVazia() {
+        Long coordenadorId = 7L;
+
+        when(cursoRepository.findByCoordenadorId(coordenadorId)).thenReturn(Collections.emptyList());
+
+        List<Curso> resultado = cursoService.findByCoordenadorId(coordenadorId);
+
+        assertNotNull(resultado);
+        assertTrue(resultado.isEmpty());
+
+        verify(cursoRepository, times(1)).findByCoordenadorId(coordenadorId);
+    }
+
 }
