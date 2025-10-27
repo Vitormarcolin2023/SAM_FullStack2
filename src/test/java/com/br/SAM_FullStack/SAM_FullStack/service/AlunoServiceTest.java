@@ -3,18 +3,14 @@ package com.br.SAM_FullStack.SAM_FullStack.service;
 import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.repository.AlunoRepository;
 import com.br.SAM_FullStack.SAM_FullStack.autenticacao.TokenService;
-import com.br.SAM_FullStack.SAM_FullStack.model.Curso; // Assuming Curso exists
+import com.br.SAM_FullStack.SAM_FullStack.model.Curso;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
@@ -30,20 +26,20 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 @DisplayName("Testes Unitários do AlunoService")
 class AlunoServiceTest {
 
-    @MockitoBean
+    @Mock
     AlunoRepository alunoRepository;
-    @Autowired
+
     AlunoService alunoService;
 
-    @MockitoBean
+    @Mock
     EmailService emailService;
-    @MockitoBean
+    @Mock
     PasswordEncoder passwordEncoder;
-    @MockitoBean
+    @Mock
     TokenService tokenService;
 
     Aluno aluno;
@@ -51,6 +47,12 @@ class AlunoServiceTest {
 
     @BeforeEach
     void setUp() {
+        alunoService = new AlunoService(alunoRepository);
+
+        ReflectionTestUtils.setField(alunoService, "emailService", emailService);
+        ReflectionTestUtils.setField(alunoService, "passwordEncoder", passwordEncoder);
+        ReflectionTestUtils.setField(alunoService, "tokenService", tokenService);
+
         mockCurso = new Curso();
         mockCurso.setId(1L);
         mockCurso.setNome("Eng Teste");
@@ -63,6 +65,7 @@ class AlunoServiceTest {
         aluno.setSenha("senha123"); // Senha não encriptada para teste
         aluno.setCurso(mockCurso);
     }
+
 
     @Test
     @DisplayName("Deve retornar aluno ao buscar por ID existente")
@@ -128,9 +131,9 @@ class AlunoServiceTest {
         assertNotNull(alunoSalvo);
         assertEquals("senhaEncriptada", alunoSalvo.getSenha());
         verify(alunoRepository).findByRa(aluno.getRa());
-        verify(passwordEncoder).encode("senha123");
+        verify(passwordEncoder).encode("senha123"); // Verifica se o encoder foi chamado
         verify(alunoRepository).save(aluno);
-        verify(emailService).enviarEmailTexto(
+        verify(emailService).enviarEmailTexto( // Verifica se o email foi chamado
                 eq(aluno.getEmail()),
                 eq("Aluno Cadastrado com Sucesso"),
                 contains("Olá Aluno Teste")
@@ -145,17 +148,17 @@ class AlunoServiceTest {
         when(alunoRepository.findByRa(aluno.getRa())).thenReturn(Optional.of(alunoExistente));
         when(emailService.enviarEmailTexto(anyString(), anyString(), anyString()))
                 .thenReturn("Email Enviado - Mock Falha");
-
         RuntimeException exception = assertThrows(RuntimeException.class, () -> alunoService.save(aluno));
 
         assertEquals("Aluno com RA 12345 já está cadastrado!", exception.getMessage());
+
         verify(emailService).enviarEmailTexto(
                 eq(aluno.getEmail()),
                 eq("Falha no Cadastro: RA já existente"),
                 contains("Olá Aluno Teste")
         );
-        verify(alunoRepository, never()).save(any(Aluno.class));
-        verify(passwordEncoder, never()).encode(anyString());
+        verify(alunoRepository, never()).save(any(Aluno.class)); // Não deve salvar
+        verify(passwordEncoder, never()).encode(anyString()); // Não deve encriptar
     }
 
     @Test
@@ -179,10 +182,10 @@ class AlunoServiceTest {
         assertEquals("Novo Nome", alunoAtualizado.getNome());
         assertEquals(54321, alunoAtualizado.getRa());
         assertEquals("teste@email.com", alunoAtualizado.getEmail());
-        assertEquals(originalEncodedPassword, alunoAtualizado.getSenha());
+        assertEquals(originalEncodedPassword, alunoAtualizado.getSenha()); // Manteve a senha original
         verify(alunoRepository).findById(1L);
-        verify(alunoRepository, never()).findByEmail(anyString());
-        verify(passwordEncoder, never()).encode(anyString());
+        verify(alunoRepository, never()).findByEmail(anyString()); // Não deve checar email
+        verify(passwordEncoder, never()).encode(anyString()); // Não deve encriptar
         verify(alunoRepository).save(aluno);
     }
 
@@ -193,20 +196,21 @@ class AlunoServiceTest {
         alunoUpdate.setNome("Aluno Teste");
         alunoUpdate.setEmail("teste@email.com");
         alunoUpdate.setRa(12345);
-        alunoUpdate.setSenha("novaSenha123");
+        alunoUpdate.setSenha("novaSenha123"); // Nova senha
 
         aluno.setSenha("senhaAntigaEncriptada");
 
         when(alunoRepository.findById(1L)).thenReturn(Optional.of(aluno));
+        // Mock do PasswordEncoder (ESSENCIAL)
         when(passwordEncoder.encode("novaSenha123")).thenReturn("novaSenhaEncriptada");
         when(alunoRepository.save(any(Aluno.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Aluno alunoAtualizado = alunoService.update(1L, alunoUpdate);
 
         assertNotNull(alunoAtualizado);
-        assertEquals("novaSenhaEncriptada", alunoAtualizado.getSenha());
+        assertEquals("novaSenhaEncriptada", alunoAtualizado.getSenha()); // Verifica se a senha foi atualizada
         verify(alunoRepository).findById(1L);
-        verify(passwordEncoder).encode("novaSenha123");
+        verify(passwordEncoder).encode("novaSenha123"); // Verifica se o encoder foi chamado
         verify(alunoRepository).save(aluno);
     }
 
@@ -216,18 +220,18 @@ class AlunoServiceTest {
     void update_quandoEmailAlteradoEDisponivel_deveRetornarAlunoAtualizado() {
         Aluno alunoUpdate = new Aluno();
         alunoUpdate.setNome("Novo Nome");
-        alunoUpdate.setEmail("novoemail@email.com");
+        alunoUpdate.setEmail("novoemail@email.com"); // Email alterado
         alunoUpdate.setSenha(null);
 
         when(alunoRepository.findById(1L)).thenReturn(Optional.of(aluno));
-        when(alunoRepository.findByEmail("novoemail@email.com")).thenReturn(Optional.empty());
+        when(alunoRepository.findByEmail("novoemail@email.com")).thenReturn(Optional.empty()); // Email está disponível
         when(alunoRepository.save(any(Aluno.class))).thenReturn(aluno);
 
         Aluno alunoAtualizado = alunoService.update(1L, alunoUpdate);
 
         assertNotNull(alunoAtualizado);
         assertEquals("novoemail@email.com", alunoAtualizado.getEmail());
-        verify(alunoRepository).findByEmail("novoemail@email.com");
+        verify(alunoRepository).findByEmail("novoemail@email.com"); // Deve checar o email
         verify(alunoRepository).save(aluno);
         verify(passwordEncoder, never()).encode(anyString());
     }
@@ -236,48 +240,54 @@ class AlunoServiceTest {
     @DisplayName("Deve lançar exceção ao atualizar aluno com e-mail que já existe")
     void update_quandoEmailAlteradoEJaExiste_deveLancarRuntimeException() {
         Aluno alunoUpdate = new Aluno();
-        alunoUpdate.setEmail("emailjaexistente@email.com");
+        alunoUpdate.setEmail("emailjaexistente@email.com"); // Email alterado
         alunoUpdate.setSenha(null);
 
         Aluno outroAluno = new Aluno();
-        outroAluno.setId(2L);
+        outroAluno.setId(2L); // É outro aluno
 
         when(alunoRepository.findById(1L)).thenReturn(Optional.of(aluno));
-        when(alunoRepository.findByEmail("emailjaexistente@email.com")).thenReturn(Optional.of(outroAluno));
+        when(alunoRepository.findByEmail("emailjaexistente@email.com")).thenReturn(Optional.of(outroAluno)); // Email já existe
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> alunoService.update(1L, alunoUpdate));
 
         assertEquals("O e-mail 'emailjaexistente@email.com' já está cadastrado.", exception.getMessage());
-        verify(alunoRepository, never()).save(any(Aluno.class));
+        verify(alunoRepository, never()).save(any(Aluno.class)); // Não deve salvar
     }
 
     @Test
     @DisplayName("Deve deletar aluno com sucesso")
     void delete_quandoIdExistente_deveChamarDelete() {
         when(alunoRepository.findById(1L)).thenReturn(Optional.of(aluno));
-        doNothing().when(alunoRepository).delete(aluno);
+        doNothing().when(alunoRepository).delete(aluno); // Mock para método void
+
         alunoService.delete(1L);
-        verify(alunoRepository).delete(aluno);
+
+        verify(alunoRepository).delete(aluno); // Verifica se o delete foi chamado
     }
 
     @Test
     @DisplayName("Deve lançar exceção ao deletar aluno inexistente")
     void delete_quandoIdNaoExistente_deveLancarRuntimeException() {
         when(alunoRepository.findById(99L)).thenReturn(Optional.empty());
+
         assertThrows(RuntimeException.class, () -> alunoService.delete(99L));
-        verify(alunoRepository, never()).delete(any(Aluno.class));
+
+        verify(alunoRepository, never()).delete(any(Aluno.class)); // Não deve chamar o delete
     }
 
 
     @Test
     @DisplayName("Deve salvar lista de alunos")
     void saveAll_deveSalvarTodosAlunos() {
+        // --- Aluno 1 ---
         Aluno aluno1 = new Aluno();
         aluno1.setRa(111);
         aluno1.setEmail("a1@email.com");
         aluno1.setSenha("senha1");
         aluno1.setCurso(mockCurso);
 
+        // --- Aluno 2 ---
         Aluno aluno2 = new Aluno();
         aluno2.setRa(222);
         aluno2.setEmail("a2@email.com");
@@ -286,31 +296,40 @@ class AlunoServiceTest {
 
         List<Aluno> alunosParaSalvar = Arrays.asList(aluno1, aluno2);
 
+        // --- Mocks Aluno 1 ---
         when(alunoRepository.findByRa(111)).thenReturn(Optional.empty());
         when(passwordEncoder.encode("senha1")).thenReturn("enc1");
         when(alunoRepository.save(aluno1)).thenAnswer(inv -> { inv.getArgument(0, Aluno.class).setId(10L); return aluno1; });
 
+        // --- Mocks Aluno 2 ---
         when(alunoRepository.findByRa(222)).thenReturn(Optional.empty());
         when(passwordEncoder.encode("senha2")).thenReturn("enc2");
         when(alunoRepository.save(aluno2)).thenAnswer(inv -> { inv.getArgument(0, Aluno.class).setId(11L); return aluno2; });
 
+        // Mock do EmailService (genérico)
         when(emailService.enviarEmailTexto(anyString(), eq("Aluno Cadastrado com Sucesso"), anyString()))
                 .thenReturn("Email Enviado - Mock");
 
+        // --- Execução ---
         List<Aluno> alunosSalvos = alunoService.saveAll(alunosParaSalvar);
 
+        // --- Verificação ---
         assertNotNull(alunosSalvos);
         assertEquals(2, alunosSalvos.size());
+
+        // Verifica chamadas para Aluno 1
         verify(alunoRepository).findByRa(111);
         verify(passwordEncoder).encode("senha1");
         verify(alunoRepository).save(aluno1);
         verify(emailService).enviarEmailTexto(eq("a1@email.com"), eq("Aluno Cadastrado com Sucesso"), anyString());
 
+        // Verifica chamadas para Aluno 2
         verify(alunoRepository).findByRa(222);
         verify(passwordEncoder).encode("senha2");
         verify(alunoRepository).save(aluno2);
         verify(emailService).enviarEmailTexto(eq("a2@email.com"), eq("Aluno Cadastrado com Sucesso"), anyString());
 
+        // Verifica totais
         verify(passwordEncoder, times(2)).encode(anyString());
         verify(alunoRepository, times(2)).save(any(Aluno.class));
         verify(emailService, times(2)).enviarEmailTexto(anyString(), eq("Aluno Cadastrado com Sucesso"), anyString());
