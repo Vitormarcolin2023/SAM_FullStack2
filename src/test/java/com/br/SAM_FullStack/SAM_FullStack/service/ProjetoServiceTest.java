@@ -310,5 +310,31 @@ class ProjetoServiceTest {
         assertTrue(result.isEmpty());
         verify(projetoRepository, times(1)).findAllByProfessoresId(professorId);
     }
+    @Test
+    @DisplayName("Buscar projetos por mentor quando existem projetos deve retornar lista")
+    void findByMentor_quandoExistemProjetos_deveRetornarLista() {
+        Long mentorId = 1L;
+        when(projetoRepository.findByMentorId(mentorId)).thenReturn(listaProjetos);
 
-}
+        List<Projeto> result = projetoService.findByMentor(mentorId);
+
+        assertEquals(2, result.size());
+
+        assertEquals("Sistema Escolar", result.get(0).getNomeDoProjeto());
+        verify(projetoRepository, times(1)).findByMentorId(mentorId);
+    }
+
+    @Test
+    @DisplayName("Buscar projetos por mentor quando não existem projetos deve lançar exceção")
+    void findByMentor_quandoNaoExistemProjetos_deveLancarExcecao() {
+        Long mentorId = 2L;
+        when(projetoRepository.findByMentorId(mentorId)).thenReturn(Collections.emptyList());
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> projetoService.findByMentor(mentorId));
+
+        assertEquals("Nenhum projeto encontrado para este mentor.", exception.getMessage());
+        verify(projetoRepository, times(1)).findByMentorId(mentorId);
+    }
+
+    }
