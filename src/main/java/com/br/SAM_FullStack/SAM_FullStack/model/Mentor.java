@@ -42,6 +42,9 @@ public class Mentor implements UserDetails {
     @NotBlank(message = "O campo telefone é obrigatório")
     private String telefone;
 
+    @NotNull(message = "A formação do mentor é obrigatório")
+    private String formacaoDoMentor;
+
     private String tempoDeExperiencia;
 
     @Enumerated(EnumType.STRING)
@@ -65,7 +68,6 @@ public class Mentor implements UserDetails {
     private List<Reuniao> reunioes = new ArrayList<>();
 
     private String resumo;
-
 
     // Metodos obrigatórios do Spring Security
 
