@@ -38,6 +38,7 @@ public class Grupo {
     @ManyToMany
     @JsonIgnoreProperties("grupo")
     @JoinTable(
+            //name = "tb_aluno_grupo",
             name = "aluno_grupo",
             joinColumns = @JoinColumn(name = "grupo_id"),
             inverseJoinColumns = @JoinColumn(name = "aluno_id")
