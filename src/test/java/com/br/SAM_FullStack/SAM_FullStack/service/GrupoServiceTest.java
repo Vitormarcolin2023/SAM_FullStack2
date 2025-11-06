@@ -474,14 +474,11 @@ public class GrupoServiceTest {
 
     @Test
     @DisplayName("Deve retornar erro caso o grupo do aluno estiver arquivado")
-    void buscarGrupoAtivo_quandoAlunoNaoPossuiGrupoAtivo_deveRetornarErro() {
+    void buscarGrupoAtivo_quandoAlunoNaoPossuiGrupoAtivo_deveRetornarNull() {
         when(grupoRepository.findByStatusGrupoAndAlunosId(StatusGrupo.ATIVO, aluno4.getId())).thenReturn(List.of());
 
-        RuntimeException runtimeException = assertThrows(RuntimeException.class, () -> {
-            this.grupoService.findByAluno(aluno4);
-        });
-
-        assertEquals("Aluno não possui nenhum grupo ativo", runtimeException.getMessage());
+        Grupo response = grupoService.findByAluno(aluno4);
+        assertNull(response);
     }
 
     @Test
