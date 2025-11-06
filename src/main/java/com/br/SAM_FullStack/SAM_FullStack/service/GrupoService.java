@@ -216,7 +216,7 @@ public class GrupoService {
             List<Grupo> grupos = grupoRepository.findByStatusGrupoAndAlunosId(StatusGrupo.ATIVO, aluno.getId());
 
             if(grupos.isEmpty()){
-                 throw new RuntimeException("Aluno não possui nenhum grupo ativo");
+                 return null;
             }
 
             // pega o primeiro grupo da lista pois o aluno só poderá ter 1 grupo ativo por projeto
