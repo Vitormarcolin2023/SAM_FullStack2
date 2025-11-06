@@ -37,8 +37,10 @@ public class Aluno implements UserDetails {
 
     private String senha;
 
+
     @NotBlank(message = "O campo e-mail é obrigatório")
     @Email(message = "O e-mail informado não é válido") // Validação extra para formato de e-mail
+    @Email
     private String email;
 
     @NotNull(message = "O curso do aluno é obrigatório")
