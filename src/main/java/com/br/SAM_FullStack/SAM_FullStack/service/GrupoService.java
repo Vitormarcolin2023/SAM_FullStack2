@@ -73,6 +73,7 @@ public class GrupoService {
         grupo.setAlunoAdmin(admin);
         grupo.setStatusGrupo(StatusGrupo.ATIVO);
         grupo.setProfessores(professores);
+        grupo.setPeriodo(grupoDTO.periodo());
 
         for (Aluno aluno : alunos) {
             aluno.setStatusAlunoGrupo(StatusAlunoGrupo.ATIVO);
@@ -89,7 +90,8 @@ public class GrupoService {
                 salvo.getNome(),
                 admin.getId(),
                 alunos.stream().map(Aluno::getId).toList(),
-                professores.stream().map(Professor::getId).toList()
+                professores.stream().map(Professor::getId).toList(),
+                salvo.getPeriodo()
         );
     }
 

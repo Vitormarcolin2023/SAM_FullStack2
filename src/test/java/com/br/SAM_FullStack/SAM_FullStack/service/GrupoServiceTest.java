@@ -89,7 +89,7 @@ public class GrupoServiceTest {
         aluno10.setGrupos(new ArrayList<>(List.of(grupo4)));
         aluno11.setGrupos(new ArrayList<>());
 
-        grupoSalvarSucesso = new GrupoDTO(10L, "Grupo salvo com sucesso", 5L, List.of(5L, 6L, 7L), List.of(1L));
+        grupoSalvarSucesso = new GrupoDTO(10L, "Grupo salvo com sucesso", 5L, List.of(5L, 6L, 7L), List.of(1L), "4 PERIODO");
 
         List<Grupo> todosGrupos = List.of(grupo1, grupo2, grupo3);
         List<Grupo> gruposAluno1 = List.of(grupo1);
@@ -135,7 +135,7 @@ public class GrupoServiceTest {
     @DisplayName("Deve retornar erro ao buscar id de aluno que não existe ao tentar salvar grupo")
     void salvarGrupo_quandoIdDeAlunoNaoExiste_deveRetornarException() {
         assertThrows(Exception.class, () -> {
-            GrupoDTO grupoSave = new GrupoDTO(4L, "Grupo Teste Save", -41L, List.of(5L, 6L, 7L), List.of(1L));
+            GrupoDTO grupoSave = new GrupoDTO(4L, "Grupo Teste Save", -41L, List.of(5L, 6L, 7L), List.of(1L), "4 PERIODO");
             grupoService.save(grupoSave);
         });
     }
@@ -145,7 +145,7 @@ public class GrupoServiceTest {
     void salvarGrupo_quandoAdminJaPossuiGrupoAtivo_deveRetornarException() {
         when(alunoRepository.findById(1L)).thenReturn(Optional.of(aluno1));
         assertThrows(IllegalStateException.class, () -> {
-            GrupoDTO grupoErroStatus = new GrupoDTO(5L, "Grupo erro status", 1L, List.of(1L, 2L, 3L, 4L), List.of(1L));
+            GrupoDTO grupoErroStatus = new GrupoDTO(5L, "Grupo erro status", 1L, List.of(1L, 2L, 3L, 4L), List.of(1L), "4 PERIODO");
             grupoService.save(grupoErroStatus);
         });
     }
@@ -154,7 +154,7 @@ public class GrupoServiceTest {
     @DisplayName("Deve retornar erro ao tentar salvar novo grupo quando algum aluno informado não existe")
     void salvarGrupo_quandoAlunoInformadoNaoExiste_deveRetornarExceprion() {
         assertThrows(IllegalArgumentException.class, () -> {
-            GrupoDTO grupoErroAlunos = new GrupoDTO(6L, "Grupo teste erro Alunos", 5L, List.of(5L, 6L, -7L), List.of(1L));
+            GrupoDTO grupoErroAlunos = new GrupoDTO(6L, "Grupo teste erro Alunos", 5L, List.of(5L, 6L, -7L), List.of(1L), "4 PERIODO");
             grupoService.save(grupoErroAlunos);
         });
     }
@@ -166,7 +166,7 @@ public class GrupoServiceTest {
         when(alunoRepository.findAllById(List.of(5L, 6L))).thenReturn(List.of(aluno5, aluno6));
         when(professorRepository.findAllById(List.of(1L))).thenReturn(List.of(professor));
         assertThrows(IllegalStateException.class, () -> {
-            GrupoDTO grupoErroQtdAlunos = new GrupoDTO(7L, "Grupo teste erro qtd alunos", 5L, List.of(5L, 6L), List.of(1L));
+            GrupoDTO grupoErroQtdAlunos = new GrupoDTO(7L, "Grupo teste erro qtd alunos", 5L, List.of(5L, 6L), List.of(1L), "4 PERIODO");
             grupoService.save(grupoErroQtdAlunos);
         });
     }
@@ -178,7 +178,7 @@ public class GrupoServiceTest {
         when(alunoRepository.findAllById(List.of(6L, 7L, 8L))).thenReturn(List.of(aluno6, aluno7, aluno8));
         when(professorRepository.findAllById(List.of(1L))).thenReturn(List.of(professor));
         assertThrows(IllegalStateException.class, () -> {
-            GrupoDTO grupoErroListaALunos = new GrupoDTO(8L, "Grupo teste erro lista alunos", 5L, List.of(6L, 7L, 8L), List.of(1L));
+            GrupoDTO grupoErroListaALunos = new GrupoDTO(8L, "Grupo teste erro lista alunos", 5L, List.of(6L, 7L, 8L), List.of(1L), "4 PERIODO");
             grupoService.save(grupoErroListaALunos);
         });
     }
@@ -191,7 +191,7 @@ public class GrupoServiceTest {
         when(professorRepository.findAllById(List.of(1L))).thenReturn(List.of(professor));
         assertThrows(IllegalStateException.class, () -> {
             GrupoDTO grupoErroAlunoComGrupoAtivo = new GrupoDTO(9L, "Grupo teste erro aluno com grupo ativo",
-                    6L, List.of(6L, 7L, 8L), List.of(1L));
+                    6L, List.of(6L, 7L, 8L), List.of(1L), "4 PERIODO");
             grupoService.save(grupoErroAlunoComGrupoAtivo);
         });
     }
@@ -544,7 +544,7 @@ public class GrupoServiceTest {
     @Test
     @DisplayName("Deve retornar erro ao tentar salvar grupo quando algum aluno já tem grupo ativo (cenário misto)")
     void salvarGrupo_quandoAlunoTemGrupoAtivo_deveRetornarErroCenarioMisto() {
-        GrupoDTO grupoErroAlunoAtivo = new GrupoDTO(12L, "Grupo Misturado", 5L, List.of(1L, 5L, 6L), List.of(1L));
+        GrupoDTO grupoErroAlunoAtivo = new GrupoDTO(12L, "Grupo Misturado", 5L, List.of(1L, 5L, 6L), List.of(1L), "4 PERIODO");
 
         when(alunoRepository.findAllById(List.of(1L, 5L, 6L)))
                 .thenReturn(List.of(aluno1, aluno5, aluno6));
@@ -692,7 +692,7 @@ public class GrupoServiceTest {
         when(professorRepository.findAllById(List.of(1L, 2L))).thenReturn(List.of(professor));
 
         GrupoDTO grupoComProfessoresInvalidos = new GrupoDTO(20L, "Grupo com professor inválido",
-                5L, List.of(5L, 6L, 7L), List.of(1L, 2L));
+                5L, List.of(5L, 6L, 7L), List.of(1L, 2L), "4 PERIODO");
 
         assertThrows(IllegalArgumentException.class, () -> {
             grupoService.save(grupoComProfessoresInvalidos);
@@ -714,7 +714,7 @@ public class GrupoServiceTest {
         when(professorRepository.findAllById(List.of(1L, 2L))).thenReturn(List.of(professor, professor2));
 
         GrupoDTO grupoComProfessores = new GrupoDTO(30L, "Grupo com professores",
-                5L, List.of(5L, 6L, 7L), List.of(1L, 2L));
+                5L, List.of(5L, 6L, 7L), List.of(1L, 2L), "4 PERIODO");
 
         GrupoDTO response = grupoService.save(grupoComProfessores);
 

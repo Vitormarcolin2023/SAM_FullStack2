@@ -8,5 +8,6 @@ public record GrupoDTO(
         long id, String nome,
         Long alunoAdminId,
         List<Long> alunosIds,
-        List<Long> professoresIds
+        List<Long> professoresIds,
+        String periodo
 ) {}
