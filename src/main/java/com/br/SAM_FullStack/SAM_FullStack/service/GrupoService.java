@@ -47,6 +47,11 @@ public class GrupoService {
             throw new IllegalArgumentException("Um ou mais IDs de alunos não existem");
         }
 
+        List<Professor> professores = professorRepository.findAllById(grupoDTO.professoresIds());
+        if (professores.size() != grupoDTO.professoresIds().size()) {
+            throw new IllegalArgumentException("Um ou mais professores estão incorretos");
+        }
+
         if (alunos.size() < 3 || alunos.size() > 6) {
             throw new IllegalStateException("Grupo deve ter entre 3 e 6 participantes");
         }
@@ -67,6 +72,7 @@ public class GrupoService {
         grupo.setNome(grupoDTO.nome());
         grupo.setAlunoAdmin(admin);
         grupo.setStatusGrupo(StatusGrupo.ATIVO);
+        grupo.setProfessores(professores);
 
         for (Aluno aluno : alunos) {
             aluno.setStatusAlunoGrupo(StatusAlunoGrupo.ATIVO);
@@ -82,7 +88,8 @@ public class GrupoService {
                 salvo.getId(),
                 salvo.getNome(),
                 admin.getId(),
-                alunos.stream().map(Aluno::getId).toList()
+                alunos.stream().map(Aluno::getId).toList(),
+                professores.stream().map(Professor::getId).toList()
         );
     }
 

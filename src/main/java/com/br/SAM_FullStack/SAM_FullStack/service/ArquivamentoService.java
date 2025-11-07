@@ -22,7 +22,6 @@ public class ArquivamentoService {
     @Scheduled(cron = "0 0 0 * * *")
     public void verificaArquivamento(){
         LocalDate hoje = LocalDate.now();
-        int mesAtual = hoje.getMonthValue();
 
         List<Projeto> projetosAtivos = projetoRepository.findAll(); // Apenas para teste, deve ser substituido pelo findByStatus
 
@@ -31,7 +30,9 @@ public class ArquivamentoService {
 
             if(projeto.getDataFinalProjeto() != null && projeto.getDataFinalProjeto().isBefore(hoje)){
                 arquivar = true;
-            } else if (projeto.getDataFinalProjeto() == null && (mesAtual == 8 || mesAtual == 12)) {
+            } else if (projeto.getDataFinalProjeto() == null
+                    && hoje.getDayOfMonth() == 10
+                    && (hoje.getMonthValue() == 7 || hoje.getMonthValue() == 12)) {
                 arquivar = true;
             }
 
@@ -51,12 +52,12 @@ public class ArquivamentoService {
     @Scheduled(cron = "0 10 0 * * *")
     public void verificaArquivamentoGrupos(){
         LocalDate hoje = LocalDate.now();
-        int mesAtual = hoje.getMonthValue();
 
         List<Grupo> gruposAtivos = grupoRepository.findByStatusGrupo(StatusGrupo.ATIVO);
 
         for (Grupo grupo : gruposAtivos) {
-           if (grupo.getStatusGrupo().equals(StatusGrupo.ATIVO) && (mesAtual == 8 || mesAtual == 12)) {
+           if (grupo.getStatusGrupo().equals(StatusGrupo.ATIVO) && hoje.getDayOfMonth() == 10
+                   && (hoje.getMonthValue() == 7 || hoje.getMonthValue() == 12)) {
                grupo.setStatusGrupo(StatusGrupo.ARQUIVADO);
                grupoRepository.save(grupo);
             }
