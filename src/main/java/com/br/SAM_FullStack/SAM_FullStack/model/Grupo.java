@@ -53,6 +53,17 @@ public class Grupo {
     @JsonIgnoreProperties("grupo")
     private List<Projeto> projetos;
 
+    @ManyToMany
+    @JsonIgnoreProperties("grupo")
+    @JoinTable(
+            name = "tb_grupo_professor",
+            joinColumns = @JoinColumn(name = "grupo_id"),
+            inverseJoinColumns = @JoinColumn(name = "professor_id")
+    )
+    private List<Professor> professores = new ArrayList<>();
+
+    private String periodo;
+
     public Grupo(Long id, String nome, StatusGrupo statusGrupo, Aluno alunoAdmin, List<Aluno> alunos) {
         this.id = id;
         this.nome = nome;
