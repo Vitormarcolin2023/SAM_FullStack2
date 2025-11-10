@@ -55,7 +55,8 @@ public class Projeto {
     @JsonIgnoreProperties("projetos")
     private Mentor mentor;
 
-    private String statusProjeto;
+    @Enumerated(EnumType.STRING)
+    private StatusProjeto statusProjeto;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JsonIgnoreProperties("projetos")

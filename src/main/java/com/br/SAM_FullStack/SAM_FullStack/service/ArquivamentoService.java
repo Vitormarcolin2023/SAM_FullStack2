@@ -3,6 +3,7 @@ package com.br.SAM_FullStack.SAM_FullStack.service;
 import com.br.SAM_FullStack.SAM_FullStack.model.Grupo;
 import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
 import com.br.SAM_FullStack.SAM_FullStack.model.StatusGrupo;
+import com.br.SAM_FullStack.SAM_FullStack.model.StatusProjeto;
 import com.br.SAM_FullStack.SAM_FullStack.repository.GrupoRepository;
 import com.br.SAM_FullStack.SAM_FullStack.repository.ProjetoRepository;
 import lombok.AllArgsConstructor;
@@ -37,7 +38,7 @@ public class ArquivamentoService {
             }
 
             if (arquivar){
-               // projeto.setStatusProjeto(ARQUIVADO);
+                projeto.setStatusProjeto(StatusProjeto.ARQUIVADO);
                 projetoRepository.save(projeto);
 
                 Grupo grupo = projeto.getGrupo();

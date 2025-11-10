@@ -48,12 +48,12 @@ public class ProjetoService {
     private void atualizarStatusProjeto(Projeto projeto) {
         LocalDate hoje = LocalDate.now();
 
-        if (projeto.getDataFinalProjeto().isBefore(hoje)) {
-            projeto.setStatusProjeto("ENCERRADO");
-        } else if (projeto.getDataInicioProjeto().isAfter(hoje)) {
-            projeto.setStatusProjeto("NAO_INICIADO");
+        if (projeto.getDataFinalProjeto() != null && projeto.getDataFinalProjeto().isBefore(hoje)) {
+            projeto.setStatusProjeto(StatusProjeto.EM_APROVACAO);
+        } else if (projeto.getDataInicioProjeto()!= null && projeto.getDataInicioProjeto().isAfter(hoje)) {
+            projeto.setStatusProjeto(StatusProjeto.NAO_INCIADO);
         } else {
-            projeto.setStatusProjeto("EM_ANDAMENTO");
+            projeto.setStatusProjeto(StatusProjeto.EM_ANDAMENTO);
         }
     }
 
