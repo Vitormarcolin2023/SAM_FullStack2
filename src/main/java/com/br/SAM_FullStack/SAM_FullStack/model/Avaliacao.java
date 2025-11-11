@@ -20,6 +20,7 @@ public class Avaliacao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // As respostas DEVEM ser @NotNull
     @NotNull(message = "O campo 'resposta1' não pode ser nulo")
     private Integer resposta1;
 
@@ -35,14 +36,16 @@ public class Avaliacao {
     @NotNull(message = "O campo 'resposta5' não pode ser nulo")
     private Integer resposta5;
 
-    @NotNull(message = "O campo 'media' não pode ser nulo")
+    @NotNull(message = "O campo 'resposta6' não pode ser nulo")
+    private Integer resposta6;
+
+    @Column(name = "media")
     private Double media;
 
     private String comentario;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "projeto_id")
-    @NotNull(message = "A avaliação deve estar associada a um projeto")
     @JsonIgnore
     private Projeto projeto;
 
