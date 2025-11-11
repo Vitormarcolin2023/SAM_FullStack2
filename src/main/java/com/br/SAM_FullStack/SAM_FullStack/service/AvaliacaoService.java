@@ -25,14 +25,15 @@ public class AvaliacaoService {
 
         avaliacao.setProjeto(projeto);
 
-        // 2. Calcula a média *desta* avaliação (r1 a r5)
+        // 2. Calcula a média *desta* avaliação (r1 a r6)
         double mediaCalculada = (
                 avaliacao.getResposta1() +
                         avaliacao.getResposta2() +
                         avaliacao.getResposta3() +
                         avaliacao.getResposta4() +
-                        avaliacao.getResposta5()
-        ) / 5.0;
+                        avaliacao.getResposta5() +
+                        avaliacao.getResposta6()
+        ) / 6.0;
 
         // 3. Define a média no objeto Avaliacao
         avaliacao.setMedia(arredondar(mediaCalculada));
