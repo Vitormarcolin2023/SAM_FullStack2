@@ -118,11 +118,9 @@ public class GrupoController {
     }
 
     @PutMapping("/arquivar/{id}")
-    public ResponseEntity<Map<String, String>> arquivarGrupo(@PathVariable long id){
+    public ResponseEntity<String> arquivarGrupo(@PathVariable long id){
         String result = grupoService.arquivarGrupo(id);
-        Map<String, String> response = new HashMap<>();
-        response.put("message", result);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(result);
     }
 
         @GetMapping("/findByGruposArquivados/{id}")
