@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,7 +35,9 @@ public class Professor implements UserDetails {
     private String nome;
 
     @Column(unique = true)
+    @Email
     private String email;
+
     private String senha;
 
     @ManyToMany(fetch = FetchType.LAZY)
