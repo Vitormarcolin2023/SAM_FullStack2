@@ -3,6 +3,7 @@ package com.br.SAM_FullStack.SAM_FullStack.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,6 +29,7 @@ public class Coordenador implements UserDetails {
     private String nome;
 
     @Column(unique = true, nullable = false)
+    @Email
     private String email;
 
     private String senha;
