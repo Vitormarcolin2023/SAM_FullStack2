@@ -254,4 +254,8 @@ public class GrupoService {
 
         return grupos;
     }
+
+    public List<Grupo> findGruposByProfessorId(Long professorId) {
+        return grupoRepository.findGruposByProfessorId(professorId);
+    }
 }
