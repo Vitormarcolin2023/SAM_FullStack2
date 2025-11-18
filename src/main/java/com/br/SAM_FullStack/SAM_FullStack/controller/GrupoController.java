@@ -129,4 +129,17 @@ public class GrupoController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/professor/{professorId}")
+    public ResponseEntity<List<Grupo>> getGruposByProfessorId(@PathVariable Long professorId) {
+        try {
+            List<Grupo> grupos = grupoService.findGruposByProfessorId(professorId);
+            if (grupos.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(grupos);
+        } catch (Exception e) {
+            // Adicione um log de erro aqui
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

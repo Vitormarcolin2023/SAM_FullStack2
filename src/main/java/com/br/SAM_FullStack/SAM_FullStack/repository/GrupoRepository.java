@@ -21,5 +21,6 @@ public interface GrupoRepository extends JpaRepository<Grupo, Long> {
     @Query("SELECT g FROM Grupo g LEFT JOIN FETCH g.alunos a LEFT JOIN FETCH a.curso c LEFT JOIN FETCH c.areaDeAtuacao WHERE g.id = :id")
     Optional<Grupo> findByIdWithAlunos(@Param("id") Long id);
 
-
+    @Query("SELECT g FROM Grupo g JOIN g.professores p WHERE p.id = :professorId")
+    List<Grupo> findGruposByProfessorId(@Param("professorId") Long professorId);
 }
