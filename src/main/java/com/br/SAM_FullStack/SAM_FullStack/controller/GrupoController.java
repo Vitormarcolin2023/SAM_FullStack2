@@ -129,4 +129,24 @@ public class GrupoController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Endpoint GET para buscar grupos por ID do professor.
+     * O frontend chamará: GET /api/grupos/professor/{id}
+     *
+     * @param professorId O ID do professor vindo da URL.
+     * @return ResponseEntity com a lista de grupos.
+     */
+    @GetMapping("/professor/{professorId}")
+    public ResponseEntity<List<Grupo>> getGruposByProfessorId(@PathVariable Long professorId) {
+        try {
+            List<Grupo> grupos = grupoService.findGruposByProfessorId(professorId);
+            if (grupos.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            return ResponseEntity.ok(grupos);
+        } catch (Exception e) {
+            // Adicione um log de erro aqui
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
