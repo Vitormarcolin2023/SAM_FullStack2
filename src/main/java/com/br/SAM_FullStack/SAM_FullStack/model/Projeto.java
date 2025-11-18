@@ -47,7 +47,7 @@ public class Projeto {
     private LocalDate dataFinalProjeto;
 
     @NotBlank(message = "É obrigatório adicionar o periodo da faculdade")
-    @Column(name = "periodo", nullable = false, length = 45)
+    @Column(name = "periodo", nullable = false)
     private String periodo;
 
     @ManyToOne
