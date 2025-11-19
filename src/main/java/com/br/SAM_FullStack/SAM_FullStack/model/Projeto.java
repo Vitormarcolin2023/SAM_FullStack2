@@ -47,7 +47,7 @@ public class Projeto {
     private LocalDate dataFinalProjeto;
 
     @NotBlank(message = "É obrigatório adicionar o periodo da faculdade")
-    @Column(name = "periodo", nullable = false, length = 45)
+    @Column(name = "periodo", nullable = false)
     private String periodo;
 
     @ManyToOne
@@ -55,7 +55,8 @@ public class Projeto {
     @JsonIgnoreProperties("projetos")
     private Mentor mentor;
 
-    private String statusProjeto;
+    @Enumerated(EnumType.STRING)
+    private StatusProjeto statusProjeto;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JsonIgnoreProperties("projetos")
