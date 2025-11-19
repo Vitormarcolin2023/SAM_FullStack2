@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -72,6 +73,9 @@ public class Mentor implements UserDetails {
     private List<Reuniao> reunioes = new ArrayList<>();
 
     private String resumo;
+
+    @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Avaliacao> avaliacoes;
 
     // Metodos obrigatórios do Spring Security
 
