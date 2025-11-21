@@ -65,6 +65,7 @@ public class MentorService {
         if (mentorUpdate.getCpf() != null) mentorExistente.setCpf(mentorUpdate.getCpf());
         if (mentorUpdate.getEmail() != null) mentorExistente.setEmail(mentorUpdate.getEmail());
         if (mentorUpdate.getTipoDeVinculo() != null) mentorExistente.setTipoDeVinculo(mentorUpdate.getTipoDeVinculo());
+        if (mentorUpdate.getFormacaoDoMentor() != null) mentorExistente.setFormacaoDoMentor(mentorUpdate.getFormacaoDoMentor());
         if (mentorUpdate.getTempoDeExperiencia() != null) mentorExistente.setTempoDeExperiencia(mentorUpdate.getTempoDeExperiencia());
         if (mentorUpdate.getAreaDeAtuacao() != null) mentorExistente.setAreaDeAtuacao(mentorUpdate.getAreaDeAtuacao());
         if (mentorUpdate.getEndereco() != null) mentorExistente.setEndereco(mentorUpdate.getEndereco());

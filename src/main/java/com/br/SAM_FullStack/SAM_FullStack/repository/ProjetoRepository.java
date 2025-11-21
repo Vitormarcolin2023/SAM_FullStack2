@@ -12,6 +12,7 @@ import java.util.List;
 public interface ProjetoRepository extends JpaRepository <Projeto, Long> {
 
     List<Projeto> findByNomeDoProjetoIgnoreCaseContaining(String nomeDoProjeto);
+    List<Projeto> findByPeriodo(String periodo);
 
     List<Projeto> findByMentorId(Long mentorId);
     List<Projeto> findByAreaDeAtuacao(AreaDeAtuacao areaDeAtuacao);

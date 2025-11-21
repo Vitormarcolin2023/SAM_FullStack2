@@ -38,6 +38,7 @@ public class Grupo {
     @ManyToMany
     @JsonIgnoreProperties("grupo")
     @JoinTable(
+            //name = "tb_aluno_grupo",
             name = "aluno_grupo",
             joinColumns = @JoinColumn(name = "grupo_id"),
             inverseJoinColumns = @JoinColumn(name = "aluno_id")
@@ -51,6 +52,17 @@ public class Grupo {
     @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL)
     @JsonIgnoreProperties("grupo")
     private List<Projeto> projetos;
+
+    @ManyToMany
+    @JsonIgnoreProperties("grupo")
+    @JoinTable(
+            name = "tb_grupo_professor",
+            joinColumns = @JoinColumn(name = "grupo_id"),
+            inverseJoinColumns = @JoinColumn(name = "professor_id")
+    )
+    private List<Professor> professores = new ArrayList<>();
+
+    private String periodo;
 
     public Grupo(Long id, String nome, StatusGrupo statusGrupo, Aluno alunoAdmin, List<Aluno> alunos) {
         this.id = id;

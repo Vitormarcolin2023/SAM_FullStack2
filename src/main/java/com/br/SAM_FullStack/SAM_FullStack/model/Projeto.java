@@ -3,7 +3,6 @@ package com.br.SAM_FullStack.SAM_FullStack.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -12,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -47,7 +47,7 @@ public class Projeto {
     private LocalDate dataFinalProjeto;
 
     @NotBlank(message = "É obrigatório adicionar o periodo da faculdade")
-    @Column(name = "periodo", nullable = false, length = 45)
+    @Column(name = "periodo", nullable = false)
     private String periodo;
 
     @ManyToOne
@@ -55,7 +55,8 @@ public class Projeto {
     @JsonIgnoreProperties("projetos")
     private Mentor mentor;
 
-    private String statusProjeto;
+    @Enumerated(EnumType.STRING)
+    private StatusProjeto statusProjeto;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JsonIgnoreProperties("projetos")
@@ -68,5 +69,8 @@ public class Projeto {
             inverseJoinColumns = @JoinColumn(name = "professor_id"))
     @JsonIgnoreProperties("projetos")
     private List<Professor> professores;
+
+    @OneToMany(mappedBy = "projeto", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Avaliacao> avaliacoes;
 
 }

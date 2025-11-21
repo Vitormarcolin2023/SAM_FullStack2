@@ -2,6 +2,7 @@ package com.br.SAM_FullStack.SAM_FullStack.controller;
 
 import com.br.SAM_FullStack.SAM_FullStack.model.AreaDeAtuacao;
 import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
+import com.br.SAM_FullStack.SAM_FullStack.repository.ProjetoRepository;
 import com.br.SAM_FullStack.SAM_FullStack.service.ProjetoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import java.util.List;
 public class ProjetoController {
 
     private final ProjetoService projetoService;
+    private ProjetoRepository projetoRepository;
 
     @GetMapping("/findAll")
     public ResponseEntity<List<Projeto>> listAll() {
@@ -41,6 +43,11 @@ public class ProjetoController {
         AreaDeAtuacao areaA = new AreaDeAtuacao();
         areaA.setNome(areaNome);
         return projetoService.buscarPorAreaAtuacao(areaA);
+    }
+
+    @GetMapping("/buscar-por-periodo")
+    public List<Projeto> buscarPorPeriodo(@RequestParam String periodo) {
+        return projetoService.findByPeriodo(periodo);
     }
 
     @PostMapping("/save")
