@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -83,5 +84,17 @@ public class ProjetoController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(projetos);
+    }
+
+    @GetMapping("/buscar-projeto-ativo/{alunoId}")
+    public ResponseEntity<Projeto> buscarProjetoAtivo(@PathVariable Long alunoId){
+        Projeto projeto = projetoService.buscarProjetoAtivo(alunoId);
+        return ResponseEntity.ok(projeto);
+    }
+
+    @GetMapping ("buscar-projetos-ativos-mentor/{mentorId}")
+    public ResponseEntity<List<Projeto>> buscarProjetosAtivosMentor(@PathVariable Long mentorId){
+        List<Projeto> response = projetoService.buscarProjetosAtivosMentores(mentorId);
+        return ResponseEntity.ok(response);
     }
 }

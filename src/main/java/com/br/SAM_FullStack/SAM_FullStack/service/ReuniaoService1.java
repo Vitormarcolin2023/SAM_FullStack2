@@ -2,10 +2,7 @@
 
     import com.br.SAM_FullStack.SAM_FullStack.dto.ReuniaoDTO;
     import com.br.SAM_FullStack.SAM_FullStack.model.*;
-    import com.br.SAM_FullStack.SAM_FullStack.repository.AlunoRepository;
-    import com.br.SAM_FullStack.SAM_FullStack.repository.GrupoRepository;
-    import com.br.SAM_FullStack.SAM_FullStack.repository.MentorRepository;
-    import com.br.SAM_FullStack.SAM_FullStack.repository.ReuniaoRepository;
+    import com.br.SAM_FullStack.SAM_FullStack.repository.*;
     import lombok.RequiredArgsConstructor;
     import org.springframework.beans.factory.annotation.Autowired;
     import org.springframework.stereotype.Service;
@@ -18,8 +15,7 @@
 
         @Autowired
         private final ReuniaoRepository reuniaoRepository;
-        private final GrupoRepository grupoRepository;
-        private final MentorRepository mentorRepository;
+        private final ProjetoRepository projetoRepository;
         private final AlunoRepository alunoRepository;
 
         // Metodo para coordenação - ver todas
@@ -44,28 +40,17 @@
         }
 
         public String save(ReuniaoDTO reuniaoDTO) {
-            Grupo grupo = grupoRepository.findById(reuniaoDTO.getGrupoId())
-                    .orElseThrow(() -> new IllegalStateException("Grupo não encontrado"));
-            Mentor mentor = mentorRepository.findById(reuniaoDTO.getMentorId())
-                    .orElseThrow(() -> new IllegalStateException("Mentor não encontrado"));
+            Projeto projeto = projetoRepository.findById(reuniaoDTO.getProjeto_id()).
+                    orElseThrow(() -> new RuntimeException("Projeto não encontrado"));
 
-            // Verifique se a área de atuação do mentor é a mesma de todos os alunos do grupo.
-            AreaDeAtuacao areaMentor = mentor.getAreaDeAtuacao();
-            List<Aluno> alunosDoGrupo = alunoRepository.findAllByGrupoId(grupo.getId());
-
-            for (Aluno aluno : alunosDoGrupo) {
-                if (aluno.getCurso().getAreaDeAtuacao() == null || !aluno.getCurso().getAreaDeAtuacao().equals(areaMentor)) {
-                    throw new IllegalStateException("A área de atuação de pelo menos um aluno não corresponde à do mentor.");
-                }
-            }
             Reuniao reuniao = new Reuniao();
             reuniao.setAssunto(reuniaoDTO.getAssunto());
             reuniao.setData(reuniaoDTO.getData());
             reuniao.setHora(reuniaoDTO.getHora());
             reuniao.setFormatoReuniao(reuniaoDTO.getFormatoReuniao());
-            reuniao.setGrupo(grupo);
-            reuniao.setMentor(mentor);
+            reuniao.setProjeto(projeto);
             reuniao.setStatusReuniao(StatusReuniao.PENDENTE);
+            reuniao.setSolicitadoPor(reuniaoDTO.getSolicitadoPor());
 
             reuniaoRepository.save(reuniao);
             return "Solicitação de reunião enviada";

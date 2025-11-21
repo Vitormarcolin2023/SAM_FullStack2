@@ -69,9 +69,6 @@ public class Mentor implements UserDetails {
     @JsonManagedReference //evita o efeito sanduiche q estava acontecendo <mentor><endereco><mentor>
     private Endereco endereco;
 
-    @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Reuniao> reunioes = new ArrayList<>();
-
     private String resumo;
 
     @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)
