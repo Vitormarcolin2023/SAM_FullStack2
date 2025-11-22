@@ -44,9 +44,15 @@ public class Avaliacao {
 
     private String comentario;
 
+    private Boolean recomendacao;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "projeto_id")
     @JsonIgnore
     private Projeto projeto;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mentor_id")
+    @JsonIgnore
+    private Mentor mentor;
 }

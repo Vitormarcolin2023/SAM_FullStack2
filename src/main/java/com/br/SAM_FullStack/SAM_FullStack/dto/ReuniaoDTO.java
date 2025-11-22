@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 
 @Getter
@@ -24,13 +26,12 @@ public class ReuniaoDTO {
     private Date data;
 
     @NotNull(message = "É necessário informar a hora da reunião")
-    private Time hora;
+    private LocalTime hora;
 
     private FormatoReuniao formatoReuniao;
 
     @NotNull(message = "O ID do mentor é obrigatório")
-    private long mentorId;
+    private long projeto_id;
 
-    @NotNull(message = "O ID do grupo é obrigatório")
-    private long grupoId;
+    private String solicitadoPor;
 }

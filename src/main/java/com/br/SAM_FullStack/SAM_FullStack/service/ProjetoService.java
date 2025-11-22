@@ -133,4 +133,13 @@ public class ProjetoService {
         return projetoRepository.findAllByProfessoresId(professorId);
     }
 
+    public Projeto buscarProjetoAtivo(Long alunoId){
+        return projetoRepository.findProjetoAtivoDoAluno(alunoId, StatusProjeto.ATIVO)
+                .orElseThrow(() -> new RuntimeException("Nenhum projeto ativo no momento"));
+    }
+
+    public List<Projeto> buscarProjetosAtivosMentores(Long mentorId){
+        return projetoRepository.findAllByMentorIdAndStatusProjeto(mentorId, StatusProjeto.ATIVO);
+    }
+
 }
