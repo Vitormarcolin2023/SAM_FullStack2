@@ -33,6 +33,10 @@
             return reuniaoRepository.findAllMentor(idMentor);
         }
 
+        public List<Reuniao> findAllByProjeto(Long projetoId) {
+            return reuniaoRepository.findAllByProjetoId(projetoId);
+        }
+
         // Buscar por ID
         public Reuniao findById(long id) {
             return reuniaoRepository.findById(id)
@@ -77,18 +81,27 @@
             if (reuniaoAtualizada.getFormatoReuniao() != null) {
                 reuniaoexiste.setFormatoReuniao(reuniaoAtualizada.getFormatoReuniao());
             }
+            if (reuniaoAtualizada.getMotivoRecusa() != null){
+                reuniaoexiste.setMotivoRecusa(reuniaoAtualizada.getMotivoRecusa());
+            }
 
 
             reuniaoRepository.save(reuniaoexiste);
             return "Reunião atualizada e reenviada para aprovação";
         }
 
-        public String aceitarReuniao(long id, StatusReuniao novoStatus) {
+        public String aceitarReuniao(long id, StatusReuniao novoStatus, String motivo) {
 
             Reuniao reuniaoExiste = reuniaoRepository.findById(id)
                     .orElseThrow(() -> new IllegalStateException("Reunião não encontrada"));
 
             reuniaoExiste.setStatusReuniao(novoStatus);
+
+            if(novoStatus == StatusReuniao.RECUSADO){
+                reuniaoExiste.setMotivoRecusa(motivo);
+            } else {
+                reuniaoExiste.setMotivoRecusa(null);
+            }
 
             reuniaoRepository.save(reuniaoExiste);
             return "Status reunião: " + novoStatus.toString().toLowerCase();

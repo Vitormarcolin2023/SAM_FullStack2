@@ -16,4 +16,6 @@ public interface ReuniaoRepository extends JpaRepository<Reuniao, Long> {
     // Reuniões por mentor
     @Query("SELECT r FROM Reuniao r WHERE r.projeto.mentor.id = :idMentor")
     List<Reuniao> findAllMentor(@Param("idMentor") long idMentor);
+
+    List<Reuniao> findAllByProjetoId(Long projetoId);
 }

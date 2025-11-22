@@ -48,6 +48,12 @@ public class ReuniaoController1 {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @GetMapping("/findByProjeto/{projetoId}")
+    public ResponseEntity<List<Reuniao>> findAllByProjeto(@PathVariable Long projetoId){
+        List<Reuniao> result = reuniaoService.findAllByProjeto(projetoId);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
 
     @PostMapping("/save")
     public ResponseEntity<String> save(@RequestBody ReuniaoDTO reuniaoDTO) {
@@ -62,10 +68,10 @@ public class ReuniaoController1 {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-    @PutMapping("/confirmarReuniao/{id}/status/{status}")
-    public ResponseEntity<String> confirmarReuniao(@PathVariable long id, @PathVariable String status) {
+    @PutMapping("/confirmarReuniao/{id}/status/{status}/motivo-cancelamento{motivo}")
+    public ResponseEntity<String> confirmarReuniao(@PathVariable long id, @PathVariable String status, @PathVariable String motivo) {
         StatusReuniao statusEnum = StatusReuniao.valueOf(status.toUpperCase());
-        String result = reuniaoService.aceitarReuniao(id, statusEnum);
+        String result = reuniaoService.aceitarReuniao(id, statusEnum, motivo);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
