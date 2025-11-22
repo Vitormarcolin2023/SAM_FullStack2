@@ -2,11 +2,13 @@ package com.br.SAM_FullStack.SAM_FullStack.controller;
 
 import com.br.SAM_FullStack.SAM_FullStack.model.AreaDeAtuacao;
 import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
+import com.br.SAM_FullStack.SAM_FullStack.repository.ProjetoRepository;
 import com.br.SAM_FullStack.SAM_FullStack.service.ProjetoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.List;
 public class ProjetoController {
 
     private final ProjetoService projetoService;
+    private ProjetoRepository projetoRepository;
 
     @GetMapping("/findAll")
     public ResponseEntity<List<Projeto>> listAll() {
@@ -41,6 +44,11 @@ public class ProjetoController {
         AreaDeAtuacao areaA = new AreaDeAtuacao();
         areaA.setNome(areaNome);
         return projetoService.buscarPorAreaAtuacao(areaA);
+    }
+
+    @GetMapping("/buscar-por-periodo")
+    public List<Projeto> buscarPorPeriodo(@RequestParam String periodo) {
+        return projetoService.findByPeriodo(periodo);
     }
 
     @PostMapping("/save")
@@ -76,5 +84,17 @@ public class ProjetoController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(projetos);
+    }
+
+    @GetMapping("/buscar-projeto-ativo/{alunoId}")
+    public ResponseEntity<Projeto> buscarProjetoAtivo(@PathVariable Long alunoId){
+        Projeto projeto = projetoService.buscarProjetoAtivo(alunoId);
+        return ResponseEntity.ok(projeto);
+    }
+
+    @GetMapping ("buscar-projetos-ativos-mentor/{mentorId}")
+    public ResponseEntity<List<Projeto>> buscarProjetosAtivosMentor(@PathVariable Long mentorId){
+        List<Projeto> response = projetoService.buscarProjetosAtivosMentores(mentorId);
+        return ResponseEntity.ok(response);
     }
 }

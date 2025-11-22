@@ -151,7 +151,7 @@ public class GrupoControllerTest {
     @DisplayName("Deve retornar GrupoDTO quando salvo com sucesso e retornar created")
     @WithMockUser
     void salvarGrupo_quandoInformacoesCorretas_deveRetornarGrupoDTO() throws Exception{
-        GrupoDTO novoGrupo = new GrupoDTO(3L, "Novo Grupo", 4L, List.of(4L, 5L, 6L));
+        GrupoDTO novoGrupo = new GrupoDTO(3L, "Novo Grupo", 4L, List.of(4L, 5L, 6L), List.of(1L), "4 PERIODO");
         when(grupoService.save(novoGrupo)).thenReturn(novoGrupo);
 
         mockMvc.perform(post("/grupos/save")

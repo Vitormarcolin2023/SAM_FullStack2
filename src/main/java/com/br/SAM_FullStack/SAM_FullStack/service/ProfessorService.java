@@ -1,11 +1,15 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
+import com.br.SAM_FullStack.SAM_FullStack.model.Curso;
 import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
 import com.br.SAM_FullStack.SAM_FullStack.model.Professor;
 import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
 import com.br.SAM_FullStack.SAM_FullStack.repository.ProfessorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.annotation.AccessType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -73,4 +77,18 @@ public class ProfessorService {
                 .orElseThrow(() -> new NoSuchElementException("Professor com ID " + id + " não encontrado."));
     }
 
+    public Professor getMyProfile() {
+        // Pega o contexto de autenticação do Spring Security
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new SecurityException("Usuário não autenticado.");
+        }
+
+        // O "name" geralmente é o email ou username usado no login
+        String email = authentication.getName();
+
+        return professorRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Professor não encontrado com o email: " + email));
+    }
 }
