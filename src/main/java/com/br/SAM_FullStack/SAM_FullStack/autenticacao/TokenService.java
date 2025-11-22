@@ -4,7 +4,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import org.springframework.beans.factory.annotation.Value; // Adicione esta importação
 import org.springframework.stereotype.Service;
 
 
@@ -15,13 +14,7 @@ import java.time.ZoneOffset;
 @Service
 public class TokenService {
 
-    /**
-     * ATENÇÃO: A chave secreta (secret) é injetada aqui.
-     * Ela será lida da propriedade 'app.security.jwt.secret' definida no application.properties,
-     * que por sua vez, está lendo a variável de ambiente ${JWT_SECRET} do seu arquivo .env
-     */
-    @Value("${app.security.jwt.secret}")
-    private String secret;
+    private String secret = "segredodejusticaessetoken";
 
     public String generateToken(String email, String role, String nome){
         try{
@@ -55,7 +48,6 @@ public class TokenService {
 
     // gera tempo de expiração do Token de 2 horas
     private Instant generateExpirationDate(){
-        // O fuso horário de Brasília é -03:00
         return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-03:00"));
     }
 

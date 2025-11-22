@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Time;
-import java.time.LocalTime;
 import java.util.Date;
 
 @Getter
@@ -35,7 +34,7 @@ public class Reuniao {
 
     @JsonFormat(pattern = "HH:mm:ss")
     @NotNull(message = "É necessário informar a hora da reunião")
-    private LocalTime hora;
+    private Time hora;
 
 
     @Enumerated(EnumType.STRING)
@@ -44,9 +43,14 @@ public class Reuniao {
     private StatusReuniao statusReuniao;
 
     @ManyToOne
-    @JoinColumn(name = "projeto_id")
+    @JoinColumn(name = "mentor_admin_id")
     @JsonIgnore
-    private Projeto projeto;
+    private Mentor mentor;
 
-    private String solicitadoPor;
+
+    @ManyToOne
+    @JoinColumn(name = "grupo_id")
+    @JsonIgnore
+    private Grupo grupo;
+
 }

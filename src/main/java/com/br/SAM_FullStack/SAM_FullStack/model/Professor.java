@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,9 +34,7 @@ public class Professor implements UserDetails {
     private String nome;
 
     @Column(unique = true)
-    @Email
     private String email;
-
     private String senha;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -52,11 +49,6 @@ public class Professor implements UserDetails {
     @ManyToMany(mappedBy = "professores")
     @JsonIgnoreProperties("professores")
     private List<Projeto> projetos;
-
-    @ManyToMany(mappedBy = "professores")
-    @JsonIgnoreProperties("professores")
-    @JsonIgnore
-    private List<Grupo> grupos = new ArrayList<>();
 
     public Professor(Long id, String nome, String email, String senha, List<Curso> cursos) {
         this.id = id;
