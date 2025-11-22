@@ -48,7 +48,7 @@ public class ReuniaoController1 {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
-
+    // Criar uma reunião - AGORA RECEBE UM DTO!
     @PostMapping("/save")
     public ResponseEntity<String> save(@RequestBody ReuniaoDTO reuniaoDTO) {
         String result = reuniaoService.save(reuniaoDTO);

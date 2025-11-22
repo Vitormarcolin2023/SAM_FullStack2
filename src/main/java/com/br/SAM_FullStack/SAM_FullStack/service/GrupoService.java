@@ -47,11 +47,6 @@ public class GrupoService {
             throw new IllegalArgumentException("Um ou mais IDs de alunos não existem");
         }
 
-        List<Professor> professores = professorRepository.findAllById(grupoDTO.professoresIds());
-        if (professores.size() != grupoDTO.professoresIds().size()) {
-            throw new IllegalArgumentException("Um ou mais professores estão incorretos");
-        }
-
         if (alunos.size() < 3 || alunos.size() > 6) {
             throw new IllegalStateException("Grupo deve ter entre 3 e 6 participantes");
         }
@@ -72,8 +67,6 @@ public class GrupoService {
         grupo.setNome(grupoDTO.nome());
         grupo.setAlunoAdmin(admin);
         grupo.setStatusGrupo(StatusGrupo.ATIVO);
-        grupo.setProfessores(professores);
-        grupo.setPeriodo(grupoDTO.periodo());
 
         for (Aluno aluno : alunos) {
             aluno.setStatusAlunoGrupo(StatusAlunoGrupo.ATIVO);
@@ -89,9 +82,7 @@ public class GrupoService {
                 salvo.getId(),
                 salvo.getNome(),
                 admin.getId(),
-                alunos.stream().map(Aluno::getId).toList(),
-                professores.stream().map(Professor::getId).toList(),
-                salvo.getPeriodo()
+                alunos.stream().map(Aluno::getId).toList()
         );
     }
 
@@ -225,7 +216,7 @@ public class GrupoService {
             List<Grupo> grupos = grupoRepository.findByStatusGrupoAndAlunosId(StatusGrupo.ATIVO, aluno.getId());
 
             if(grupos.isEmpty()){
-                 return null;
+                 throw new RuntimeException("Aluno não possui nenhum grupo ativo");
             }
 
             // pega o primeiro grupo da lista pois o aluno só poderá ter 1 grupo ativo por projeto
@@ -253,9 +244,5 @@ public class GrupoService {
         }
 
         return grupos;
-    }
-
-    public List<Grupo> findGruposByProfessorId(Long professorId) {
-        return grupoRepository.findGruposByProfessorId(professorId);
     }
 }

@@ -118,9 +118,11 @@ public class GrupoController {
     }
 
     @PutMapping("/arquivar/{id}")
-    public ResponseEntity<String> arquivarGrupo(@PathVariable long id){
+    public ResponseEntity<Map<String, String>> arquivarGrupo(@PathVariable long id){
         String result = grupoService.arquivarGrupo(id);
-        return ResponseEntity.ok(result);
+        Map<String, String> response = new HashMap<>();
+        response.put("message", result);
+        return ResponseEntity.ok(response);
     }
 
         @GetMapping("/findByGruposArquivados/{id}")
@@ -129,17 +131,4 @@ public class GrupoController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/professor/{professorId}")
-    public ResponseEntity<List<Grupo>> getGruposByProfessorId(@PathVariable Long professorId) {
-        try {
-            List<Grupo> grupos = grupoService.findGruposByProfessorId(professorId);
-            if (grupos.isEmpty()) {
-                return ResponseEntity.noContent().build();
-            }
-            return ResponseEntity.ok(grupos);
-        } catch (Exception e) {
-            // Adicione um log de erro aqui
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
 }

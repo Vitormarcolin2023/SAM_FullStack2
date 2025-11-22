@@ -43,25 +43,18 @@ public class ProjetoService {
 
     public List<Projeto> buscarPorAreaAtuacao(AreaDeAtuacao areaDeAtuacao) {
         return projetoRepository.findByAreaDeAtuacao(areaDeAtuacao);
-
-    }
-    public List<Projeto> findByPeriodo(String periodo) {
-        return projetoRepository.findByPeriodo(periodo);
     }
 
     private void atualizarStatusProjeto(Projeto projeto) {
         LocalDate hoje = LocalDate.now();
 
-        if (projeto.getDataFinalProjeto() != null && projeto.getDataInicioProjeto().isAfter(hoje)) {
-         projeto.setStatusProjeto(StatusProjeto.EM_APROVACAO);
-        } else if (projeto.getDataFinalProjeto() != null && projeto.getDataFinalProjeto().isAfter(hoje)) {
-            projeto.setStatusProjeto(StatusProjeto.ATIVO);
-        } else if (projeto.getDataFinalProjeto() != null && projeto.getDataFinalProjeto().isBefore(hoje)) {
-            projeto.setStatusProjeto(StatusProjeto.ATIVO);
+        if (projeto.getDataFinalProjeto().isBefore(hoje)) {
+            projeto.setStatusProjeto("ENCERRADO");
+        } else if (projeto.getDataInicioProjeto().isAfter(hoje)) {
+            projeto.setStatusProjeto("NAO_INICIADO");
         } else {
-            projeto.setStatusProjeto(StatusProjeto.ATIVO);
+            projeto.setStatusProjeto("EM_ANDAMENTO");
         }
-
     }
 
     // SALVAR
@@ -91,23 +84,23 @@ public class ProjetoService {
 
 
     //atualizar
-    public Projeto update (Long id, Projeto projetoUpdate){
-        Projeto projetoExistente = findById(id);
-        projetoExistente.setNomeDoProjeto(projetoUpdate.getNomeDoProjeto());
-        projetoExistente.setDataInicioProjeto(projetoUpdate.getDataInicioProjeto());
-        projetoExistente.setDataFinalProjeto(projetoUpdate.getDataFinalProjeto());
-        projetoExistente.setDescricao(projetoUpdate.getDescricao());
-        projetoExistente.setPeriodo(projetoUpdate.getPeriodo());
-        projetoExistente.setAreaDeAtuacao(projetoUpdate.getAreaDeAtuacao());
+        public Projeto update (Long id, Projeto projetoUpdate){
+            Projeto projetoExistente = findById(id);
+            projetoExistente.setNomeDoProjeto(projetoUpdate.getNomeDoProjeto());
+            projetoExistente.setDataInicioProjeto(projetoUpdate.getDataInicioProjeto());
+            projetoExistente.setDataFinalProjeto(projetoUpdate.getDataFinalProjeto());
+            projetoExistente.setDescricao(projetoUpdate.getDescricao());
+            projetoExistente.setPeriodo(projetoUpdate.getPeriodo());
+            projetoExistente.setAreaDeAtuacao(projetoUpdate.getAreaDeAtuacao());
 
-        atualizarStatusProjeto(projetoExistente);
+            atualizarStatusProjeto(projetoExistente);
 
-        return projetoRepository.save(projetoExistente);
-    }
+            return projetoRepository.save(projetoExistente);
+        }
 
-    public void delete(Long id){
-        Projeto projeto = findById(id);
-        projetoRepository.delete(projeto);
+        public void delete(Long id){
+             Projeto projeto = findById(id);
+             projetoRepository.delete(projeto);
     }
 
     @Transactional
@@ -131,15 +124,6 @@ public class ProjetoService {
 
     public List<Projeto> buscarProjetosPorProfessor(Long professorId) {
         return projetoRepository.findAllByProfessoresId(professorId);
-    }
-
-    public Projeto buscarProjetoAtivo(Long alunoId){
-        return projetoRepository.findProjetoAtivoDoAluno(alunoId, StatusProjeto.ATIVO)
-                .orElseThrow(() -> new RuntimeException("Nenhum projeto ativo no momento"));
-    }
-
-    public List<Projeto> buscarProjetosAtivosMentores(Long mentorId){
-        return projetoRepository.findAllByMentorIdAndStatusProjeto(mentorId, StatusProjeto.ATIVO);
     }
 
 }
