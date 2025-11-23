@@ -47,12 +47,13 @@ public class MentorService {
         String senhaEncript = passwordEncoder.encode(mentor.getSenha());
         mentor.setSenha(senhaEncript);
 
+        /*Precisa ser arrumado
         //Envio de email
         String destinatario = mentor.getEmail();
         String assunto = "Bem-vindo(a) ao SAM - Cadastro em Análise";
         Map<String, Object> variaveis = Map.of("nomeMentor", mentor.getNome());
         String template = "emails/boasVindasMentor";
-        emailService.enviarEmailComTemplate(destinatario, assunto, template, variaveis);
+        emailService.enviarEmailComTemplate(destinatario, assunto, template, variaveis);*/
 
         return mentorRepository.save(mentor);
     }
