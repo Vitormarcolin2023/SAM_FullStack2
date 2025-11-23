@@ -44,7 +44,7 @@ public class MentorService {
         // Status inicial até a coordenação aprovar
         mentor.setStatusMentor(StatusMentor.PENDENTE);
 
-        String senhaEncript = passwordEncoder.encode(mentor.getSenha());
+        String senhaEncript = passwordEncoder.encode(mentor.getSenha()); // ⬅️ Falha se passwordEncoder for null
         mentor.setSenha(senhaEncript);
 
         //Envio de email
@@ -52,7 +52,7 @@ public class MentorService {
         String assunto = "Bem-vindo(a) ao SAM - Cadastro em Análise";
         Map<String, Object> variaveis = Map.of("nomeMentor", mentor.getNome());
         String template = "emails/boasVindasMentor";
-        emailService.enviarEmailComTemplate(destinatario, assunto, template, variaveis);
+        emailService.enviarEmailComTemplate(destinatario, assunto, template, variaveis); // ⬅️ Agora deve funcionar
 
         return mentorRepository.save(mentor);
     }

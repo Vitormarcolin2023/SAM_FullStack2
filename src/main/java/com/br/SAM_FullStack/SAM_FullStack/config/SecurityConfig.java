@@ -51,22 +51,22 @@
 			return http.getSharedObject(AuthenticationManager.class);
 		}
 
-		@Bean
-		public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-			http
-					.csrf(csrf -> csrf.disable())
-					.cors(cors -> {})
-					.authorizeHttpRequests(auth -> auth
-							.requestMatchers("/auth/login").permitAll()
-							.requestMatchers("/areas/findAll").permitAll()
-							.requestMatchers("/mentores/save").permitAll()
-							.requestMatchers("/alunos/save").permitAll()
-							.requestMatchers("/api/coordenador/save").permitAll()
-							.requestMatchers("/api/professor/save").permitAll()
-							.requestMatchers("/grupos/save").permitAll()
-							.requestMatchers("/cursos/findAll").permitAll()
-							.anyRequest().authenticated()
-					)
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+            http
+                    .csrf(csrf -> csrf.disable())
+                    .cors(cors -> {})
+                    .authorizeHttpRequests(auth -> auth
+                            .requestMatchers("/auth/login").permitAll()
+                            .requestMatchers("/areas/findAll").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/mentores/save").permitAll() // ⬅️ ALTERAÇÃO AQUI
+                            .requestMatchers("/alunos/save").permitAll()
+                            .requestMatchers("/api/coordenador/save").permitAll()
+                            .requestMatchers("/api/professor/save").permitAll()
+                            .requestMatchers("/grupos/save").permitAll()
+                            .requestMatchers("/cursos/findAll").permitAll()
+                            .anyRequest().authenticated()
+                    )
 					.authenticationProvider(authenticationProvider())
 					.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 					.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
