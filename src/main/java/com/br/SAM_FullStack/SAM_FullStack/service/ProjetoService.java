@@ -5,9 +5,7 @@ import com.br.SAM_FullStack.SAM_FullStack.repository.GrupoRepository;
 import com.br.SAM_FullStack.SAM_FullStack.repository.MentorRepository;
 import com.br.SAM_FullStack.SAM_FullStack.repository.ProjetoRepository;
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.annotation.AccessType;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -86,6 +84,7 @@ public class ProjetoService {
             }
         }
         atualizarStatusProjeto(projeto);
+        projeto.setAvaliadoPorMentor(false);
         return projetoRepository.save(projeto);
     }
 
@@ -134,12 +133,21 @@ public class ProjetoService {
     }
 
     public Projeto buscarProjetoAtivo(Long alunoId){
-        return projetoRepository.findProjetoAtivoDoAluno(alunoId, StatusProjeto.ATIVO)
+        return projetoRepository.findProjetoPorStatusAluno(alunoId, StatusProjeto.ATIVO)
                 .orElseThrow(() -> new RuntimeException("Nenhum projeto ativo no momento"));
     }
 
     public List<Projeto> buscarProjetosAtivosMentores(Long mentorId){
         return projetoRepository.findAllByMentorIdAndStatusProjeto(mentorId, StatusProjeto.ATIVO);
+    }
+
+    public List<Projeto> buscarProjetosAguardandoAvaliacaoMentor(Long mentorId) {
+        return projetoRepository.findAllByMentorIdAndStatusProjeto(mentorId, StatusProjeto.AGUARDANDO_AVALIACAO);
+    }
+
+    public Projeto buscarProjetoAguardandoAvaliacaoAluno(Long alunoId) {
+        return projetoRepository.findProjetoPorStatusAluno(alunoId, StatusProjeto.AGUARDANDO_AVALIACAO)
+                .orElseThrow(() -> new RuntimeException("Nenhum projeto aguardando avaliação"));
     }
 
 }

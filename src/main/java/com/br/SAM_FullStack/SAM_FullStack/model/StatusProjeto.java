@@ -5,4 +5,5 @@ public enum StatusProjeto {
     NAO_ACEITO,
     ARQUIVADO,
     EM_APROVACAO,
+    AGUARDANDO_AVALIACAO,
 }

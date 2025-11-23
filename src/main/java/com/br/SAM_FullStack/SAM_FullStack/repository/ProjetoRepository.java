@@ -1,7 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.repository;
 
 import com.br.SAM_FullStack.SAM_FullStack.model.AreaDeAtuacao;
-import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
 import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
 import com.br.SAM_FullStack.SAM_FullStack.model.StatusProjeto;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,8 +24,8 @@ public interface ProjetoRepository extends JpaRepository <Projeto, Long> {
 
     @Query("SELECT p FROM Projeto p JOIN p.grupo g JOIN g.alunos a " +
             "WHERE a.id = :alunoId AND p.statusProjeto = :status")
-    Optional<Projeto> findProjetoAtivoDoAluno(@Param("alunoId") Long alunoId,
-                                              @Param("status") StatusProjeto status);
+    Optional<Projeto> findProjetoPorStatusAluno(@Param("alunoId") Long alunoId,
+                                                @Param("status") StatusProjeto status);
 
 
 }

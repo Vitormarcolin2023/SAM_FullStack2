@@ -92,9 +92,22 @@ public class ProjetoController {
         return ResponseEntity.ok(projeto);
     }
 
-    @GetMapping ("buscar-projetos-ativos-mentor/{mentorId}")
+    @GetMapping ("/buscar-projetos-ativos-mentor/{mentorId}")
     public ResponseEntity<List<Projeto>> buscarProjetosAtivosMentor(@PathVariable Long mentorId){
         List<Projeto> response = projetoService.buscarProjetosAtivosMentores(mentorId);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping ("/buscar-projetos-nao-avaliados-mentor/{mentorId}")
+    public ResponseEntity<List<Projeto>> buscarProjetosNaoAvaliadosMentor(@PathVariable Long mentorId) {
+        List<Projeto> response = projetoService.buscarProjetosAguardandoAvaliacaoMentor(mentorId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping ("/buscar-projeto-nao-avaliado-aluno/{alunoId}")
+    public ResponseEntity<Projeto> buscarProjetoNaoAvalidadoAluno(@PathVariable Long alunoId) {
+        Projeto response = projetoService.buscarProjetoAguardandoAvaliacaoAluno(alunoId);
+        return ResponseEntity.ok(response);
+    }
+
 }

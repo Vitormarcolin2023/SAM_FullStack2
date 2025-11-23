@@ -2,6 +2,7 @@ package com.br.SAM_FullStack.SAM_FullStack.service;
 
 import com.br.SAM_FullStack.SAM_FullStack.model.Avaliacao;
 import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
+import com.br.SAM_FullStack.SAM_FullStack.model.StatusProjeto;
 import com.br.SAM_FullStack.SAM_FullStack.repository.AvaliacaoRepository;
 import com.br.SAM_FullStack.SAM_FullStack.repository.ProjetoRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -37,6 +38,8 @@ public class AvaliacaoService {
 
         // 3. Define a média no objeto Avaliacao
         avaliacao.setMedia(arredondar(mediaCalculada));
+
+        projeto.setStatusProjeto(StatusProjeto.ARQUIVADO);
 
         // 4. Salva a avaliação (com sua média) no banco
         return avaliacaoRepository.save(avaliacao);

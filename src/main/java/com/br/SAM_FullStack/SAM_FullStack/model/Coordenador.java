@@ -38,6 +38,8 @@ public class Coordenador implements UserDetails {
     @JsonIgnoreProperties("coordenador")
     private List<Curso> cursos;
 
+
+
     public void addCurso(Curso curso) {
         if (cursos == null) {
             cursos = new ArrayList<>();

@@ -71,8 +71,6 @@ public class Mentor implements UserDetails {
 
     private String resumo;
 
-    @OneToMany(mappedBy = "mentor", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Avaliacao> avaliacoes;
 
     // Metodos obrigatórios do Spring Security
 

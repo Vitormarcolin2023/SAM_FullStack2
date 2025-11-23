@@ -38,7 +38,7 @@ public class ArquivamentoService {
             }
 
             if (arquivar){
-                projeto.setStatusProjeto(StatusProjeto.ARQUIVADO);
+                projeto.setStatusProjeto(StatusProjeto.AGUARDANDO_AVALIACAO);
                 projetoRepository.save(projeto);
 
                 Grupo grupo = projeto.getGrupo();

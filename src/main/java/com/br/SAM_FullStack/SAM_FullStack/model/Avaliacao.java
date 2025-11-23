@@ -1,6 +1,8 @@
 package com.br.SAM_FullStack.SAM_FullStack.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -48,11 +50,6 @@ public class Avaliacao {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "projeto_id")
-    @JsonIgnore
+    @JsonIgnoreProperties("avaliacoes")
     private Projeto projeto;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mentor_id")
-    @JsonIgnore
-    private Mentor mentor;
 }
