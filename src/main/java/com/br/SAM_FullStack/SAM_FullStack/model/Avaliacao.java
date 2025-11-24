@@ -52,4 +52,10 @@ public class Avaliacao {
     @JoinColumn(name = "projeto_id")
     @JsonIgnoreProperties("avaliacoes")
     private Projeto projeto;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "aluno_id")
+    @JsonIgnoreProperties("avaliacoesRespondidas")
+    private Aluno aluno;
+
 }

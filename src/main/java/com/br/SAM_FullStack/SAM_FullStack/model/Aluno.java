@@ -56,6 +56,11 @@ public class Aluno implements UserDetails {
     @JsonIgnore
     private List<Grupo> grupos = new ArrayList<>();
 
+    @OneToMany(mappedBy = "aluno")
+    @JsonIgnore
+    private List<Avaliacao> avaliacoesRespondidas = new ArrayList<>();
+
+
     public Aluno(Long id, String nome, Integer ra, String senha, String email, Curso curso, StatusAlunoGrupo statusAlunoGrupo) {
         this.id = id;
         this.nome = nome;

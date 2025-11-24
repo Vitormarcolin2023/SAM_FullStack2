@@ -1,6 +1,7 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
 import com.br.SAM_FullStack.SAM_FullStack.model.*;
+import com.br.SAM_FullStack.SAM_FullStack.repository.AvaliacaoRepository;
 import com.br.SAM_FullStack.SAM_FullStack.repository.GrupoRepository;
 import com.br.SAM_FullStack.SAM_FullStack.repository.MentorRepository;
 import com.br.SAM_FullStack.SAM_FullStack.repository.ProjetoRepository;

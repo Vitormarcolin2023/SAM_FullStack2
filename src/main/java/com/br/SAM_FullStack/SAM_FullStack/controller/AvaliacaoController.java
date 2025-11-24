@@ -33,4 +33,14 @@ public class AvaliacaoController {
         // Retorna 201 Created com a avaliação salva (agora com a média calculada)
         return ResponseEntity.status(201).body(avaliacaoSalva);
     }
+
+    @GetMapping("/verifica-pendencia-aluno/{alunoId}/projeto/{projetoId}")
+    public ResponseEntity<Boolean> verificaPendenciaAluno(
+            @PathVariable Long alunoId,
+            @PathVariable Long projetoId) {
+
+        boolean jaRespondeu = avaliacaoService.alunoRespondeuAvaliacao(alunoId, projetoId);
+        return ResponseEntity.ok(jaRespondeu);
+    }
+
 }

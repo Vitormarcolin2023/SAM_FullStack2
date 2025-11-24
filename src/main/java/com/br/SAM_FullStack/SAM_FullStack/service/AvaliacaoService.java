@@ -1,5 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
+import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.model.Avaliacao;
 import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
 import com.br.SAM_FullStack.SAM_FullStack.model.StatusProjeto;
@@ -9,6 +10,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -39,10 +42,23 @@ public class AvaliacaoService {
         // 3. Define a média no objeto Avaliacao
         avaliacao.setMedia(arredondar(mediaCalculada));
 
-        projeto.setStatusProjeto(StatusProjeto.ARQUIVADO);
+        Avaliacao avaliacaoSalva = avaliacaoRepository.save(avaliacao);
+
+        List<Aluno> alunosDoProjeto = projeto.getGrupo().getAlunos();
+
+        List<Aluno> alunosQueResponderam = avaliacaoRepository.findByProjetoId(projetoId).stream()
+                        .map(Avaliacao::getAluno)
+                                .distinct().toList();
+
+        boolean todosResponderam = alunosQueResponderam.size() == alunosDoProjeto.size();
+
+        if(todosResponderam){
+            projeto.setStatusProjeto(StatusProjeto.ARQUIVADO);
+            projetoRepository.save(projeto);
+        }
 
         // 4. Salva a avaliação (com sua média) no banco
-        return avaliacaoRepository.save(avaliacao);
+        return avaliacaoSalva;
 
     }
 
@@ -50,4 +66,9 @@ public class AvaliacaoService {
     private double arredondar(double valor) {
         return Math.round(valor * 100.0) / 100.0;
     }
+
+    public boolean alunoRespondeuAvaliacao(Long alunoId, Long projetoId) {
+        return avaliacaoRepository.existsByProjetoIdAndAlunoId(projetoId, alunoId);
+    }
+
 }
