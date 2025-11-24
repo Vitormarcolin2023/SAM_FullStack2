@@ -5,12 +5,13 @@ import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface AvaliacaoRepository extends JpaRepository<Avaliacao, Long> {
 
-    Optional<Avaliacao> findByProjetoId(Long projetoId);
+    List<Avaliacao> findByProjetoId(Long projetoId);
 
     boolean existsByProjetoIdAndAlunoId(Long projetoId, Long alunoId);
 

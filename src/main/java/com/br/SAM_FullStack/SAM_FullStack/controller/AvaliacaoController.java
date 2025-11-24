@@ -21,18 +21,17 @@ public class AvaliacaoController {
      * O corpo da avaliação (respostas, comentario) é passado no Body.
      */
     @PostMapping("/projeto/{projetoId}")
-    public ResponseEntity<Avaliacao> criarAvaliacao(
+    public ResponseEntity<Boolean> criarAvaliacao(
             @PathVariable Long projetoId,
             @Valid @RequestBody Avaliacao avaliacao) {
 
         avaliacao.setId(null);
         avaliacao.setMedia(null); // Será calculado no service
 
-        Avaliacao avaliacaoSalva = avaliacaoService.salvarAvaliacao(avaliacao, projetoId);
-
-        // Retorna 201 Created com a avaliação salva (agora com a média calculada)
-        return ResponseEntity.status(201).body(avaliacaoSalva);
+        boolean sucesso = avaliacaoService.salvarAvaliacao(avaliacao, projetoId);
+        return ResponseEntity.status(201).body(sucesso);
     }
+
 
     @GetMapping("/verifica-pendencia-aluno/{alunoId}/projeto/{projetoId}")
     public ResponseEntity<Boolean> verificaPendenciaAluno(

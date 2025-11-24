@@ -21,15 +21,18 @@ public class AvaliacaoService {
     private final ProjetoRepository projetoRepository;
 
     @Transactional
-    public Avaliacao salvarAvaliacao(Avaliacao avaliacao, Long projetoId) {
+    public boolean salvarAvaliacao(Avaliacao avaliacao, Long projetoId) {
 
-        // 1. Associa o Projeto à Avaliação
         Projeto projeto = projetoRepository.findById(projetoId)
                 .orElseThrow(() -> new EntityNotFoundException("Projeto não encontrado com ID: " + projetoId));
-
         avaliacao.setProjeto(projeto);
 
-        // 2. Calcula a média *desta* avaliação (r1 a r6)
+        // Verifica se o aluno já respondeu
+        if (avaliacaoRepository.existsByProjetoIdAndAlunoId(projetoId, avaliacao.getAluno().getId())) {
+            throw new RuntimeException("Aluno já respondeu a avaliação deste projeto");
+        }
+
+        // Calcula a média desta avaliação (r1 a r6)
         double mediaCalculada = (
                 avaliacao.getResposta1() +
                         avaliacao.getResposta2() +
@@ -38,29 +41,33 @@ public class AvaliacaoService {
                         avaliacao.getResposta5() +
                         avaliacao.getResposta6()
         ) / 6.0;
-
-        // 3. Define a média no objeto Avaliacao
         avaliacao.setMedia(arredondar(mediaCalculada));
 
-        Avaliacao avaliacaoSalva = avaliacaoRepository.save(avaliacao);
+        try {
+            // Salva a avaliação no banco
+            avaliacaoRepository.save(avaliacao);
 
-        List<Aluno> alunosDoProjeto = projeto.getGrupo().getAlunos();
+            // Verifica se todos os alunos do projeto já responderam
+            List<Aluno> alunosDoProjeto = projeto.getGrupo().getAlunos();
+            List<Aluno> alunosQueResponderam = avaliacaoRepository.findByProjetoId(projetoId).stream()
+                    .map(Avaliacao::getAluno)
+                    .distinct()
+                    .toList();
 
-        List<Aluno> alunosQueResponderam = avaliacaoRepository.findByProjetoId(projetoId).stream()
-                        .map(Avaliacao::getAluno)
-                                .distinct().toList();
+            boolean todosResponderam = alunosQueResponderam.size() == alunosDoProjeto.size();
 
-        boolean todosResponderam = alunosQueResponderam.size() == alunosDoProjeto.size();
+            if (todosResponderam) {
+                projeto.setStatusProjeto(StatusProjeto.ARQUIVADO);
+                projetoRepository.save(projeto);
+            }
 
-        if(todosResponderam){
-            projeto.setStatusProjeto(StatusProjeto.ARQUIVADO);
-            projetoRepository.save(projeto);
+            return true; // Avaliação salva com sucesso
+
+        } catch (Exception e) {
+            return false; // Algum erro ao salvar
         }
-
-        // 4. Salva a avaliação (com sua média) no banco
-        return avaliacaoSalva;
-
     }
+
 
     // Helper para arredondar as médias para 2 casas decimais
     private double arredondar(double valor) {
