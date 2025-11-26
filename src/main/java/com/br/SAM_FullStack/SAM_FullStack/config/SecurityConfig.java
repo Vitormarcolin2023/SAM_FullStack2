@@ -57,6 +57,7 @@
 					.csrf(csrf -> csrf.disable())
 					.cors(cors -> {})
 					.authorizeHttpRequests(auth -> auth
+							// rotas livres
 							.requestMatchers("/auth/login").permitAll()
 							.requestMatchers("/areas/findAll").permitAll()
 							.requestMatchers("/mentores/save").permitAll()
@@ -65,6 +66,23 @@
 							.requestMatchers("/api/professor/save").permitAll()
 							.requestMatchers("/grupos/save").permitAll()
 							.requestMatchers("/cursos/findAll").permitAll()
+							// rotas guardadas por Role
+							.requestMatchers("/alunos/findAll").hasAnyRole("COORDENADOR", "PROFESSOR")
+							.requestMatchers("/alunos/**").hasRole("ALUNO")
+							.requestMatchers("/api/coordenador/**").hasRole("COORDENADOR")
+							.requestMatchers("/api/professor/**").hasRole("PROFESSOR")
+							.requestMatchers("/mentores/**").hasRole("MENTOR")
+							.requestMatchers("/avaliacoes/**").hasAnyRole("ALUNO", "COORDENADOR")
+							.requestMatchers("/reunioes/**").hasAnyRole("MENTOR", "ALUNO")
+							.requestMatchers("/projetos/findById/**").hasAnyRole("ALUNO", "MENTOR", "PROFESSOR", "COORDENADOR")
+							.requestMatchers("/projetos//buscar-projetos-ativos-mentor/**").hasRole("MENTOR")
+							.requestMatchers("/projetos/buscar-projetos-nao-avaliados-mentor/**").hasRole("MENTOR")
+							.requestMatchers("/projetos/mentor/**").hasRole("MENTOR")
+							.requestMatchers("/projetos/professor/**").hasRole("PROFESSOR")
+							.requestMatchers("/projetos/**").hasRole("ALUNO")
+							.requestMatchers("/grupos/**").hasRole("ALUNO")
+
+
 							.anyRequest().authenticated()
 					)
 					.authenticationProvider(authenticationProvider())
