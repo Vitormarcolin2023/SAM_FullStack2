@@ -89,6 +89,7 @@ public class ProjetoController {
     @GetMapping("/buscar-projeto-ativo/{alunoId}")
     public ResponseEntity<Projeto> buscarProjetoAtivo(@PathVariable Long alunoId){
         Projeto projeto = projetoService.buscarProjetoAtivo(alunoId);
+        System.out.println(projeto);
         return ResponseEntity.ok(projeto);
     }
 

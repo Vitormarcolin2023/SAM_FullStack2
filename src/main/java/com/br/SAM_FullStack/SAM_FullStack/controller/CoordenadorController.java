@@ -1,7 +1,9 @@
 package com.br.SAM_FullStack.SAM_FullStack.controller;
 
+import com.br.SAM_FullStack.SAM_FullStack.autenticacao.TokenService;
 import com.br.SAM_FullStack.SAM_FullStack.dto.CoordenadorDTO;
 import com.br.SAM_FullStack.SAM_FullStack.dto.CoordenadorUpdateDTO;
+import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.model.Coordenador;
 import com.br.SAM_FullStack.SAM_FullStack.model.Mentor;
 import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
@@ -22,6 +24,8 @@ public class CoordenadorController {
 
     @Autowired
     private CoordenadorService coordenadorService;
+    @Autowired
+    private TokenService tokenService;
 
     @PostMapping("/save")
     public ResponseEntity<Coordenador> save(@Valid @RequestBody CoordenadorDTO coordenadorDTO) {
@@ -82,5 +86,28 @@ public class CoordenadorController {
         return optionalCoordenador
                 .map(coordenador -> new ResponseEntity<>(coordenador, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<Coordenador> getCoordenadorProfile(
+            @RequestHeader("Authorization") String authorizationHeader) {
+
+        String token = null;
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            token = authorizationHeader.substring(7); // remove "Bearer "
+        }
+
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String email = tokenService.extractEmail(token);
+
+        Coordenador coordenador = coordenadorService.buscarPorEmail(email);
+
+        if (coordenador != null) {
+            return ResponseEntity.ok(coordenador);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 }

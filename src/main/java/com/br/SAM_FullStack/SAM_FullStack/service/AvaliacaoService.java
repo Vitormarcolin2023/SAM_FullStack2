@@ -1,5 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
+import com.br.SAM_FullStack.SAM_FullStack.dto.AvaliacaoDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.Aluno;
 import com.br.SAM_FullStack.SAM_FullStack.model.Avaliacao;
 import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,6 +22,23 @@ public class AvaliacaoService {
     private final AvaliacaoRepository avaliacaoRepository;
     private final ProjetoRepository projetoRepository;
 
+    public List<Avaliacao> findAll() {
+        return avaliacaoRepository.findAll();
+    }
+
+    public List<AvaliacaoDTO> buscarAvaliacoesPorAreas(List<Long> areaIds) {
+        if (areaIds == null || areaIds.isEmpty()) {
+            throw new IllegalArgumentException("A lista de áreas de atuação não pode ser vazia.");
+        }
+        List<Avaliacao> avaliacoes = avaliacaoRepository.findAllByAreasDeAtuacao(areaIds);
+
+        List avaliacoesDTO = new ArrayList<>();
+        for (Avaliacao avaliacao: avaliacoes) {
+            avaliacoesDTO.add(avaliacao);
+        }
+
+        return avaliacoesDTO;
+    }
     @Transactional
     public boolean salvarAvaliacao(Avaliacao avaliacao, Long projetoId) {
 

@@ -74,10 +74,12 @@ public class Projeto {
     private List<Professor> professores;
 
     @OneToMany(mappedBy = "projeto", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("projeto")
     private Set<Avaliacao> avaliacoes;
 
 
     @OneToMany(mappedBy = "projeto", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("projeto")
     private List<Reuniao> reunioes = new ArrayList<>();
 
     private Boolean avaliadoPorMentor;

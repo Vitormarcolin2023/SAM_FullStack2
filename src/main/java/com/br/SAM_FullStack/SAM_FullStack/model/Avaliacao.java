@@ -48,12 +48,12 @@ public class Avaliacao {
 
     private Boolean recomendacao;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "projeto_id")
     @JsonIgnoreProperties("avaliacoes")
     private Projeto projeto;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "aluno_id")
     @JsonIgnoreProperties("avaliacoesRespondidas")
     private Aluno aluno;

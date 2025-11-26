@@ -1,11 +1,14 @@
 package com.br.SAM_FullStack.SAM_FullStack.controller;
 
+import com.br.SAM_FullStack.SAM_FullStack.dto.AvaliacaoDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.Avaliacao;
 import com.br.SAM_FullStack.SAM_FullStack.service.AvaliacaoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/avaliacoes")
@@ -14,6 +17,12 @@ import org.springframework.web.bind.annotation.*;
 public class AvaliacaoController {
 
     private final AvaliacaoService avaliacaoService;
+
+    @GetMapping("/buscar-todos/area-atuacao/{areaIds}")
+    public ResponseEntity<List<AvaliacaoDTO>> buscarPorAreaDeAtuacao(@PathVariable List<Long> areaIds){
+        List<AvaliacaoDTO> response = avaliacaoService.buscarAvaliacoesPorAreas(areaIds);
+        return ResponseEntity.status(200).body(response);
+    }
 
     /**
      * Endpoint para um aluno submeter uma nova avaliação para um projeto.
