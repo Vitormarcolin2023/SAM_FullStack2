@@ -72,6 +72,7 @@
 							.requestMatchers("/api/coordenador/**").hasRole("COORDENADOR")
 							.requestMatchers("/api/professor/findAll").hasRole("ALUNO")
 							.requestMatchers("/api/professor/**").hasRole("PROFESSOR")
+							.requestMatchers("/mentores/area/**").hasRole("ALUNO")
 							.requestMatchers("/mentores/**").hasRole("MENTOR")
 							.requestMatchers("/avaliacoes/**").hasAnyRole("ALUNO", "COORDENADOR")
 							.requestMatchers("/reunioes/**").hasAnyRole("MENTOR", "ALUNO")
