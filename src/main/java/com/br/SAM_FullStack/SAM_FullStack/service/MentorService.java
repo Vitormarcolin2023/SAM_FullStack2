@@ -41,21 +41,26 @@ public class MentorService {
 
     // Salvar
     public Mentor save(Mentor mentor) {
-        // Status inicial até a coordenação aprovar
         mentor.setStatusMentor(StatusMentor.PENDENTE);
 
         String senhaEncript = passwordEncoder.encode(mentor.getSenha());
         mentor.setSenha(senhaEncript);
 
-        /*Precisa ser arrumado
-        //Envio de email
-        String destinatario = mentor.getEmail();
-        String assunto = "Bem-vindo(a) ao SAM - Cadastro em Análise";
-        Map<String, Object> variaveis = Map.of("nomeMentor", mentor.getNome());
-        String template = "emails/boasVindasMentor";
-        emailService.enviarEmailComTemplate(destinatario, assunto, template, variaveis);*/
+        Mentor mentorSalvo = mentorRepository.save(mentor);
 
-        return mentorRepository.save(mentor);
+        try {
+            String destinatario = mentor.getEmail();
+            String assunto = "Bem-vindo(a) ao SAM - Cadastro em Análise";
+            Map<String, Object> variaveis = Map.of("nomeMentor", mentorSalvo.getNome());
+            String template = "emails/boasVindasMentor";
+
+            emailService.enviarEmailComTemplate(destinatario, assunto, template, variaveis);
+        } catch (Exception e) {
+            System.err.println("Erro ao enviar e-mail de boas-vindas: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return mentorSalvo;
     }
 
     public Mentor update(Long id, Mentor mentorUpdate) {
