@@ -60,6 +60,10 @@ public class Aluno implements UserDetails {
     @JsonIgnore
     private List<Avaliacao> avaliacoesRespondidas = new ArrayList<>();
 
+    @ManyToOne
+    @JsonIgnoreProperties("aluno")
+    private Grupo grupo;
+
 
     public Aluno(Long id, String nome, Integer ra, String senha, String email, Curso curso, StatusAlunoGrupo statusAlunoGrupo) {
         this.id = id;

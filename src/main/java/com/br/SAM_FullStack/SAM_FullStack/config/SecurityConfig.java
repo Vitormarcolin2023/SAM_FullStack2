@@ -67,7 +67,7 @@
 							.requestMatchers("/grupos/save").permitAll()
 							.requestMatchers("/cursos/findAll").permitAll()
 							// rotas guardadas por Role
-							.requestMatchers("/alunos/findAll").hasAnyRole("COORDENADOR", "PROFESSOR")
+							/*.requestMatchers("/alunos/findAll").hasAnyRole("COORDENADOR", "PROFESSOR")
 							.requestMatchers("/alunos/**").hasRole("ALUNO")
 							.requestMatchers("/api/coordenador/**").hasRole("COORDENADOR")
 							.requestMatchers("/api/professor/findAll").hasRole("ALUNO")
@@ -83,7 +83,7 @@
 							.requestMatchers("/projetos/professor/**").hasRole("PROFESSOR")
 							.requestMatchers("/projetos/**").hasRole("ALUNO")
 							.requestMatchers("/grupos/**").hasRole("ALUNO")
-
+*/
 
 							.anyRequest().authenticated()
 					)

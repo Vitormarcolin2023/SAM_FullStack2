@@ -26,6 +26,17 @@ public interface ProjetoRepository extends JpaRepository <Projeto, Long> {
             "WHERE a.id = :alunoId AND p.statusProjeto = :status")
     Optional<Projeto> findProjetoPorStatusAluno(@Param("alunoId") Long alunoId,
                                                 @Param("status") StatusProjeto status);
+    List<Projeto> findByGrupo_Id(Long grupoId);
 
+    List<Projeto> findByGrupo_IdAndStatusProjetoIn(Long grupoId, List<StatusProjeto> status);
 
+    // Projetos de um mentor
+    List<Projeto> findByMentor_Id(Long mentorId);
+    List<Projeto> findByMentor_IdAndStatusProjetoIn(Long mentorId, List<StatusProjeto> status);
+
+    // Projetos de professor (ManyToMany)
+    @Query("SELECT p FROM Projeto p JOIN p.professores prof WHERE prof.id = :professorId")
+    List<Projeto> findByProfessor_Id(@Param("professorId") Long professorId);
 }
+
+

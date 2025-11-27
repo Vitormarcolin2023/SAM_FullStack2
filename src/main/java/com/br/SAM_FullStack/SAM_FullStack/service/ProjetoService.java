@@ -1,28 +1,29 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
 import com.br.SAM_FullStack.SAM_FullStack.model.*;
-import com.br.SAM_FullStack.SAM_FullStack.repository.AvaliacaoRepository;
-import com.br.SAM_FullStack.SAM_FullStack.repository.GrupoRepository;
-import com.br.SAM_FullStack.SAM_FullStack.repository.MentorRepository;
-import com.br.SAM_FullStack.SAM_FullStack.repository.ProjetoRepository;
+import com.br.SAM_FullStack.SAM_FullStack.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Service
 public class ProjetoService {
     private final ProjetoRepository projetoRepository;
     private final GrupoRepository grupoRepository;
+    private final AlunoRepository alunoRepository;
 
     @Autowired
     private MentorRepository mentorRepository;
 
-    public ProjetoService(ProjetoRepository projetoRepository, GrupoRepository grupoRepository) {
+    public ProjetoService(ProjetoRepository projetoRepository, GrupoRepository grupoRepository, AlunoRepository alunoRepository) {
         this.projetoRepository = projetoRepository;
         this.grupoRepository = grupoRepository;
+        this.alunoRepository = alunoRepository;
     }
 
     //LISTAR PROJETO
@@ -151,4 +152,34 @@ public class ProjetoService {
                 .orElseThrow(() -> new RuntimeException("Nenhum projeto aguardando avaliação"));
     }
 
-}
+        // Aluno
+        public List<Projeto> buscarProjetosDoAluno(Long alunoId) {
+            Aluno aluno = alunoRepository.findById(alunoId)
+                    .orElseThrow(() -> new RuntimeException("Aluno não encontrado"));
+
+            Grupo grupo = aluno.getGrupo();
+            if (grupo == null) return Collections.emptyList();
+
+            Long grupoId = grupo.getId();
+            return projetoRepository.findByGrupo_IdAndStatusProjetoIn(grupoId,
+                    Arrays.asList(StatusProjeto.ATIVO, StatusProjeto.ARQUIVADO));
+        }
+
+        // Mentor
+        public List<Projeto> buscarProjetosDoMentor(Long mentorId) {
+            return projetoRepository.findByMentor_IdAndStatusProjetoIn(mentorId,
+                    Arrays.asList(StatusProjeto.ATIVO, StatusProjeto.ARQUIVADO, StatusProjeto.EM_APROVACAO));
+        }
+
+        // Professor
+        public List<Projeto> buscarProjetosDoProfessor(Long professorId) {
+            return projetoRepository.findByProfessor_Id(professorId);
+        }
+
+        // Coordenador
+        public List<Projeto> buscarTodosProjetos() {
+            return projetoRepository.findAll();
+        }
+    }
+
+
