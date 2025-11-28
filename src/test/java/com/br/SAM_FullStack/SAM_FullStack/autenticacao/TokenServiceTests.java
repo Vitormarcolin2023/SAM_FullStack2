@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Field;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class TokenServiceTest {
@@ -15,9 +17,14 @@ class TokenServiceTest {
     private String role = "ALUNO";
     private String nome = "Joana Silveira";
 
+    private final String secretFake = "chaveDeTeste123456";
+
     @BeforeEach
-    void setup() {
+    void setup() throws IllegalAccessException, NoSuchFieldException {
         tokenService = new TokenService();
+        Field secretField = TokenService.class.getDeclaredField("secret");
+        secretField.setAccessible(true);
+        secretField.set(tokenService, secretFake);
     }
 
     @Test
