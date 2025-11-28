@@ -5,9 +5,9 @@ import com.br.SAM_FullStack.SAM_FullStack.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -16,22 +16,21 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
 class CustomUserDetailsServiceTest {
 
-    @Autowired
+    @InjectMocks
     private CustomUserDetailsService userDetailsService;
 
-    @MockitoBean
+    @Mock
     private AlunoRepository alunoRepo;
 
-    @MockitoBean
+    @Mock
     private MentorRepository mentorRepo;
 
-    @MockitoBean
+    @Mock
     private ProfessorRepository professorRepo;
 
-    @MockitoBean
+    @Mock
     private CoordenadorRepository coordenadorRepo;
 
     private final String email = "teste@email.com";
@@ -43,6 +42,8 @@ class CustomUserDetailsServiceTest {
 
     @BeforeEach
     void setup() {
+        MockitoAnnotations.openMocks(this);
+
         aluno = new Aluno();
         aluno.setEmail(email);
         aluno.setSenha("senha123");
