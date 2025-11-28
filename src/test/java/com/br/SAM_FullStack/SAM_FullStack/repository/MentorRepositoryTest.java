@@ -16,126 +16,130 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-// Anotação essencial para testes de Repositório -inicia apenas a camada JPA em memória
 @DataJpaTest
 public class MentorRepositoryTest {
 
     @Autowired
     private MentorRepository mentorRepository;
 
-    // Ajuda a persistir dados de teste diretamente no banco de dados em memória
     @Autowired
     private TestEntityManager entityManager;
 
     private Mentor mentorAtivo;
     private Mentor mentorPendente;
     private AreaDeAtuacao areaTI;
-    private AreaDeAtuacao areaSaude; // Área solicitada
+    private AreaDeAtuacao areaSaude;
 
     @BeforeEach
     void setUp() {
-        // 1. Configura as Áreas de Atuação
+        // 1. Configura e persiste as Áreas de Atuação
         areaTI = new AreaDeAtuacao(null, "Tecnologia da Informação");
         areaSaude = new AreaDeAtuacao(null, "Saúde");
 
         entityManager.persist(areaTI);
         entityManager.persist(areaSaude);
-        entityManager.flush(); // Garante que os IDs são gerados
 
-        // 2. Cria Mentor Ativo (na área TI)
-        // A senha é salva como a hash literal para testar findByEmailAndSenha.
-        mentorAtivo = new Mentor(
-                null, "Alice Teste", "11111111111", "alice@ativo.com",
-                "hashAtivo", "888888888", "3 anos", StatusMentor.ATIVO,
-                TipoDeVinculo.CLT, areaTI, null, null, "Resumo Ativo", null
-        );
+        // 2. Cria Mentor Ativo
+        mentorAtivo = new Mentor();
+        mentorAtivo.setNome("Alice Teste");
+        mentorAtivo.setCpf("22057014797");
+        mentorAtivo.setEmail("alice@ativo.com");
+        mentorAtivo.setSenha("hashAtivo");
+        mentorAtivo.setTelefone("888888888");
+        mentorAtivo.setFormacaoDoMentor("Engenharia de Software");
+        mentorAtivo.setTempoDeExperiencia("3 anos");
+        mentorAtivo.setStatusMentor(StatusMentor.ATIVO);
+        mentorAtivo.setTipoDeVinculo(TipoDeVinculo.CLT);
+        mentorAtivo.setAreaDeAtuacao(areaTI);
+        mentorAtivo.setResumo("Resumo Ativo");
+        mentorAtivo.setEndereco(null);
 
-        // 3. Cria Mentor Pendente (na área TI)
-        mentorPendente = new Mentor(
-                null, "Bob Pendente", "22222222222", "bob@pendente.com",
-                "hashPendente", "777777777", "1 ano", StatusMentor.PENDENTE,
-                TipoDeVinculo.PJ, areaTI, null, null, "Resumo Pendente", null
-        );
+        // 3. Cria Mentor Pendente
+        mentorPendente = new Mentor();
+        mentorPendente.setNome("Bob Pendente");
+        mentorPendente.setCpf("75874887156");
+        mentorPendente.setEmail("bob@pendente.com");
+        mentorPendente.setSenha("hashPendente");
+        mentorPendente.setTelefone("777777777");
+        mentorPendente.setFormacaoDoMentor("Ciência da Computação");
+        mentorPendente.setTempoDeExperiencia("1 ano");
+        mentorPendente.setStatusMentor(StatusMentor.PENDENTE);
+        mentorPendente.setTipoDeVinculo(TipoDeVinculo.PJ);
+        mentorPendente.setAreaDeAtuacao(areaTI);
+        mentorPendente.setResumo("Resumo Pendente");
+        mentorPendente.setEndereco(null);
 
         // 4. Salva no banco de dados em memória
         entityManager.persist(mentorAtivo);
         entityManager.persist(mentorPendente);
+
         entityManager.flush();
     }
 
-     //TESTES PARA findByEmail
+    // --- TESTES findByEmail ---
+
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO REPO – Busca por Email deve encontrar Mentor existente")
+    @DisplayName("Busca por Email deve encontrar Mentor existente")
     void findByEmail_DeveRetornarMentorExistente() {
-        // Ação
         Optional<Mentor> resultado = mentorRepository.findByEmail(mentorAtivo.getEmail());
 
-        // Verificação (assertTrue e assertEquals)
         assertTrue(resultado.isPresent(), "O Optional deve conter o mentor");
-        assertEquals(mentorAtivo.getNome(), resultado.get().getNome(), "O nome deve ser o esperado");
+        assertEquals(mentorAtivo.getNome(), resultado.get().getNome());
     }
 
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO REPO – Busca por Email deve retornar Optional vazio quando não existir")
+    @DisplayName("Busca por Email inexistente deve retornar Optional vazio")
     void findByEmail_DeveRetornarOptionalVazio() {
-        // Ação
         Optional<Mentor> resultado = mentorRepository.findByEmail("email@naoexiste.com");
 
-        // Verificação (assertFalse)
-        assertFalse(resultado.isPresent(), "O Optional deve estar vazio");
+        assertFalse(resultado.isPresent());
     }
 
-     //TESTES PARA findByEmailAndSenha
+    // --- TESTES findByEmailAndSenha ---
+
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO REPO – Busca por Email e Senha deve retornar Mentor quando credenciais corretas")
-    void findByEmailAndSenha_DeveRetornarMentorComCredenciaisCorretas() {
-        // Ação: Busca pela hash salva no setUp
+    @DisplayName("Busca por Email e Senha correta deve retornar Mentor")
+    void findByEmailAndSenha_DeveRetornarMentor() {
         Optional<Mentor> resultado = mentorRepository.findByEmailAndSenha(
                 mentorAtivo.getEmail(), mentorAtivo.getSenha()
         );
 
-        // Verificação (assertTrue e assertEquals)
         assertTrue(resultado.isPresent());
         assertEquals(mentorAtivo.getEmail(), resultado.get().getEmail());
     }
 
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO REPO – Busca por Email e Senha deve retornar Optional vazio quando senha incorreta")
-    void findByEmailAndSenha_OptionalVazioComSenhaIncorreta() {
-        // Ação
+    @DisplayName("Busca por Senha incorreta deve retornar Vazio")
+    void findByEmailAndSenha_ComSenhaIncorreta_DeveFalhar() {
         Optional<Mentor> resultado = mentorRepository.findByEmailAndSenha(
-                mentorAtivo.getEmail(), "senhaIncorreta"
+                mentorAtivo.getEmail(), "senhaErrada"
         );
 
-        // Verificação (assertFalse)
         assertFalse(resultado.isPresent());
     }
 
-     //TESTES PARA findByAreaDeAtuacaoIdAndStatusMentor
+    // --- TESTES findByAreaDeAtuacaoIdAndStatusMentor ---
+
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO REPO – Busca por Area e Status deve retornar apenas Mentores ATIVOS")
-    void findByAreaDeAtuacaoIdAndStatusMentor_MentoresAtivos() {
-        // Ação: Busca mentores na área de TI que estejam ATIVOS
+    @DisplayName("Busca por Área e Status deve filtrar corretamente")
+    void findByAreaDeAtuacao_DeveRetornarApenasAtivos() {
+        // Busca na área de TI apenas os ATIVOS (deve ignorar o mentorPendente que também é de TI)
         List<Mentor> resultado = mentorRepository.findByAreaDeAtuacaoIdAndStatusMentor(
                 areaTI.getId(), StatusMentor.ATIVO
         );
 
-        // Verificação (assertNotNull, assertEquals)
         assertNotNull(resultado);
-        assertEquals(1, resultado.size(), "Deve haver apenas um mentor ATIVO nesta área");
-        assertEquals(mentorAtivo.getEmail(), resultado.get(0).getEmail());
-        assertEquals(StatusMentor.ATIVO, resultado.get(0).getStatusMentor());
+        assertEquals(1, resultado.size(), "Deve retornar apenas 1 mentor (Alice)");
+        assertEquals(mentorAtivo.getNome(), resultado.get(0).getNome());
     }
 
     @Test
-    @DisplayName("TESTE DE INTEGRAÇÃO REPO – Busca por Area e Status deve retornar lista vazia se nenhum ativo na area")
-    void findByAreaDeAtuacaoIdAndStatusMentor_ListaVazia() {
-        // Ação: Busca mentores na área de Saúde (onde não persistimos mentores) que estejam ATIVOS
+    @DisplayName("Busca por Área sem mentores deve retornar lista vazia")
+    void findByAreaDeAtuacao_SemMentores_DeveRetornarVazio() {
         List<Mentor> resultado = mentorRepository.findByAreaDeAtuacaoIdAndStatusMentor(
                 areaSaude.getId(), StatusMentor.ATIVO
         );
 
-        // Verificação (assertTrue)
-        assertTrue(resultado.isEmpty(), "A lista deve estar vazia, pois não há mentores ativos nesta área");
+        assertTrue(resultado.isEmpty());
     }
 }
