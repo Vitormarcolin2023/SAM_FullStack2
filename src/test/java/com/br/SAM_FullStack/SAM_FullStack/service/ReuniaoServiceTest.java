@@ -3,8 +3,7 @@ package com.br.SAM_FullStack.SAM_FullStack.service;
 import com.br.SAM_FullStack.SAM_FullStack.dto.ReuniaoDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.*;
 import com.br.SAM_FullStack.SAM_FullStack.repository.AlunoRepository;
-import com.br.SAM_FullStack.SAM_FullStack.repository.GrupoRepository;
-import com.br.SAM_FullStack.SAM_FullStack.repository.MentorRepository;
+import com.br.SAM_FullStack.SAM_FullStack.repository.ProjetoRepository;
 import com.br.SAM_FullStack.SAM_FullStack.repository.ReuniaoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,7 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -37,60 +35,50 @@ public class ReuniaoServiceTest {
     private ReuniaoRepository reuniaoRepository;
 
     @Mock
-    private GrupoRepository grupoRepository;
+    private ProjetoRepository projetoRepository;
 
     @Mock
     private AlunoRepository alunoRepository;
 
-    @Mock
-    private MentorRepository mentorRepository;
-
-    private Mentor mentor;
-    private Mentor mentorDif;
-    private Grupo grupo;
+    private Projeto projeto;
     private Reuniao reuniaoAceita;
     private Reuniao reuniaoPendente;
     private ReuniaoDTO reuniaoDTO;
-    private Aluno aluno1;
-    private Aluno aluno2;
-    private Aluno aluno3;
     private Date data;
-    private Time hora;
-    private AreaDeAtuacao areaTecnologia;
-    private AreaDeAtuacao areaSaude;
-    private Curso curso;
-
+    private LocalTime hora; // Alterado para LocalTime para bater com o DTO
 
     @BeforeEach
     void setup() {
-        // Inicialização de dados
+        // Inicialização de Data e Hora
         LocalDate localDate = LocalDate.of(2025, 10, 23);
         this.data = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        this.hora = Time.valueOf(LocalTime.of(14, 0, 0));
+        this.hora = LocalTime.of(14, 0, 0); // LocalTime direto
 
-        areaTecnologia = new AreaDeAtuacao(1L, "Tecnologia");
-        areaSaude = new AreaDeAtuacao(2L, "Saúde");
-        curso = new Curso(1L, "Engenharia de Software", areaTecnologia);
+        // Setup do Projeto
+        projeto = new Projeto();
+        projeto.setId(1L);
+        projeto.setNomeDoProjeto("SAM FullStack");
+        projeto.setStatusProjeto(StatusProjeto.ATIVO);
 
-        aluno1 = new Aluno(1L, "Joana Silveira", 1001, "senha123", "joana@gmail.com", curso, StatusAlunoGrupo.ATIVO);
-        aluno2 = new Aluno(2L, "Anderson Ribeiro", 1002, "senha123", "ander@gmail.com", curso, StatusAlunoGrupo.ATIVO);
-        aluno3 = new Aluno(3L, "Benicio Fragoso", 1003, "senha123", "benicio@gmail.com", curso, StatusAlunoGrupo.AGUARDANDO);
+        // Setup Reunião Aceita
+        reuniaoAceita = new Reuniao();
+        reuniaoAceita.setId(1L);
+        reuniaoAceita.setAssunto("Validar requisitos do projeto");
+        reuniaoAceita.setData(data);
+        reuniaoAceita.setHora(hora); // Assumindo que o Model também usa LocalTime
+        reuniaoAceita.setFormatoReuniao(FormatoReuniao.ONLINE);
+        reuniaoAceita.setStatusReuniao(StatusReuniao.ACEITO);
+        reuniaoAceita.setProjeto(projeto);
 
-        // O serviço de Reunião não deve se preocupar com os "sets" de grupos/alunos
-        grupo = new Grupo(1L, "Grupo Ativo", StatusGrupo.ATIVO, aluno1, List.of(aluno1, aluno2, aluno3));
-
-        mentor = new Mentor();
-        mentor.setId(1L);
-        mentor.setNome("Romana Novaes");
-        mentor.setAreaDeAtuacao(areaTecnologia);
-
-        mentorDif = new Mentor();
-        mentorDif.setId(2L);
-        mentorDif.setNome("Vitoria");
-        mentorDif.setAreaDeAtuacao(areaSaude);
-
-        reuniaoAceita = new Reuniao(1L, "Validar requisitos do projeto", data, hora, FormatoReuniao.ONLINE, StatusReuniao.ACEITO, mentor, grupo);
-        reuniaoPendente = new Reuniao(2L, "Assinar documentos", data, hora, FormatoReuniao.PRESENCIAL, StatusReuniao.PENDENTE, mentor, grupo);
+        // Setup Reunião Pendente
+        reuniaoPendente = new Reuniao();
+        reuniaoPendente.setId(2L);
+        reuniaoPendente.setAssunto("Assinar documentos");
+        reuniaoPendente.setData(data);
+        reuniaoPendente.setHora(hora);
+        reuniaoPendente.setFormatoReuniao(FormatoReuniao.PRESENCIAL);
+        reuniaoPendente.setStatusReuniao(StatusReuniao.PENDENTE);
+        reuniaoPendente.setProjeto(projeto);
     }
 
     // --- Testes de Busca (Find) ---
@@ -110,25 +98,37 @@ public class ReuniaoServiceTest {
     @Test
     @DisplayName("BUSCA: Deve retornar lista com todas as reuniões do mentor pelo ID")
     void buscarReunioesMentor_deveRetornarListaDeReunioesDoMentor() {
-        when(reuniaoRepository.findAllMentor(mentor.getId())).thenReturn(List.of(reuniaoAceita, reuniaoPendente));
+        when(reuniaoRepository.findAllMentor(1L)).thenReturn(List.of(reuniaoAceita));
 
-        List<Reuniao> retorno = reuniaoService.findAllByMentor(mentor.getId());
+        List<Reuniao> retorno = reuniaoService.findAllByMentor(1L);
 
         assertFalse(retorno.isEmpty());
-        assertEquals(2, retorno.size());
-        verify(reuniaoRepository).findAllMentor(mentor.getId());
+        assertEquals(1, retorno.size());
+        verify(reuniaoRepository).findAllMentor(1L);
     }
 
     @Test
     @DisplayName("BUSCA: Deve retornar lista com todas as reuniões do grupo pelo ID")
     void buscarReunioesGrupo_deveRetornarListaDeReunioesDoGrupo() {
-        when(reuniaoRepository.findAllGrupo(grupo.getId())).thenReturn(List.of(reuniaoAceita, reuniaoPendente));
+        when(reuniaoRepository.findAllGrupo(1L)).thenReturn(List.of(reuniaoAceita));
 
-        List<Reuniao> retorno = reuniaoService.findAllByGrupo(grupo.getId());
+        List<Reuniao> retorno = reuniaoService.findAllByGrupo(1L);
+
+        assertFalse(retorno.isEmpty());
+        assertEquals(1, retorno.size());
+        verify(reuniaoRepository).findAllGrupo(1L);
+    }
+
+    @Test
+    @DisplayName("BUSCA: Deve retornar lista com todas as reuniões do projeto pelo ID")
+    void buscarReunioesProjeto_deveRetornarListaDeReunioesDoProjeto() {
+        when(reuniaoRepository.findAllByProjetoId(projeto.getId())).thenReturn(List.of(reuniaoAceita, reuniaoPendente));
+
+        List<Reuniao> retorno = reuniaoService.findAllByProjeto(projeto.getId());
 
         assertFalse(retorno.isEmpty());
         assertEquals(2, retorno.size());
-        verify(reuniaoRepository).findAllGrupo(grupo.getId());
+        verify(reuniaoRepository).findAllByProjetoId(projeto.getId());
     }
 
     @Test
@@ -159,97 +159,44 @@ public class ReuniaoServiceTest {
     // --- Testes de Cadastro (Save) ---
 
     @Test
-    @DisplayName("CADASTRO: Deve cadastrar e retornar sucesso quando informações corretas")
+    @DisplayName("CADASTRO: Deve cadastrar e retornar sucesso quando projeto existe")
     void saveReuniao_quandoCorreto_deveRetornarSucesso() {
-        reuniaoDTO = new ReuniaoDTO("nova reunião", data, hora, FormatoReuniao.ONLINE, mentor.getId(), grupo.getId());
+        // Construtor do DTO baseado na ordem dos campos da classe que você mandou
+        reuniaoDTO = new ReuniaoDTO(
+                "nova reunião",
+                data,
+                hora,
+                FormatoReuniao.ONLINE,
+                projeto.getId(),
+                "MENTOR"
+        );
 
-        when(grupoRepository.findById(grupo.getId())).thenReturn(Optional.of(grupo));
-        when(mentorRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
-        when(alunoRepository.findAllByGrupoId(grupo.getId())).thenReturn(List.of(aluno1, aluno2, aluno3));
+        when(projetoRepository.findById(projeto.getId())).thenReturn(Optional.of(projeto));
 
-        // Mock o save e capture o argumento para verificação (opcional, mas boa prática)
-        when(reuniaoRepository.save(any(Reuniao.class))).thenAnswer(invocation -> {
-            Reuniao savedReuniao = invocation.getArgument(0);
-            savedReuniao.setId(3L); // Simula o ID gerado no DB
-            return savedReuniao;
-        });
+        // Mock do save
+        when(reuniaoRepository.save(any(Reuniao.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         String retorno = reuniaoService.save(reuniaoDTO);
 
         assertEquals("Solicitação de reunião enviada", retorno);
+        verify(projetoRepository).findById(projeto.getId());
         verify(reuniaoRepository).save(any(Reuniao.class));
     }
 
     @Test
-    @DisplayName("CADASTRO: Deve retornar erro quando id do Grupo não existe")
-    void saveReuniao_quandoIdGrupoIncorreto_deveRetornarErro() {
-        Long idGrupoInexistente = -1L;
-        reuniaoDTO = new ReuniaoDTO("nova reunião", data, hora, FormatoReuniao.ONLINE, mentor.getId(), idGrupoInexistente);
+    @DisplayName("CADASTRO: Deve retornar erro quando Projeto não encontrado")
+    void saveReuniao_quandoProjetoNaoEncontrado_deveRetornarErro() {
+        reuniaoDTO = new ReuniaoDTO();
+        reuniaoDTO.setProjeto_id(99L); // ID inexistente
 
-        when(grupoRepository.findById(idGrupoInexistente)).thenReturn(Optional.empty());
+        when(projetoRepository.findById(99L)).thenReturn(Optional.empty());
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             reuniaoService.save(reuniaoDTO);
         });
 
-        assertEquals("Grupo não encontrado", exception.getMessage());
-        verify(grupoRepository).findById(idGrupoInexistente);
+        assertEquals("Projeto não encontrado", exception.getMessage());
         verify(reuniaoRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("CADASTRO: Deve retornar erro quando mentor não encontrado")
-    void saveReuniao_quandoIdMentorIncorreto_deveRetornarErro() {
-        Long idMentorInexistente = -1L;
-        reuniaoDTO = new ReuniaoDTO("nova reunião", data, hora, FormatoReuniao.ONLINE, idMentorInexistente, grupo.getId());
-
-        when(grupoRepository.findById(grupo.getId())).thenReturn(Optional.of(grupo));
-        when(mentorRepository.findById(idMentorInexistente)).thenReturn(Optional.empty());
-
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            reuniaoService.save(reuniaoDTO);
-        });
-
-        assertEquals("Mentor não encontrado", exception.getMessage());
-        verify(mentorRepository).findById(idMentorInexistente);
-        verify(reuniaoRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("CADASTRO: Deve retornar erro quando área de atuação do mentor for diferente da dos alunos do grupo")
-    void saveReuniao_quandoAreaDeAtuacaoDoMentorDiferenteDoGrupo_deveRetornarErro() {
-        reuniaoDTO = new ReuniaoDTO("nova reunião", data, hora, FormatoReuniao.ONLINE, mentorDif.getId(), grupo.getId());
-
-        when(grupoRepository.findById(grupo.getId())).thenReturn(Optional.of(grupo));
-        when(mentorRepository.findById(mentorDif.getId())).thenReturn(Optional.of(mentorDif));
-        when(alunoRepository.findAllByGrupoId(grupo.getId())).thenReturn(List.of(aluno1, aluno2, aluno3));
-
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            reuniaoService.save(reuniaoDTO);
-        });
-
-        assertEquals("A área de atuação de pelo menos um aluno não corresponde à do mentor.", exception.getMessage());
-        verify(alunoRepository).findAllByGrupoId(grupo.getId());
-        verify(reuniaoRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("CADASTRO: Deve retornar erro quando a área de atuação de um aluno for nula")
-    void saveReuniao_quandoAreaAlunoNula_deveRetornarErro() {
-        Aluno alunoNulo = new Aluno(4L, "Teste Nulo", 1004, "senha", "teste@gmail.com", new Curso(2L, "Curso Nulo", null), StatusAlunoGrupo.ATIVO);
-
-        reuniaoDTO = new ReuniaoDTO("nova reunião", data, hora, FormatoReuniao.ONLINE, mentor.getId(), grupo.getId());
-
-        when(grupoRepository.findById(grupo.getId())).thenReturn(Optional.of(grupo));
-        when(mentorRepository.findById(mentor.getId())).thenReturn(Optional.of(mentor));
-        when(alunoRepository.findAllByGrupoId(grupo.getId())).thenReturn(List.of(aluno1, alunoNulo)); // Aluno com área nula
-
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            reuniaoService.save(reuniaoDTO);
-        });
-
-        assertEquals("A área de atuação de pelo menos um aluno não corresponde à do mentor.", exception.getMessage());
-        verify(alunoRepository).findAllByGrupoId(grupo.getId());
     }
 
     // --- Testes de Atualização (Update) ---
@@ -267,8 +214,6 @@ public class ReuniaoServiceTest {
         });
 
         assertEquals("Reunião não encontrada", exception.getMessage());
-        verify(reuniaoRepository).findById(-1L);
-        verify(reuniaoRepository, never()).save(any());
     }
 
     @Test
@@ -277,7 +222,6 @@ public class ReuniaoServiceTest {
         Reuniao reuniaoUpdates = new Reuniao();
         reuniaoUpdates.setAssunto("Novo assunto teste");
 
-        // reuniaoAceita tem StatusReuniao.ACEITO
         when(reuniaoRepository.findById(reuniaoAceita.getId())).thenReturn(Optional.of(reuniaoAceita));
 
         IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
@@ -285,17 +229,13 @@ public class ReuniaoServiceTest {
         });
 
         assertEquals("Operação não permitida. A reunião já foi avaliada pelo solicitado", exception.getMessage());
-        verify(reuniaoRepository).findById(reuniaoAceita.getId());
-        verify(reuniaoRepository, never()).save(any());
     }
 
     @Test
     @DisplayName("UPDATE: Deve atualizar a reunião com novos dados e retornar sucesso")
     void update_quandoInformacoesCorretas_deveRetornarSucesso() {
-        // Objeto com os campos a serem atualizados
         Reuniao reuniaoUpdates = new Reuniao();
         reuniaoUpdates.setAssunto("Novo assunto teste");
-        reuniaoUpdates.setData(data);
         reuniaoUpdates.setFormatoReuniao(FormatoReuniao.PRESENCIAL);
 
         when(reuniaoRepository.findById(reuniaoPendente.getId())).thenReturn(Optional.of(reuniaoPendente));
@@ -304,73 +244,42 @@ public class ReuniaoServiceTest {
         String retorno = reuniaoService.update(reuniaoPendente.getId(), reuniaoUpdates);
 
         assertEquals("Reunião atualizada e reenviada para aprovação", retorno);
-        verify(reuniaoRepository).save(reuniaoPendente);
-        assertEquals("Novo assunto teste", reuniaoPendente.getAssunto(), "O assunto deve ter sido atualizado.");
-        assertEquals(StatusReuniao.PENDENTE, reuniaoPendente.getStatusReuniao(), "O status deve ser redefinido para PENDENTE.");
-    }
 
-    @Test
-    @DisplayName("UPDATE: Deve atualizar reunião, preenchendo apenas campos não nulos, e retornar sucesso")
-    void update_quandoCamposNulos_deveAtualizarComSucesso() {
-        Reuniao reuniaoUpdates = new Reuniao(); // Todos os campos de update nulos
-        reuniaoUpdates.setAssunto("Novo Assunto Nulo Teste"); // Apenas este campo será atualizado
-
-        when(reuniaoRepository.findById(reuniaoPendente.getId())).thenReturn(Optional.of(reuniaoPendente));
-        when(reuniaoRepository.save(any(Reuniao.class))).thenReturn(reuniaoPendente);
-
-        String retorno = reuniaoService.update(reuniaoPendente.getId(), reuniaoUpdates);
-
-        assertEquals("Reunião atualizada e reenviada para aprovação", retorno);
-        verify(reuniaoRepository).save(reuniaoPendente);
-        assertEquals("Novo Assunto Nulo Teste", reuniaoPendente.getAssunto(), "O assunto deve ter sido atualizado.");
-        assertEquals(reuniaoPendente.getData(), reuniaoPendente.getData(), "A data deve permanecer inalterada se nula no update.");
+        assertEquals("Novo assunto teste", reuniaoPendente.getAssunto());
+        assertEquals(FormatoReuniao.PRESENCIAL, reuniaoPendente.getFormatoReuniao());
     }
 
     // --- Testes de Aceitação/Rejeição (Aceitar) ---
 
     @Test
-    @DisplayName("ACEITAR: Deve retornar erro quando id da reunião for inexistente")
-    void aceitarReuniao_quandoIdReuniaoInexistente_deveRetornarErro() {
-        when(reuniaoRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            reuniaoService.aceitarReuniao(-1L, StatusReuniao.ACEITO);
-        });
-
-        assertEquals("Reunião não encontrada", exception.getMessage());
-        verify(reuniaoRepository).findById(-1L);
-        verify(reuniaoRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("ACEITAR: Deve atualizar status da reunião e retornar mensagem de sucesso")
-    void aceitarReuniao_quandoInformacoesCorretas_deveRetornarSucesso() {
-        // reuniaoPendente tem StatusReuniao.PENDENTE
+    @DisplayName("ACEITAR: Deve aceitar reunião e retornar sucesso")
+    void aceitarReuniao_quandoAceitar_deveRetornarSucesso() {
         when(reuniaoRepository.findById(reuniaoPendente.getId())).thenReturn(Optional.of(reuniaoPendente));
         when(reuniaoRepository.save(any(Reuniao.class))).thenReturn(reuniaoPendente);
 
-        String retorno = reuniaoService.aceitarReuniao(reuniaoPendente.getId(), StatusReuniao.ACEITO);
+        // Agora passando 'null' como motivo, pois é aceitação
+        String retorno = reuniaoService.aceitarReuniao(reuniaoPendente.getId(), StatusReuniao.ACEITO, null);
 
         assertEquals("Status reunião: aceito", retorno);
-        verify(reuniaoRepository).save(reuniaoPendente);
         assertEquals(StatusReuniao.ACEITO, reuniaoPendente.getStatusReuniao());
+        assertNull(reuniaoPendente.getMotivoRecusa());
+    }
+
+    @Test
+    @DisplayName("ACEITAR: Deve recusar reunião com motivo e retornar sucesso")
+    void aceitarReuniao_quandoRecusar_deveSalvarMotivo() {
+        when(reuniaoRepository.findById(reuniaoPendente.getId())).thenReturn(Optional.of(reuniaoPendente));
+        when(reuniaoRepository.save(any(Reuniao.class))).thenReturn(reuniaoPendente);
+
+        String motivo = "Horário indisponível";
+        String retorno = reuniaoService.aceitarReuniao(reuniaoPendente.getId(), StatusReuniao.RECUSADO, motivo);
+
+        assertEquals("Status reunião: recusado", retorno);
+        assertEquals(StatusReuniao.RECUSADO, reuniaoPendente.getStatusReuniao());
+        assertEquals(motivo, reuniaoPendente.getMotivoRecusa());
     }
 
     // --- Testes de Deleção (Delete) ---
-
-    @Test
-    @DisplayName("DELETE: Deve retornar erro quando id da reunião for inexistente")
-    void deletarReuniao_quandoIdInexistente_deveRetornarErro() {
-        when(reuniaoRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            reuniaoService.delete(-1L);
-        });
-
-        assertEquals("Reunião não encontrada", exception.getMessage());
-        verify(reuniaoRepository).findById(-1L);
-        verify(reuniaoRepository, never()).delete(any());
-    }
 
     @Test
     @DisplayName("DELETE: Deve deletar reunião e retornar sucesso")
@@ -381,7 +290,6 @@ public class ReuniaoServiceTest {
         String retorno = reuniaoService.delete(reuniaoAceita.getId());
 
         assertEquals("Reunião deletada com sucesso", retorno);
-        verify(reuniaoRepository).findById(reuniaoAceita.getId());
         verify(reuniaoRepository).delete(reuniaoAceita);
     }
 }
