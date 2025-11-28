@@ -24,7 +24,7 @@ public class ArquivamentoService {
     public void verificaArquivamento(){
         LocalDate hoje = LocalDate.now();
 
-        List<Projeto> projetosAtivos = projetoRepository.findAll(); // Apenas para teste, deve ser substituido pelo findByStatus
+        List<Projeto> projetosAtivos = projetoRepository.findAllByStatusProjeto(StatusProjeto.ATIVO);
 
         for (Projeto projeto : projetosAtivos) {
             boolean arquivar = false;
