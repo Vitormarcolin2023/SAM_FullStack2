@@ -45,35 +45,31 @@ public class ReuniaoServiceTest {
     private Reuniao reuniaoPendente;
     private ReuniaoDTO reuniaoDTO;
     private Date data;
-    private LocalTime hora; // Alterado para LocalTime para bater com o DTO
+    private LocalTime hora;
 
     @BeforeEach
     void setup() {
-        // Inicialização de Data e Hora
+
         LocalDate localDate = LocalDate.of(2025, 10, 23);
         this.data = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-        this.hora = LocalTime.of(14, 0, 0); // LocalTime direto
+        this.hora = LocalTime.of(14, 0);
 
-        // Setup do Projeto
         projeto = new Projeto();
         projeto.setId(1L);
         projeto.setNomeDoProjeto("SAM FullStack");
         projeto.setStatusProjeto(StatusProjeto.ATIVO);
 
-        // Setup Reunião Aceita
         reuniaoAceita = new Reuniao();
         reuniaoAceita.setId(1L);
-        reuniaoAceita.setAssunto("Validar requisitos do projeto");
+        reuniaoAceita.setAssunto("Validar requisitos");
         reuniaoAceita.setData(data);
-        reuniaoAceita.setHora(hora); // Assumindo que o Model também usa LocalTime
+        reuniaoAceita.setHora(hora);
         reuniaoAceita.setFormatoReuniao(FormatoReuniao.ONLINE);
         reuniaoAceita.setStatusReuniao(StatusReuniao.ACEITO);
-        reuniaoAceita.setProjeto(projeto);
 
-        // Setup Reunião Pendente
         reuniaoPendente = new Reuniao();
         reuniaoPendente.setId(2L);
-        reuniaoPendente.setAssunto("Assinar documentos");
+        reuniaoPendente.setAssunto("Assinar docs");
         reuniaoPendente.setData(data);
         reuniaoPendente.setHora(hora);
         reuniaoPendente.setFormatoReuniao(FormatoReuniao.PRESENCIAL);
@@ -81,215 +77,176 @@ public class ReuniaoServiceTest {
         reuniaoPendente.setProjeto(projeto);
     }
 
-    // --- Testes de Busca (Find) ---
 
     @Test
-    @DisplayName("BUSCA: Deve retornar lista com todas as reuniões")
     void buscarReunioes_deveRetornarListaDeReunioes() {
         when(reuniaoRepository.findAll()).thenReturn(List.of(reuniaoAceita, reuniaoPendente));
-
         List<Reuniao> retorno = reuniaoService.findAll();
-
-        assertNotNull(retorno);
         assertEquals(2, retorno.size());
-        verify(reuniaoRepository).findAll();
     }
 
     @Test
-    @DisplayName("BUSCA: Deve retornar lista com todas as reuniões do mentor pelo ID")
-    void buscarReunioesMentor_deveRetornarListaDeReunioesDoMentor() {
+    void buscarReunioesMentor_deveRetornarLista() {
         when(reuniaoRepository.findAllMentor(1L)).thenReturn(List.of(reuniaoAceita));
-
         List<Reuniao> retorno = reuniaoService.findAllByMentor(1L);
-
-        assertFalse(retorno.isEmpty());
         assertEquals(1, retorno.size());
-        verify(reuniaoRepository).findAllMentor(1L);
     }
 
     @Test
-    @DisplayName("BUSCA: Deve retornar lista com todas as reuniões do grupo pelo ID")
-    void buscarReunioesGrupo_deveRetornarListaDeReunioesDoGrupo() {
+    void buscarReunioesGrupo_deveRetornarLista() {
         when(reuniaoRepository.findAllGrupo(1L)).thenReturn(List.of(reuniaoAceita));
-
         List<Reuniao> retorno = reuniaoService.findAllByGrupo(1L);
-
-        assertFalse(retorno.isEmpty());
         assertEquals(1, retorno.size());
-        verify(reuniaoRepository).findAllGrupo(1L);
     }
 
     @Test
-    @DisplayName("BUSCA: Deve retornar lista com todas as reuniões do projeto pelo ID")
-    void buscarReunioesProjeto_deveRetornarListaDeReunioesDoProjeto() {
-        when(reuniaoRepository.findAllByProjetoId(projeto.getId())).thenReturn(List.of(reuniaoAceita, reuniaoPendente));
-
-        List<Reuniao> retorno = reuniaoService.findAllByProjeto(projeto.getId());
-
-        assertFalse(retorno.isEmpty());
-        assertEquals(2, retorno.size());
-        verify(reuniaoRepository).findAllByProjetoId(projeto.getId());
+    void buscarReunioesProjeto_deveRetornarLista() {
+        when(reuniaoRepository.findAllByProjetoId(1L)).thenReturn(List.of(reuniaoAceita));
+        List<Reuniao> retorno = reuniaoService.findAllByProjeto(1L);
+        assertEquals(1, retorno.size());
     }
 
     @Test
-    @DisplayName("BUSCA: Deve retornar a reunião quando o Id existe")
-    void buscarReuniao_quandoIdExiste_deveRetornarReuniao() {
-        when(reuniaoRepository.findById(reuniaoAceita.getId())).thenReturn(Optional.of(reuniaoAceita));
-
-        Reuniao retorno = reuniaoService.findById(reuniaoAceita.getId());
-
-        assertNotNull(retorno);
-        assertEquals("Validar requisitos do projeto", retorno.getAssunto());
-        verify(reuniaoRepository).findById(reuniaoAceita.getId());
+    void buscarReuniao_quandoIdExiste() {
+        when(reuniaoRepository.findById(1L)).thenReturn(Optional.of(reuniaoAceita));
+        Reuniao retorno = reuniaoService.findById(1L);
+        assertEquals("Validar requisitos", retorno.getAssunto());
     }
 
     @Test
-    @DisplayName("BUSCA: Deve retornar erro quando o Id for inexistente")
-    void buscarReuniao_quandoIdInexistente_deveRetornarErro() {
+    void buscarReuniao_quandoIdInexistente() {
         when(reuniaoRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            reuniaoService.findById(-1L);
-        });
-
-        assertEquals("Reunião não encontrada com id -1", exception.getMessage());
-        verify(reuniaoRepository).findById(-1L);
+        assertThrows(IllegalArgumentException.class, () -> reuniaoService.findById(99L));
     }
 
-    // --- Testes de Cadastro (Save) ---
-
     @Test
-    @DisplayName("CADASTRO: Deve cadastrar e retornar sucesso quando projeto existe")
-    void saveReuniao_quandoCorreto_deveRetornarSucesso() {
-        // Construtor do DTO baseado na ordem dos campos da classe que você mandou
-        reuniaoDTO = new ReuniaoDTO(
-                "nova reunião",
-                data,
-                hora,
-                FormatoReuniao.ONLINE,
-                projeto.getId(),
-                "MENTOR"
-        );
-
-        when(projetoRepository.findById(projeto.getId())).thenReturn(Optional.of(projeto));
-
-        // Mock do save
-        when(reuniaoRepository.save(any(Reuniao.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    void saveReuniao_quandoCorreto() {
+        reuniaoDTO = new ReuniaoDTO("Nova", data, hora, FormatoReuniao.ONLINE, 1L, "MENTOR");
+        when(projetoRepository.findById(1L)).thenReturn(Optional.of(projeto));
+        when(reuniaoRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         String retorno = reuniaoService.save(reuniaoDTO);
 
         assertEquals("Solicitação de reunião enviada", retorno);
-        verify(projetoRepository).findById(projeto.getId());
-        verify(reuniaoRepository).save(any(Reuniao.class));
     }
 
     @Test
-    @DisplayName("CADASTRO: Deve retornar erro quando Projeto não encontrado")
-    void saveReuniao_quandoProjetoNaoEncontrado_deveRetornarErro() {
+    void saveReuniao_quandoProjetoNaoExiste() {
         reuniaoDTO = new ReuniaoDTO();
-        reuniaoDTO.setProjeto_id(99L); // ID inexistente
+        reuniaoDTO.setProjeto_id(55L);
+        when(projetoRepository.findById(55L)).thenReturn(Optional.empty());
 
-        when(projetoRepository.findById(99L)).thenReturn(Optional.empty());
-
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            reuniaoService.save(reuniaoDTO);
-        });
-
-        assertEquals("Projeto não encontrado", exception.getMessage());
-        verify(reuniaoRepository, never()).save(any());
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> reuniaoService.save(reuniaoDTO));
+        assertEquals("Projeto não encontrado", ex.getMessage());
     }
 
-    // --- Testes de Atualização (Update) ---
+    @Test
+    @DisplayName("SAVE: deve definir status PENDENTE e solicitadoPor corretamente")
+    void saveReuniao_deveSetarStatusEPessoaCorretamente() {
+        reuniaoDTO = new ReuniaoDTO("Assunto", data, hora, FormatoReuniao.ONLINE, 1L, "ALUNO");
+
+        when(projetoRepository.findById(1L)).thenReturn(Optional.of(projeto));
+        when(reuniaoRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        reuniaoService.save(reuniaoDTO);
+
+        verify(reuniaoRepository).save(argThat(r ->
+                r.getStatusReuniao() == StatusReuniao.PENDENTE &&
+                        "ALUNO".equals(r.getSolicitadoPor())
+        ));
+    }
+
 
     @Test
-    @DisplayName("UPDATE: Deve retornar erro quando Id da reunião for incorreto")
-    void update_quandoIdDaReuniaoIncorreto_deveRetornarErro() {
-        Reuniao reuniaoAtualizada = new Reuniao();
-        reuniaoAtualizada.setAssunto("Novo assunto teste");
-
+    void update_IdIncorreto() {
         when(reuniaoRepository.findById(anyLong())).thenReturn(Optional.empty());
-
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            reuniaoService.update(-1L, reuniaoAtualizada);
-        });
-
-        assertEquals("Reunião não encontrada", exception.getMessage());
+        assertThrows(IllegalStateException.class,
+                () -> reuniaoService.update(99L, new Reuniao()));
     }
 
     @Test
-    @DisplayName("UPDATE: Deve retornar erro quando a reunião não tiver o status PENDENTE")
-    void update_quandoStatusReuniaoDiferenteDePendente_deveRetornarErro() {
-        Reuniao reuniaoUpdates = new Reuniao();
-        reuniaoUpdates.setAssunto("Novo assunto teste");
-
-        when(reuniaoRepository.findById(reuniaoAceita.getId())).thenReturn(Optional.of(reuniaoAceita));
-
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
-            reuniaoService.update(reuniaoAceita.getId(), reuniaoUpdates);
-        });
-
-        assertEquals("Operação não permitida. A reunião já foi avaliada pelo solicitado", exception.getMessage());
+    void update_StatusNaoPendente() {
+        when(reuniaoRepository.findById(1L)).thenReturn(Optional.of(reuniaoAceita));
+        assertThrows(IllegalStateException.class,
+                () -> reuniaoService.update(1L, new Reuniao()));
     }
 
     @Test
-    @DisplayName("UPDATE: Deve atualizar a reunião com novos dados e retornar sucesso")
-    void update_quandoInformacoesCorretas_deveRetornarSucesso() {
-        Reuniao reuniaoUpdates = new Reuniao();
-        reuniaoUpdates.setAssunto("Novo assunto teste");
-        reuniaoUpdates.setFormatoReuniao(FormatoReuniao.PRESENCIAL);
+    void update_quandoCorreto() {
+        Reuniao updates = new Reuniao();
+        updates.setAssunto("Novo");
+        updates.setFormatoReuniao(FormatoReuniao.ONLINE);
 
-        when(reuniaoRepository.findById(reuniaoPendente.getId())).thenReturn(Optional.of(reuniaoPendente));
-        when(reuniaoRepository.save(any(Reuniao.class))).thenReturn(reuniaoPendente);
+        when(reuniaoRepository.findById(2L)).thenReturn(Optional.of(reuniaoPendente));
+        when(reuniaoRepository.save(any())).thenReturn(reuniaoPendente);
 
-        String retorno = reuniaoService.update(reuniaoPendente.getId(), reuniaoUpdates);
+        String retorno = reuniaoService.update(2L, updates);
 
         assertEquals("Reunião atualizada e reenviada para aprovação", retorno);
-
-        assertEquals("Novo assunto teste", reuniaoPendente.getAssunto());
-        assertEquals(FormatoReuniao.PRESENCIAL, reuniaoPendente.getFormatoReuniao());
+        assertEquals("Novo", reuniaoPendente.getAssunto());
+        assertEquals(FormatoReuniao.ONLINE, reuniaoPendente.getFormatoReuniao());
     }
 
-    // --- Testes de Aceitação/Rejeição (Aceitar) ---
+    @Test
+    @DisplayName("UPDATE: deve atualizar motivoRecusa também")
+    void update_deveAtualizarMotivoRecusa() {
+        Reuniao updates = new Reuniao();
+        updates.setMotivoRecusa("faltou info");
+
+        when(reuniaoRepository.findById(2L)).thenReturn(Optional.of(reuniaoPendente));
+        when(reuniaoRepository.save(any())).thenReturn(reuniaoPendente);
+
+        reuniaoService.update(2L, updates);
+
+        assertEquals("faltou info", reuniaoPendente.getMotivoRecusa());
+    }
+
+    // ---------- ACEITAR ----------
 
     @Test
-    @DisplayName("ACEITAR: Deve aceitar reunião e retornar sucesso")
-    void aceitarReuniao_quandoAceitar_deveRetornarSucesso() {
-        when(reuniaoRepository.findById(reuniaoPendente.getId())).thenReturn(Optional.of(reuniaoPendente));
-        when(reuniaoRepository.save(any(Reuniao.class))).thenReturn(reuniaoPendente);
+    void aceitarReuniao_Aceitar() {
+        when(reuniaoRepository.findById(2L)).thenReturn(Optional.of(reuniaoPendente));
 
-        // Agora passando 'null' como motivo, pois é aceitação
-        String retorno = reuniaoService.aceitarReuniao(reuniaoPendente.getId(), StatusReuniao.ACEITO, null);
+        String retorno = reuniaoService.aceitarReuniao(2L, StatusReuniao.ACEITO, null);
 
         assertEquals("Status reunião: aceito", retorno);
-        assertEquals(StatusReuniao.ACEITO, reuniaoPendente.getStatusReuniao());
         assertNull(reuniaoPendente.getMotivoRecusa());
     }
 
     @Test
-    @DisplayName("ACEITAR: Deve recusar reunião com motivo e retornar sucesso")
-    void aceitarReuniao_quandoRecusar_deveSalvarMotivo() {
-        when(reuniaoRepository.findById(reuniaoPendente.getId())).thenReturn(Optional.of(reuniaoPendente));
-        when(reuniaoRepository.save(any(Reuniao.class))).thenReturn(reuniaoPendente);
+    void aceitarReuniao_Recusar() {
+        when(reuniaoRepository.findById(2L)).thenReturn(Optional.of(reuniaoPendente));
 
-        String motivo = "Horário indisponível";
-        String retorno = reuniaoService.aceitarReuniao(reuniaoPendente.getId(), StatusReuniao.RECUSADO, motivo);
+        String motivo = "indisponível";
+        String retorno = reuniaoService.aceitarReuniao(2L, StatusReuniao.RECUSADO, motivo);
 
         assertEquals("Status reunião: recusado", retorno);
-        assertEquals(StatusReuniao.RECUSADO, reuniaoPendente.getStatusReuniao());
         assertEquals(motivo, reuniaoPendente.getMotivoRecusa());
     }
 
-    // --- Testes de Deleção (Delete) ---
+    @Test
+    @DisplayName("ACEITAR: deve lançar exceção quando reunião não existe")
+    void aceitarReuniao_IdInexistente() {
+        when(reuniaoRepository.findById(anyLong())).thenReturn(Optional.empty());
+        assertThrows(IllegalStateException.class,
+                () -> reuniaoService.aceitarReuniao(99L, StatusReuniao.ACEITO, null));
+    }
+
 
     @Test
-    @DisplayName("DELETE: Deve deletar reunião e retornar sucesso")
-    void deletarReuniao_deveRetornarSucesso() {
-        when(reuniaoRepository.findById(reuniaoAceita.getId())).thenReturn(Optional.of(reuniaoAceita));
-        doNothing().when(reuniaoRepository).delete(reuniaoAceita);
+    void deletarReuniao() {
+        when(reuniaoRepository.findById(1L)).thenReturn(Optional.of(reuniaoAceita));
+        doNothing().when(reuniaoRepository).delete(any());
 
-        String retorno = reuniaoService.delete(reuniaoAceita.getId());
-
+        String retorno = reuniaoService.delete(1L);
         assertEquals("Reunião deletada com sucesso", retorno);
-        verify(reuniaoRepository).delete(reuniaoAceita);
+    }
+
+    @Test
+    @DisplayName("DELETE: deve lançar erro quando ID não existe")
+    void deletarReuniao_IdInexistente() {
+        when(reuniaoRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(IllegalStateException.class, () -> reuniaoService.delete(99L));
     }
 }

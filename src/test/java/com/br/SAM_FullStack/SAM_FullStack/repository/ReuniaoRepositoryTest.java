@@ -27,6 +27,7 @@ public class ReuniaoRepositoryTest {
 
     private Grupo grupo;
     private Mentor mentor;
+    private Projeto projeto;
 
     private LocalDate dataHoje;
     private LocalTime horaAgora;
@@ -34,20 +35,20 @@ public class ReuniaoRepositoryTest {
 
     @BeforeEach
     void setup() {
-        // Inicializa datas
+
         dataHoje = LocalDate.now();
         horaAgora = LocalTime.of(14, 0);
         dataLegacy = Date.from(dataHoje.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-        // 1. Área de Atuação
+
         AreaDeAtuacao areaDeAtuacao = new AreaDeAtuacao(null, "Tecnologia");
         entityManager.persistAndFlush(areaDeAtuacao);
 
-        // 2. Curso
+
         Curso curso = new Curso(null, "ADS", areaDeAtuacao);
         entityManager.persistAndFlush(curso);
 
-        // 3. Alunos
+
         Aluno aluno1 = new Aluno(null, "Joana Silveira", 1001, "senha123", "joana@gmail.com", curso, StatusAlunoGrupo.ATIVO);
         Aluno aluno2 = new Aluno(null, "Anderson Ribeiro", 1002, "senha123", "ander@gmail.com", curso, StatusAlunoGrupo.ATIVO);
         Aluno aluno3 = new Aluno(null, "Benicio Fragoso", 1003, "senha123", "benicio@gmail.com", curso, StatusAlunoGrupo.AGUARDANDO);
@@ -55,7 +56,7 @@ public class ReuniaoRepositoryTest {
         entityManager.persistAndFlush(aluno2);
         entityManager.persistAndFlush(aluno3);
 
-        // 4. Mentor
+
         mentor = new Mentor();
         mentor.setNome("Romana Novaes");
         mentor.setEmail("romana@teste.com");
@@ -69,12 +70,12 @@ public class ReuniaoRepositoryTest {
 
         entityManager.persistAndFlush(mentor);
 
-        // 5. Grupo
+
         grupo = new Grupo(null, "Grupo Ativo", StatusGrupo.ATIVO, aluno1, List.of(aluno1, aluno2, aluno3));
         entityManager.persistAndFlush(grupo);
 
-        // 6. Projeto (CORREÇÃO PRINCIPAL AQUI)
-        Projeto projeto = new Projeto();
+
+        projeto = new Projeto();
         projeto.setNomeDoProjeto("Projeto Teste");
         projeto.setDescricao("Descrição do projeto teste");
         projeto.setDataInicioProjeto(dataHoje);
@@ -87,7 +88,6 @@ public class ReuniaoRepositoryTest {
 
         entityManager.persistAndFlush(projeto);
 
-        // 7. Reuniões
         Reuniao reuniao1 = new Reuniao();
         reuniao1.setAssunto("Validar requisitos do projeto");
         reuniao1.setData(dataLegacy);
@@ -136,5 +136,14 @@ public class ReuniaoRepositoryTest {
 
         assertFalse(retorno.isEmpty(), "A lista de reuniões do mentor não deve estar vazia");
         assertTrue(retorno.stream().anyMatch(r -> r.getAssunto().equals("Validar requisitos do projeto")));
+    }
+
+    @Test
+    @DisplayName("Deve retornar lista de reuniões pelo Id do projeto associado")
+    void buscarReunioesProjetoId_deveRetornarListaDeReunioesAssociadasAoProjeto() {
+        List<Reuniao> retorno = reuniaoRepository.findAllByProjetoId(projeto.getId());
+
+        assertFalse(retorno.isEmpty(), "A lista de reuniões associadas ao projeto nãoo deve estar vazia");
+        assertEquals(2, retorno.size());
     }
 }
