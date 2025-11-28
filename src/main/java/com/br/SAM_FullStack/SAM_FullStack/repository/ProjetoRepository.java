@@ -22,6 +22,8 @@ public interface ProjetoRepository extends JpaRepository <Projeto, Long> {
     List<Projeto> findAllByProfessoresId(Long professorId);
     List<Projeto> findAllByMentorIdAndStatusProjeto(Long professorId, StatusProjeto statusProjeto);
 
+    List<Projeto> findAllByStatusProjeto(StatusProjeto statusProjeto);
+
     @Query("SELECT p FROM Projeto p JOIN p.grupo g JOIN g.alunos a " +
             "WHERE a.id = :alunoId AND p.statusProjeto = :status")
     Optional<Projeto> findProjetoPorStatusAluno(@Param("alunoId") Long alunoId,
