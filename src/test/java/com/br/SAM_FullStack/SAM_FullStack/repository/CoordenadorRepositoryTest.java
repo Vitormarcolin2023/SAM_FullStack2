@@ -120,4 +120,13 @@ class CoordenadorRepositoryTest {
         Optional<Coordenador> resultado = coordenadorRepository.findById(coordenadorSalvo.getId());
         assertFalse(resultado.isPresent());
     }
+
+    @Test
+    @DisplayName("Deve retornar o coordenador pelo email passado")
+    void findByEmail_deveRetornarCoordenador() {
+        Optional<Coordenador> result = coordenadorRepository.findByEmail(emailExistente);
+
+        assertEquals("Coordenador Teste", result.get().getNome());
+    }
+
 }
