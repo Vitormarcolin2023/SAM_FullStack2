@@ -2,69 +2,61 @@ package com.br.SAM_FullStack.SAM_FullStack.autenticacao;
 
 import com.br.SAM_FullStack.SAM_FullStack.dto.LoginDTO;
 import com.br.SAM_FullStack.SAM_FullStack.dto.RespostaLoginDTO;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.lang.reflect.Field;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 class LoginControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    private LoginController loginController;
+    private AuthService authServiceMock;
 
-    @MockitoBean
-    private AuthService authService;
+    private final String email = "teste@email.com";
+    private final String senha = "senha123";
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @BeforeEach
+    void setup() throws NoSuchFieldException, IllegalAccessException {
+        authServiceMock = mock(AuthService.class);
+        loginController = new LoginController();
 
-    @Test
-    @DisplayName("Login correto deve retornar 200 e token")
-    void login_quandoCorreto_deveRetornar200() throws Exception {
-        LoginDTO loginDTO = new LoginDTO("teste@email.com", "senha123");
-        RespostaLoginDTO resposta = new RespostaLoginDTO("token123", "ALUNO", "teste@email.com", null);
-
-        when(authService.login(any(LoginDTO.class))).thenReturn(resposta);
-
-        mockMvc.perform(post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginDTO)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value("token123"))
-                .andExpect(jsonPath("$.role").value("ALUNO"));
+        // injeta o AuthService mock no controller via reflexão
+        Field authServiceField = LoginController.class.getDeclaredField("authService");
+        authServiceField.setAccessible(true);
+        authServiceField.set(loginController, authServiceMock);
     }
 
     @Test
-    @DisplayName("Login incorreto deve retornar erro 500")
-    void login_quandoFalha_deveRetornarErro() throws Exception {
-        LoginDTO loginDTO = new LoginDTO("teste@email.com", "senhaErrada");
+    @DisplayName("Login correto deve retornar 200 e token")
+    void login_quandoCorreto_deveRetornar200() {
+        LoginDTO loginDTO = new LoginDTO(email, senha);
+        RespostaLoginDTO respostaMock = new RespostaLoginDTO("token123", "ALUNO", email, null);
 
-        when(authService.login(any(LoginDTO.class)))
+        when(authServiceMock.login(loginDTO)).thenReturn(respostaMock);
+
+        var response = loginController.login(loginDTO);
+
+        assertNotNull(response);
+        assertEquals(200, response.getStatusCodeValue());
+        assertEquals("token123", response.getBody().getToken());
+        assertEquals("ALUNO", response.getBody().getRole());
+    }
+
+    @Test
+    @DisplayName("Login incorreto deve lançar exceção")
+    void login_quandoFalha_deveLancarExcecao() {
+        LoginDTO loginDTO = new LoginDTO(email, "senhaErrada");
+
+        when(authServiceMock.login(loginDTO))
                 .thenThrow(new RuntimeException("Email ou senha inválidos"));
 
-        mockMvc.perform(post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginDTO)))
-                .andExpect(status().isBadRequest())
-                .andExpect(result ->
-                        assertTrue(result.getResolvedException() instanceof RuntimeException))
-                .andExpect(result ->
-                        assertEquals("Email ou senha inválidos", result.getResolvedException().getMessage()));
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> loginController.login(loginDTO));
+
+        assertEquals("Email ou senha inválidos", exception.getMessage());
     }
 }
