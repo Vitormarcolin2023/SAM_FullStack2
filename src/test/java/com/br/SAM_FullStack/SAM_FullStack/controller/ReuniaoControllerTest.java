@@ -30,7 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-// 1. Configuração de Propriedades Fakes para ignorar .env e Banco Real
 @TestPropertySource(properties = {
         "MAIL_HOST=localhost",
         "MAIL_PORT=1025",
@@ -43,7 +42,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         "spring.datasource.driver-class-name=org.h2.Driver",
         "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect"
 })
-// 2. CORREÇÃO DO 403: Define um usuário com permissões de MENTOR e ADMIN para TODOS os testes da classe
 @WithMockUser(username = "admin@sam.com", roles = {"MENTOR", "ADMIN"})
 public class ReuniaoControllerTest {
 
