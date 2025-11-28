@@ -95,7 +95,7 @@ class ProjetoServiceTest {
         projeto1.setDataFinalProjeto(LocalDate.of(2024, 6, 30));
         projeto1.setPeriodo("1° Periodo");
         projeto1.setMentor(mentorCarlos);
-        projeto1.setStatusProjeto("Em Andamento");
+        projeto1.setStatusProjeto(StatusProjeto.ATIVO);
         projeto1.setGrupo(grupoA);
 
         projeto2 = new Projeto();
@@ -107,7 +107,7 @@ class ProjetoServiceTest {
         projeto2.setDataFinalProjeto(LocalDate.of(2024, 8, 31));
         projeto2.setPeriodo("Integral");
         projeto2.setMentor(mentorCarlos);
-        projeto2.setStatusProjeto("Planejamento");
+        projeto2.setStatusProjeto(StatusProjeto.ATIVO);
         projeto2.setGrupo(grupoA);
 
         listaProjetos = Arrays.asList(projeto1, projeto2);

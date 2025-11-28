@@ -69,7 +69,7 @@ public class ProjetoRepositoryTest {
         projeto1.setDataFinalProjeto(LocalDate.of(2024, 6, 30));
         projeto1.setPeriodo("1° Periodo");
         projeto1.setMentor(mentorCarlos);
-        projeto1.setStatusProjeto("Em Andamento");
+        projeto1.setStatusProjeto(StatusProjeto.ATIVO);
         projeto1.setProfessores(new ArrayList<>());
         projeto1.getProfessores().add(professorJoao);
         projetoRepository.save(projeto1);
@@ -82,7 +82,7 @@ public class ProjetoRepositoryTest {
         projeto2.setDataFinalProjeto(LocalDate.of(2024, 8, 31));
         projeto2.setPeriodo("3° Periodo");
         projeto2.setMentor(mentorCarlos);
-        projeto2.setStatusProjeto("Planejamento");
+        projeto2.setStatusProjeto(StatusProjeto.ARQUIVADO);
         projeto2.setProfessores(new ArrayList<>());
         projetoRepository.save(projeto2);
 

@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static com.br.SAM_FullStack.SAM_FullStack.model.StatusProjeto.ARQUIVADO;
+import static com.br.SAM_FullStack.SAM_FullStack.model.StatusProjeto.ATIVO;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -110,7 +112,7 @@ public class ProjetoControllerTest {
         projeto1.setDataFinalProjeto(LocalDate.of(2024, 6, 30));
         projeto1.setPeriodo("1° Periodo");
         projeto1.setMentor(mentorCarlos);
-        projeto1.setStatusProjeto("Em Andamento");
+        projeto1.setStatusProjeto(ATIVO);
         projeto1.setGrupo(grupoA);
 
         projeto2 = new Projeto();
@@ -122,7 +124,7 @@ public class ProjetoControllerTest {
         projeto2.setDataFinalProjeto(LocalDate.of(2024, 8, 31));
         projeto2.setPeriodo("Integral");
         projeto2.setMentor(mentorCarlos);
-        projeto2.setStatusProjeto("Planejamento");
+        projeto2.setStatusProjeto(ARQUIVADO);
         projeto2.setGrupo(grupoA);
 
         listaProjetos = Arrays.asList(projeto1, projeto2);
@@ -225,7 +227,7 @@ public class ProjetoControllerTest {
         projeto4.setDataFinalProjeto(LocalDate.of(2024, 12, 31));
         projeto4.setPeriodo("2° Periodo");
         projeto4.setMentor(mentorCarlos);
-        projeto4.setStatusProjeto("Ativo");
+        projeto4.setStatusProjeto(ATIVO);
         projeto4.setGrupo(grupoB);
 
         when(projetoService.save(any(Projeto.class))).thenReturn(projeto4);
@@ -256,7 +258,7 @@ public class ProjetoControllerTest {
         projetoAtualizado.setDataFinalProjeto(projeto1.getDataFinalProjeto());
         projetoAtualizado.setPeriodo(projeto1.getPeriodo());
         projetoAtualizado.setMentor(projeto1.getMentor());
-        projetoAtualizado.setStatusProjeto("Concluído");
+        projetoAtualizado.setStatusProjeto(ATIVO);
         projetoAtualizado.setGrupo(projeto1.getGrupo());
 
         when(projetoService.update(eq(1L), any(Projeto.class))).thenReturn(projetoAtualizado);
