@@ -151,4 +151,10 @@ public class ProjetoService {
                 .orElseThrow(() -> new RuntimeException("Nenhum projeto aguardando avaliação"));
     }
 
+    public Projeto findByGrupo(Long idGrupo) {
+        // O .orElse(null) é importante aqui para não quebrar com erro 500
+        // se o projeto não existir. Ele vai retornar null suavemente.
+        return projetoRepository.findByGrupoId(idGrupo).orElse(null);
+    }
+
 }
