@@ -29,5 +29,7 @@ public interface ProjetoRepository extends JpaRepository <Projeto, Long> {
     Optional<Projeto> findProjetoPorStatusAluno(@Param("alunoId") Long alunoId,
                                                 @Param("status") StatusProjeto status);
 
+    Optional<Projeto> findByGrupoId(Long grupoId);
+
 
 }

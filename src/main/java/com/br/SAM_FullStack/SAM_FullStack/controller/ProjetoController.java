@@ -111,4 +111,19 @@ public class ProjetoController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/grupo/{id}")
+    public ResponseEntity<Projeto> findByGrupo(@PathVariable Long id) {
+        // Tenta buscar o projeto pelo ID do grupo
+        Projeto projeto = projetoService.findByGrupo(id);
+
+        // Se encontrar, retorna 200 OK com o projeto
+        if (projeto != null) {
+            return ResponseEntity.ok(projeto);
+        }
+
+        // Se NÃO encontrar, retorna 404 Not Found.
+        // Isso é importante para o seu Front-end saber que o grupo está livre.
+        return ResponseEntity.notFound().build();
+    }
+
 }
