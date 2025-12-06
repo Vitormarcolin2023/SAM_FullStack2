@@ -1,5 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.service;
 
+import com.br.SAM_FullStack.SAM_FullStack.dto.ProjetoPendenteDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.*;
 import com.br.SAM_FullStack.SAM_FullStack.repository.AvaliacaoRepository;
 import com.br.SAM_FullStack.SAM_FullStack.repository.GrupoRepository;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjetoService {
@@ -155,6 +157,19 @@ public class ProjetoService {
         // O .orElse(null) é importante aqui para não quebrar com erro 500
         // se o projeto não existir. Ele vai retornar null suavemente.
         return projetoRepository.findByGrupoId(idGrupo).orElse(null);
+    }
+
+    public List<ProjetoPendenteDTO> buscarPendentesPorMentor(Long idMentor) {
+        // Usamos o status EM_APROVACAO do seu Enum
+        List<Projeto> projetos = projetoRepository.findByMentorIdAndStatusProjeto(
+                idMentor,
+                StatusProjeto.EM_APROVACAO
+        );
+
+        // Transforma a lista de Projetos em lista de DTOs
+        return projetos.stream()
+                .map(ProjetoPendenteDTO::new)
+                .collect(Collectors.toList());
     }
 
 }
