@@ -1,5 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.controller;
 
+import com.br.SAM_FullStack.SAM_FullStack.dto.ProjetoPendenteDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.AreaDeAtuacao;
 import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
 import com.br.SAM_FullStack.SAM_FullStack.repository.ProjetoRepository;
@@ -124,6 +125,12 @@ public class ProjetoController {
         // Se NÃO encontrar, retorna 404 Not Found.
         // Isso é importante para o seu Front-end saber que o grupo está livre.
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/mentor/{idMentor}/pendentes")
+    public ResponseEntity<List<ProjetoPendenteDTO>> listarProjetosPendentes(@PathVariable Long idMentor) {
+        List<ProjetoPendenteDTO> lista = projetoService.buscarPendentesPorMentor(idMentor);
+        return ResponseEntity.ok(lista);
     }
 
 }
