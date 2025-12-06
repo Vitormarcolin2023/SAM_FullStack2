@@ -31,5 +31,6 @@ public interface ProjetoRepository extends JpaRepository <Projeto, Long> {
 
     Optional<Projeto> findByGrupoId(Long grupoId);
 
-
+    // Busca projetos de um mentor específico que estejam EM_APROVACAO
+    List<Projeto> findByMentorIdAndStatusProjeto(Long mentorId, StatusProjeto statusProjeto);
 }
