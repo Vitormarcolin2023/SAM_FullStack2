@@ -64,7 +64,9 @@ public class ProjetoService {
     }
 
     // SALVAR
+    @Transactional // É uma boa prática adicionar Transactional aqui para garantir integridade
     public Projeto save(Projeto projeto) {
+        // --- INÍCIO DA SUA LÓGICA EXISTENTE (MANTIDA) ---
         if (projeto.getGrupo() != null && projeto.getGrupo().getId() != null) {
             Grupo grupoGerenciado = grupoRepository.findByIdWithAlunos(projeto.getGrupo().getId())
                     .orElse(projeto.getGrupo());
@@ -84,8 +86,23 @@ public class ProjetoService {
 
             }
         }
-        atualizarStatusProjeto(projeto);
+        // --- FIM DA SUA LÓGICA EXISTENTE ---
+
+        // --- ALTERAÇÃO DA FEATURE-131 ---
+
+        // Removemos a chamada 'atualizarStatusProjeto(projeto)' pois ela define status por data.
+        // Agora, forçamos o status inicial do fluxo de aprovação:
+        projeto.setStatusProjeto(StatusProjeto.AGUARDANDO_APROVACAO);
+
+        // Garantimos que não haja motivo de recusa prévio (boas práticas)
+        projeto.setMotivoRecusa(null);
+
+        // O campo 'avaliadoPorMentor' se tornou redundante com os novos Status,
+        // mas mantive aqui false para não quebrar compatibilidade se você ainda usa no front.
         projeto.setAvaliadoPorMentor(false);
+
+        // TODO FUTURO: Aqui chamaremos o emailService.enviarNotificacaoMentor(...)
+
         return projetoRepository.save(projeto);
     }
 
@@ -155,6 +172,38 @@ public class ProjetoService {
         // O .orElse(null) é importante aqui para não quebrar com erro 500
         // se o projeto não existir. Ele vai retornar null suavemente.
         return projetoRepository.findByGrupoId(idGrupo).orElse(null);
+    }
+
+    @Transactional
+    public Projeto avaliarProjeto(Long idProjeto, boolean aprovado, String motivoRecusa) {
+        Projeto projeto = findById(idProjeto);
+
+        if (aprovado) {
+            // Se aprovado, o projeto se torna ATIVO
+            projeto.setStatusProjeto(StatusProjeto.ATIVO);
+
+            // Opcional: Se você quiser que a lógica de datas (se já começou ou não)
+            // seja aplicada IMEDIATAMENTE após a aprovação, descomente a linha abaixo:
+            // atualizarStatusProjeto(projeto);
+
+            // Limpa qualquer motivo de recusa anterior, caso exista
+            projeto.setMotivoRecusa(null);
+
+            // TODO FUTURO: Disparar e-mail de aprovação para o grupo
+
+        } else {
+            // Se recusado, validamos se existe motivo
+            if (motivoRecusa == null || motivoRecusa.trim().isEmpty()) {
+                throw new IllegalArgumentException("Para recusar o projeto, é obrigatório informar o motivo.");
+            }
+
+            projeto.setStatusProjeto(StatusProjeto.RECUSADO);
+            projeto.setMotivoRecusa(motivoRecusa);
+
+            // TODO FUTURO: Disparar e-mail de recusa para o grupo
+        }
+
+        return projetoRepository.save(projeto);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.br.SAM_FullStack.SAM_FullStack.controller;
 
+import com.br.SAM_FullStack.SAM_FullStack.dto.AvaliacaoProjetoDTO;
 import com.br.SAM_FullStack.SAM_FullStack.model.AreaDeAtuacao;
 import com.br.SAM_FullStack.SAM_FullStack.model.Projeto;
 import com.br.SAM_FullStack.SAM_FullStack.repository.ProjetoRepository;
@@ -124,6 +125,24 @@ public class ProjetoController {
         // Se NÃO encontrar, retorna 404 Not Found.
         // Isso é importante para o seu Front-end saber que o grupo está livre.
         return ResponseEntity.notFound().build();
+    }
+
+    @PatchMapping("/avaliar/{id}")
+    public ResponseEntity<?> avaliarProjeto(@PathVariable Long id, @RequestBody AvaliacaoProjetoDTO avaliacaoDTO) {
+        try {
+            Projeto projetoAvaliado = projetoService.avaliarProjeto(
+                    id,
+                    avaliacaoDTO.isAprovado(),
+                    avaliacaoDTO.getMotivoRecusa()
+            );
+            return ResponseEntity.ok(projetoAvaliado);
+
+        } catch (IllegalArgumentException e) {
+            // Retorna erro 400 (Bad Request) se faltar o motivo da recusa
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao avaliar projeto.");
+        }
     }
 
 }
