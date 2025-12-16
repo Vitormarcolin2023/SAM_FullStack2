@@ -61,6 +61,9 @@ public class Projeto {
     @Enumerated(EnumType.STRING)
     private StatusProjeto statusProjeto;
 
+    @Column(name = "motivo_recusa", columnDefinition = "TEXT")
+    private String motivoRecusa;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JsonIgnoreProperties("projetos")
     private Grupo grupo;
