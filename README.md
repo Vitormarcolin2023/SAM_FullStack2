@@ -67,11 +67,13 @@ mvn spring-boot:run
 
 4. A API estará disponível em `http://localhost:8080`.
 
-## 👨‍🏫 Orientador do Projeto
+## 👨‍🏫 Orientadores do Projeto
 
 **Willian Bogler da Silva**
 - Mestre em Tecnologia Ambiental e docente do curso de Engenharia de Software.
-- Especialista Edrian Silva e docente do curso de Engenharia de Software.
+
+**Edrian Silva**
+- Especialista em Gestão em Modelos Educacionais Inovadores e docente do curso de Engenharia de Software.
 
 ## 👨‍🏫 Mentor do Projeto
 
